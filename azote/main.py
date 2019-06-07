@@ -71,6 +71,8 @@ class GUI:
         btn.set_image(img)
         btn.set_image_position(2)  # TOP
 
+        if len(filename) > 30:
+            filename = '…{}'.format(filename[-28::])
         btn.set_label(filename)
 
         return btn
