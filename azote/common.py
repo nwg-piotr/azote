@@ -1,3 +1,5 @@
+preview = None
+
 CRITICAL = 'critical'
 ERROR = 'error'
 WARNING = 'warning'

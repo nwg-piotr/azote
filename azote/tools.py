@@ -43,9 +43,9 @@ def log(message, level=None):
 
 def hash_name(full_path):
     """
-    Returns thumbnail name
+    Thumbnail path -> name (w/o extension)
     :param full_path: original file path
-    :return: MD5-hashed path + .jpg extension
+    :return: MD5-hashed path
     """
     return hashlib.md5(full_path.encode()).hexdigest()
 
