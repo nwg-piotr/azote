@@ -29,17 +29,16 @@ class GUI:
 
         col = 0
         row = 0
-        for folder in common.settings.src_paths:
-            src_pictures = [f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f))]
-            for file in src_pictures:
-                if file_allowed(file):
-                    btn = self.thumb_btn(folder, file)
-                    grid.attach(btn, col, row, 1, 1)
-                    if col < 2:
-                        col += 1
-                    else:
-                        col = 0
-                        row += 1
+        src_pictures = [f for f in os.listdir(common.settings.src_path) if os.path.isfile(os.path.join(common.settings.src_path, f))]
+        for file in src_pictures:
+            if file_allowed(file):
+                btn = self.thumb_btn(common.settings.src_path, file)
+                grid.attach(btn, col, row, 1, 1)
+                if col < 2:
+                    col += 1
+                else:
+                    col = 0
+                    row += 1
 
         preview.add_with_viewport(grid)
 
@@ -113,9 +112,7 @@ def check_displays():
 
 def main():
     set_env()   # set paths and stuff
-    log('Launched', common.INFO)
-    for path in common.settings.src_paths:
-        create_thumbnails(path)
+    create_thumbnails(common.settings.src_path)
     displays = check_displays()
     app = GUI(displays)
     Gtk.main()

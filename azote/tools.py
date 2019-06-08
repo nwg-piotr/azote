@@ -23,6 +23,7 @@ def set_env():
     logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
                         level=logging.INFO)
 
+    log('Launched', common.INFO)
     common.settings = Settings()
 
 
@@ -86,18 +87,35 @@ def file_allowed(path):
 class Settings(object):
     def __init__(self):
         self.file = os.path.join(common.app_dir, "settings.pkl")
-        self.src_paths = ['/home/piotr/Obrazy/Wallpapers', '/home/piotr/Obrazy']
+
+        # Try to find user's Pictures directory
+        user_dirs = os.path.join(os.getenv("HOME"), '.config/user-dirs.dirs')
+        if os.path.isfile(user_dirs):
+            lines = open(user_dirs, 'r').read().rstrip().splitlines()
+            for line in lines:
+                if line.startswith('XDG_PICTURES_DIR'):
+                    pic_dir = os.path.join(os.getenv("HOME"), line.split('/')[1][:-1])
+                    if os.path.isdir(pic_dir):
+                        print(pic_dir)
+                        self.src_path = pic_dir
+
+                    else:
+                        self.src_path = os.getenv("HOME")
+        else:
+            self.src_path = os.getenv("HOME")
 
         self.load()
 
     def load(self):
         if not os.path.isfile(self.file):
+            log('Creating initial settings', common.INFO)
+            log('Pictures dir: {}'.format(self.src_path), common.INFO)
             self.save()
 
         with open(self.file, 'rb') as input_data:
             settings = pickle.load(input_data)
 
-        self.src_paths = settings.src_paths  # holds selected paths to source pictures
+        self.src_path = settings.src_path  # holds selected path to source pictures
 
     def save(self):
         with open(self.file, 'wb') as output:
