@@ -30,7 +30,7 @@ class Preview(Gtk.ScrolledWindow):
 
         for file in src_pictures:
             if file_allowed(file):
-                btn = self.thumb_btn(common.settings.src_path, file)
+                btn = ThumbButton(common.settings.src_path, file)
                 self.buttons.append(btn)
                 self.grid.attach(btn, col, row, 1, 1)
                 if col < 2:
@@ -55,7 +55,7 @@ class Preview(Gtk.ScrolledWindow):
 
         for file in src_pictures:
             if file_allowed(file):
-                btn = self.thumb_btn(common.settings.src_path, file)
+                btn = ThumbButton(common.settings.src_path, file)
                 self.buttons.append(btn)
                 self.grid.attach(btn, col, row, 1, 1)
                 if col < 2:
@@ -65,19 +65,30 @@ class Preview(Gtk.ScrolledWindow):
                     row += 1
                 btn.show()
 
-    def thumb_btn(self, folder, filename):
+
+class ThumbButton(Gtk.Button):
+    def __init__(self, folder, filename):
+        super().__init__()
+
+        self.source_path = os.path.join(folder, filename)
+
         img = Gtk.Image()
-        thumb_file = "{}.png".format(os.path.join(common.thumb_dir, hash_name(os.path.join(folder, filename))))
+        thumb_file = "{}.png".format(os.path.join(common.thumb_dir, hash_name(self.source_path)))
         img.set_from_file(thumb_file)
-        btn = Gtk.Button()
-        btn.set_image(img)
-        btn.set_image_position(2)  # TOP
+
+        self.set_image(img)
+        self.set_image_position(2)  # TOP
 
         if len(filename) > 30:
             filename = '…{}'.format(filename[-28::])
-        btn.set_label(filename)
+        self.set_label(filename)
+        self.selected = False
 
-        return btn
+    def select(self):
+        self.selected = True
+
+    def deselect(self):
+        self.selected = False
 
 
 class GUI:
@@ -115,20 +126,6 @@ class GUI:
     def destroy(window, self):
         Gtk.main_quit()
 
-    def thumb_btn(self, folder, filename):
-        img = Gtk.Image()
-        thumb_file = "{}.png".format(os.path.join(common.thumb_dir, hash_name(os.path.join(folder, filename))))
-        img.set_from_file(thumb_file)
-        btn = Gtk.Button()
-        btn.set_image(img)
-        btn.set_image_position(2)  # TOP
-
-        if len(filename) > 30:
-            filename = '…{}'.format(filename[-28::])
-        btn.set_label(filename)
-
-        return btn
-
     def on_folder_clicked(self, button):
         dialog = Gtk.FileChooserDialog("Open Image", button.get_toplevel(), Gtk.FileChooserAction.SELECT_FOLDER);
         dialog.add_button(Gtk.STOCK_CANCEL, 0)
@@ -162,6 +159,7 @@ def check_displays():
                        'width': output.rect.width,
                        'height': output.rect.height}
             displays.append(display)
+            log("Output: {}".format(display), common.INFO)
         return displays
     except Exception as e:
         log(e, common.ERROR)
@@ -170,7 +168,6 @@ def check_displays():
 
 def main():
     set_env()   # set paths and stuff
-    #create_thumbnails(common.settings.src_path)
     displays = check_displays()
     app = GUI(displays)
     Gtk.main()
