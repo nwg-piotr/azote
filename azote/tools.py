@@ -50,26 +50,16 @@ def hash_name(full_path):
 
 
 def create_thumbnails(scr_path):
-    # get all the jpg files from current path
-    for in_path in glob.glob(os.path.join(scr_path, "*.jpg")):
-        if file_allowed(in_path):
-            thumb_name = "{}.png".format(hash_name(in_path))
-            dest_path = os.path.join(common.thumb_dir, thumb_name)
-            if not os.path.isfile(dest_path):
-                create_thumbnail(in_path, dest_path, thumb_name)
-                log('New thumb {} -> {}'.format(in_path, thumb_name), common.INFO)
-            elif is_newer(in_path, dest_path):
-                create_thumbnail(in_path, dest_path, thumb_name)
-                log('Refresh {} -> {}'.format(in_path, thumb_name), common.INFO)
-
-    for in_path in glob.glob(os.path.join(scr_path, "*.png")):
-        if file_allowed(in_path):
-            thumb_name = "{}.png".format(hash_name(in_path))
-            dest_path = os.path.join(common.thumb_dir, thumb_name)
-            if not os.path.isfile(dest_path):
-                create_thumbnail(in_path, dest_path, thumb_name)
-            elif is_newer(in_path, dest_path):
-                create_thumbnail(in_path, dest_path, thumb_name, True)
+    # get all the files of allowed types from current path
+    for extension in common.allowed_file_types:
+        for in_path in glob.glob(os.path.join(scr_path, "*.{}".format(extension))):
+            if file_allowed(in_path):
+                thumb_name = "{}.png".format(hash_name(in_path))
+                dest_path = os.path.join(common.thumb_dir, thumb_name)
+                if not os.path.isfile(dest_path):
+                    create_thumbnail(in_path, dest_path, thumb_name)
+                elif is_newer(in_path, dest_path):
+                    create_thumbnail(in_path, dest_path, thumb_name, True)
 
 
 def create_thumbnail(in_path, dest_path, thumb_name, refresh=False):
