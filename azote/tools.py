@@ -5,9 +5,11 @@ import logging
 from PIL import Image
 import common
 import pickle
+import subprocess
 
 
 def set_env():
+
     # application folder
     common.app_dir = os.getenv("HOME") + "/.azote"
     if not os.path.isdir(common.app_dir):
@@ -25,6 +27,10 @@ def set_env():
 
     log('Launched', common.INFO)
     common.settings = Settings()
+
+    # check if Wayland available
+    common.wayland = 'wayland' in subprocess.check_output("echo $XDG_SESSION_TYPE", shell=True).decode("utf-8")
+    log("Wayland session: {}".format(common.wayland), common.INFO)
 
 
 def log(message, level=None):

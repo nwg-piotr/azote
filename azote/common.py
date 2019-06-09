@@ -4,6 +4,7 @@ WARNING = 'warning'
 INFO = 'info'
 DEBUG = 'debug'
 
+wayland = False
 preview = None
 buttons_list = None
 selected_image = None

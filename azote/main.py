@@ -100,9 +100,8 @@ class ThumbButton(Gtk.Button):
         rgba = Gdk.RGBA.from_color(color)
         button.override_background_color(0, rgba)
 
-        print(self.source_path)
         with Image.open(self.source_path) as img:
-            common.selected_picture_label.set_text("{} ({} x {}px)".format(self.filename, img.size[0], img.size[1]))
+            common.selected_picture_label.set_text("{}    ({} x {})".format(self.filename, img.size[0], img.size[1]))
 
     def deselect(self, button):
         self.selected = False
@@ -165,8 +164,6 @@ class GUI:
             common.settings.save()
             common.preview.refresh()
             button.set_label(common.settings.src_path)
-        elif response == 0:
-            print("Cancel clicked")
 
         dialog.destroy()
 
