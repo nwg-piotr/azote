@@ -18,7 +18,7 @@ class Preview(Gtk.ScrolledWindow):
         self.set_size_request(400, 600)
         self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
 
-        self.buttons = []
+        common.buttons_list = []
         self.grid = Gtk.Grid()
 
         create_thumbnails(common.settings.src_path)
@@ -31,7 +31,7 @@ class Preview(Gtk.ScrolledWindow):
         for file in src_pictures:
             if file_allowed(file):
                 btn = ThumbButton(common.settings.src_path, file)
-                self.buttons.append(btn)
+                common.buttons_list.append(btn)
                 self.grid.attach(btn, col, row, 1, 1)
                 if col < 2:
                     col += 1
@@ -44,7 +44,7 @@ class Preview(Gtk.ScrolledWindow):
     def refresh(self):
         create_thumbnails(common.settings.src_path)
 
-        for button in self.buttons:
+        for button in common.buttons_list:
             self.grid.remove(button)
             button.destroy()
 
@@ -56,7 +56,7 @@ class Preview(Gtk.ScrolledWindow):
         for file in src_pictures:
             if file_allowed(file):
                 btn = ThumbButton(common.settings.src_path, file)
-                self.buttons.append(btn)
+                common.buttons_list.append(btn)
                 self.grid.attach(btn, col, row, 1, 1)
                 if col < 2:
                     col += 1
@@ -84,11 +84,33 @@ class ThumbButton(Gtk.Button):
         self.set_label(filename)
         self.selected = False
 
-    def select(self):
-        self.selected = True
+        color = Gdk.color_parse('#fefefe')
+        rgba = Gdk.RGBA.from_color(color)
+        self.override_background_color(0, rgba)
 
-    def deselect(self):
+        self.connect('clicked', self.select)
+
+    def select(self, button):
+        self.selected = True
+        deselect_all()
+
+        color = Gdk.color_parse('#66ccff')
+        rgba = Gdk.RGBA.from_color(color)
+        button.override_background_color(0, rgba)
+
+        print(self.source_path)
+
+    def deselect(self, button):
         self.selected = False
+
+        color = Gdk.color_parse('#fefefe')
+        rgba = Gdk.RGBA.from_color(color)
+        button.override_background_color(0, rgba)
+
+
+def deselect_all():
+    for btn in common.buttons_list:
+        btn.deselect(btn)
 
 
 class GUI:
@@ -135,8 +157,6 @@ class GUI:
 
         response = dialog.run()
         if response == 1:
-            print("Select clicked")
-            print("Folder selected: " + dialog.get_filename())
             common.settings.src_path = dialog.get_filename()
             common.settings.save()
             common.preview.refresh()

@@ -1,4 +1,5 @@
 preview = None
+buttons_list = None
 
 CRITICAL = 'critical'
 ERROR = 'error'
