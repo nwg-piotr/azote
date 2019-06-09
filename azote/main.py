@@ -3,6 +3,7 @@ import sys
 import i3ipc
 import common
 import gi
+from PIL import Image
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from tools import set_env, log, hash_name, create_thumbnails, file_allowed
@@ -70,11 +71,12 @@ class ThumbButton(Gtk.Button):
     def __init__(self, folder, filename):
         super().__init__()
 
+        self.filename = filename
         self.source_path = os.path.join(folder, filename)
 
         img = Gtk.Image()
-        thumb_file = "{}.png".format(os.path.join(common.thumb_dir, hash_name(self.source_path)))
-        img.set_from_file(thumb_file)
+        self.thumb_file = "{}.png".format(os.path.join(common.thumb_dir, hash_name(self.source_path)))
+        img.set_from_file(self.thumb_file)
 
         self.set_image(img)
         self.set_image_position(2)  # TOP
@@ -99,6 +101,8 @@ class ThumbButton(Gtk.Button):
         button.override_background_color(0, rgba)
 
         print(self.source_path)
+        with Image.open(self.source_path) as img:
+            common.selected_picture_label.set_text("{} ({} x {}px)".format(self.filename, img.size[0], img.size[1]))
 
     def deselect(self, button):
         self.selected = False
@@ -115,14 +119,13 @@ def deselect_all():
 
 class GUI:
     def __init__(self, displays):
-        create_thumbnails(common.settings.src_path)
 
         window = Gtk.Window()
         window.set_title("Hello World")
         window.connect_after('destroy', self.destroy)
 
         box = Gtk.Box()
-        box.set_spacing(5)
+        box.set_spacing(15)
         box.set_orientation(Gtk.Orientation.VERTICAL)
         window.add(box)
 
@@ -130,18 +133,19 @@ class GUI:
 
         box.pack_start(common.preview, False, False, 0)
 
-        label = Gtk.Label()
-        label.set_text(displays[0].get('name'))
-        box.pack_start(label, False, False, 0)
+        common.selected_picture_label = Gtk.Label()
+        common.selected_picture_label.set_text('Select a picture')
 
-        self.image = Gtk.Image()
-        self.image.set_padding(20, 20)
-        box.pack_start(self.image, False, False, 0)
+        box.pack_start(common.selected_picture_label, False, False, 0)
 
-        button = Gtk.Button(common.settings.src_path)
-        box.pack_start(button, False, False, 0)
+        folder_button = Gtk.Button(common.settings.src_path)
+        box.pack_start(folder_button, False, False, 0)
 
-        button.connect_after('clicked', self.on_folder_clicked)
+        folder_button.connect_after('clicked', self.on_folder_clicked)
+
+        output_label = Gtk.Label()
+        output_label.set_text(displays[0].get('name'))
+        box.pack_start(output_label, False, False, 0)
 
         window.show_all()
 
