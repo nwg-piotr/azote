@@ -71,6 +71,8 @@ class ThumbButton(Gtk.Button):
     def __init__(self, folder, filename):
         super().__init__()
 
+        self.set_property("name", "thumb-btn")
+
         self.filename = filename
         self.source_path = os.path.join(folder, filename)
 
@@ -86,30 +88,20 @@ class ThumbButton(Gtk.Button):
         self.set_label(filename)
         self.selected = False
 
-        color = Gdk.color_parse('#fefefe')
-        rgba = Gdk.RGBA.from_color(color)
-        self.override_background_color(0, rgba)
-
         self.connect('clicked', self.select)
 
     def select(self, button):
         self.selected = True
         common.selected_wallpaper = self
         deselect_all()
-
-        color = Gdk.color_parse('#66ccff')
-        rgba = Gdk.RGBA.from_color(color)
-        button.override_background_color(0, rgba)
+        button.set_property("name", "thumb-btn-selected")
 
         with Image.open(self.source_path) as img:
             common.selected_picture_label.set_text("{}    ({} x {})".format(self.filename, img.size[0], img.size[1]))
 
     def deselect(self, button):
         self.selected = False
-
-        color = Gdk.color_parse('#fefefe')
-        rgba = Gdk.RGBA.from_color(color)
-        button.override_background_color(0, rgba)
+        button.set_property("name", "thumb-btn")
 
 
 def deselect_all():
@@ -169,6 +161,7 @@ class GUI:
         window = Gtk.Window()
         window.set_title("Azote")
         window.connect_after('destroy', self.destroy)
+
 
         main_box = Gtk.Box()
         main_box.set_spacing(15)
@@ -247,6 +240,22 @@ def check_displays():
 
 
 def main():
+    screen = Gdk.Screen.get_default()
+    provider = Gtk.CssProvider()
+    style_context = Gtk.StyleContext()
+    style_context.add_provider_for_screen(
+        screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    )
+    css = b"""
+            button#thumb-btn {
+                background-color: #fefefe;
+            }
+            button#thumb-btn-selected {
+                background-color: #66ccff;
+            }
+            """
+    provider.load_from_data(css)
+
     set_env()   # set paths and stuff
     displays = check_displays()
     app = GUI(displays)
