@@ -232,13 +232,14 @@ def check_displays():
         i3 = i3ipc.Connection()
         common.outputs = i3.get_outputs()
         for output in common.outputs:
-            display = {'name': output.name,
-                       'x': output.rect.x,
-                       'y': output.rect.y,
-                       'width': output.rect.width,
-                       'height': output.rect.height}
-            displays.append(display)
-            log("Output: {}".format(display), common.INFO)
+            if output.active:  # dunno WTF xroot-0 is: i3 returns such an output with "active":false
+                display = {'name': output.name,
+                           'x': output.rect.x,
+                           'y': output.rect.y,
+                           'width': output.rect.width,
+                           'height': output.rect.height}
+                displays.append(display)
+                log("Output: {}".format(display), common.INFO)
         return displays
     except Exception as e:
         log(e, common.ERROR)
