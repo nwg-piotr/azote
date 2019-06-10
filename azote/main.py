@@ -16,7 +16,7 @@ class Preview(Gtk.ScrolledWindow):
         super().__init__()
 
         self.set_border_width(10)
-        self.set_size_request(400, 600)
+        self.set_size_request(400, 500)
         self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
 
         common.buttons_list = []
@@ -94,6 +94,7 @@ class ThumbButton(Gtk.Button):
 
     def select(self, button):
         self.selected = True
+        common.selected_wallpaper = self
         deselect_all()
 
         color = Gdk.color_parse('#66ccff')
@@ -116,35 +117,92 @@ def deselect_all():
         btn.deselect(btn)
 
 
+class DisplayBox(Gtk.Box):
+    def __init__(self, name):
+        super().__init__()
+
+        self.name = name
+        self.set_spacing(15)
+        self.set_orientation(Gtk.Orientation.VERTICAL)
+
+        self.label = Gtk.Label()
+        self.label.set_text(self.name)
+        self.pack_start(self.label, False, False, 0)
+
+        self.img = Gtk.Image()
+        self.img.set_from_file("images/empty.png")
+        self.pack_start(self.img, False, False, 10)
+
+        self.set_button = Gtk.Button("Set selected")
+        self.pack_start(self.set_button, False, False, 10)
+
+        self.set_button.connect_after('clicked', self.select)
+
+        country_store = Gtk.ListStore(str)
+        countries = ["stretch", "fit", "fill", "center", "tile"]
+        for country in countries:
+            country_store.append([country])
+
+        country_combo = Gtk.ComboBox.new_with_model(country_store)
+        country_combo.connect("changed", self.on_country_combo_changed)
+        renderer_text = Gtk.CellRendererText()
+        country_combo.pack_start(renderer_text, True)
+        country_combo.add_attribute(renderer_text, "text", 0)
+        self.pack_start(country_combo, False, False, True)
+
+    def select(self, button):
+        if common.selected_wallpaper:
+            print(common.selected_wallpaper.thumb_file)
+            self.img.set_from_file(common.selected_wallpaper.thumb_file)
+
+    def on_country_combo_changed(self, combo):
+        tree_iter = combo.get_active_iter()
+        if tree_iter is not None:
+            model = combo.get_model()
+            country = model[tree_iter][0]
+            print("Selected: country=%s" % country)
+
+
 class GUI:
     def __init__(self, displays):
 
         window = Gtk.Window()
-        window.set_title("Hello World")
+        window.set_title("Azote")
         window.connect_after('destroy', self.destroy)
 
-        box = Gtk.Box()
-        box.set_spacing(15)
-        box.set_orientation(Gtk.Orientation.VERTICAL)
-        window.add(box)
+        main_box = Gtk.Box()
+        main_box.set_spacing(15)
+        main_box.set_orientation(Gtk.Orientation.VERTICAL)
+        window.add(main_box)
 
+        # This contains a Gtk.ScrolledWindow with Gtk.Grid() inside, filled with ThumbButton(Gtk.Button) instances
         common.preview = Preview()
 
-        box.pack_start(common.preview, False, False, 0)
+        main_box.pack_start(common.preview, False, False, 0)
 
+        # Display details of currently selected picture
         common.selected_picture_label = Gtk.Label()
         common.selected_picture_label.set_text('Select a picture')
 
-        box.pack_start(common.selected_picture_label, False, False, 0)
+        main_box.pack_start(common.selected_picture_label, False, False, 0)
 
+        # Source folder selection
         folder_button = Gtk.Button(common.settings.src_path)
-        box.pack_start(folder_button, False, False, 0)
+        main_box.pack_start(folder_button, False, False, 0)
 
         folder_button.connect_after('clicked', self.on_folder_clicked)
 
-        output_label = Gtk.Label()
-        output_label.set_text(displays[0].get('name'))
-        box.pack_start(output_label, False, False, 0)
+        # We need a horizontal container to display outputs
+        displays_box = Gtk.Box()
+        displays_box.set_spacing(15)
+        displays_box.set_orientation(Gtk.Orientation.HORIZONTAL)
+        window.add(main_box)
+
+        for display in displays:
+            display_box = DisplayBox(display.get('name'))
+            displays_box.pack_start(display_box, True, False, 0)
+
+        main_box.pack_start(displays_box, False, False, 0)
 
         window.show_all()
 

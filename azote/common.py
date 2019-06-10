@@ -7,7 +7,7 @@ DEBUG = 'debug'
 wayland = False
 preview = None
 buttons_list = None
-selected_image = None
+selected_wallpaper = None
 selected_picture_label = None
 
 allowed_file_types = ['jpg', 'jpeg', 'png']
