@@ -8,15 +8,13 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from tools import set_env, log, hash_name, create_thumbnails, file_allowed
 
-cols = 3
-
 
 class Preview(Gtk.ScrolledWindow):
     def __init__(self):
         super().__init__()
 
         self.set_border_width(10)
-        self.set_size_request(400, 500)
+        self.set_size_request(0, 500)
         self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
 
         common.buttons_list = []
@@ -34,7 +32,7 @@ class Preview(Gtk.ScrolledWindow):
                 btn = ThumbButton(common.settings.src_path, file)
                 common.buttons_list.append(btn)
                 self.grid.attach(btn, col, row, 1, 1)
-                if col < 2:
+                if col < common.cols - 1:
                     col += 1
                 else:
                     col = 0
@@ -42,8 +40,9 @@ class Preview(Gtk.ScrolledWindow):
 
         self.add_with_viewport(self.grid)
 
-    def refresh(self):
-        create_thumbnails(common.settings.src_path)
+    def refresh(self, create_thumbs=True):
+        if create_thumbs:
+            create_thumbnails(common.settings.src_path)
 
         for button in common.buttons_list:
             self.grid.remove(button)
@@ -59,7 +58,7 @@ class Preview(Gtk.ScrolledWindow):
                 btn = ThumbButton(common.settings.src_path, file)
                 common.buttons_list.append(btn)
                 self.grid.attach(btn, col, row, 1, 1)
-                if col < 2:
+                if col < common.cols - 1:
                     col += 1
                 else:
                     col = 0
@@ -159,9 +158,11 @@ class GUI:
     def __init__(self, displays):
 
         window = Gtk.Window()
-        window.set_title("Azote")
-        window.connect_after('destroy', self.destroy)
 
+        window.set_title("Azote")
+        window.set_wmclass("azote", "azote")
+
+        window.connect_after('destroy', self.destroy)
 
         main_box = Gtk.Box()
         main_box.set_spacing(15)
@@ -170,6 +171,7 @@ class GUI:
 
         # This contains a Gtk.ScrolledWindow with Gtk.Grid() inside, filled with ThumbButton(Gtk.Button) instances
         common.preview = Preview()
+        window.connect('configure-event', on_configure_event)
 
         main_box.pack_start(common.preview, False, False, 0)
 
@@ -233,10 +235,51 @@ def check_displays():
                            'height': output.rect.height}
                 displays.append(display)
                 log("Output: {}".format(display), common.INFO)
+
+        """"# for testing
+        display = {'name': 'HDMI-A-2',
+                   'x': 0,
+                   'y': 0,
+                   'width': 1920,
+                   'height': 1080}
+        displays.append(display)
+        log("Output: {}".format(display), common.INFO)
+
+        display = {'name': 'HDMI-A-3',
+                   'x': 0,
+                   'y': 0,
+                   'width': 1920,
+                   'height': 1080}
+        displays.append(display)
+        log("Output: {}".format(display), common.INFO)
+
+        display = {'name': 'HDMI-A-4',
+                   'x': 1366,
+                   'y': 728,
+                   'width': 1920,
+                   'height': 1080}
+        displays.append(display)
+        log("Output: {}".format(display), common.INFO)"""
+
         return displays
     except Exception as e:
         log(e, common.ERROR)
         return None
+
+
+def on_configure_event(window, e):
+    cols = e.width // 256
+    if cols != common.cols:
+        common.preview.hide()
+        if cols != common.cols:
+            common.cols = cols
+            common.preview.refresh(False)
+
+        #window.reshow_with_initial_size()
+
+        common.preview.show()
+        print("Refresh!")
+    print('I have resized:', e.width, cols)
 
 
 def main():
@@ -258,6 +301,7 @@ def main():
 
     set_env()   # set paths and stuff
     displays = check_displays()
+    common.cols = len(displays) if len(displays) > 3 else 3
     app = GUI(displays)
     Gtk.main()
 

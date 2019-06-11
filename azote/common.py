@@ -10,6 +10,8 @@ buttons_list = None
 selected_wallpaper = None
 selected_picture_label = None
 
+cols = 3                # number of columns in pictures preview
+
 allowed_file_types = ['jpg', 'jpeg', 'png']
 
 app_dir = ''            # ~/.azote
