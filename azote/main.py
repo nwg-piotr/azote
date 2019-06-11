@@ -123,6 +123,7 @@ class DisplayBox(Gtk.Box):
         self.img = Gtk.Image()
         self.img.set_from_file("images/empty.png")
         #self.pack_start(self.img, False, False, 10)
+        # todo consider joining the label, too
 
         self.set_button = Gtk.Button()
         self.set_button.set_image(self.img)
