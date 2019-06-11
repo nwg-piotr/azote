@@ -122,9 +122,11 @@ class DisplayBox(Gtk.Box):
 
         self.img = Gtk.Image()
         self.img.set_from_file("images/empty.png")
-        self.pack_start(self.img, False, False, 10)
+        #self.pack_start(self.img, False, False, 10)
 
-        self.set_button = Gtk.Button("Set selected")
+        self.set_button = Gtk.Button()
+        self.set_button.set_image(self.img)
+        self.set_button.set_image_position(2)
         self.pack_start(self.set_button, False, False, 10)
 
         self.set_button.connect_after('clicked', self.select)
