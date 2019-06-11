@@ -4,6 +4,7 @@ import i3ipc
 import common
 import gi
 from PIL import Image
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from tools import set_env, log, hash_name, create_thumbnails, file_allowed
@@ -109,45 +110,45 @@ def deselect_all():
 
 
 class DisplayBox(Gtk.Box):
-    def __init__(self, name):
+    """
+    The box contains elements to preview certain displays and assign wallpapers to them
+    """
+    def __init__(self, display_name):
         super().__init__()
 
-        self.name = name
-        self.set_spacing(15)
         self.set_orientation(Gtk.Orientation.VERTICAL)
-
-        self.label = Gtk.Label()
-        self.label.set_text(self.name)
-        self.pack_start(self.label, False, False, 0)
 
         self.img = Gtk.Image()
         self.img.set_from_file("images/empty.png")
-        #self.pack_start(self.img, False, False, 10)
-        # todo consider joining the label, too
 
         self.set_button = Gtk.Button()
-        self.set_button.set_image(self.img)
-        self.set_button.set_image_position(2)
+        self.set_button.set_label(display_name)                 # label on top: name (with x height)
+        self.set_button.set_image(self.img)                     # preview of selected wallpaper
+        self.set_button.set_image_position(3)                   # label on top, image below
+        self.set_button.set_property("name", "display-btn")     # to assign css style
+
         self.pack_start(self.set_button, False, False, 10)
 
-        self.set_button.connect_after('clicked', self.select)
+        self.set_button.connect_after('clicked', self.select_btn)
 
-        country_store = Gtk.ListStore(str)
-        countries = ["stretch", "fit", "fill", "center", "tile"]
-        for country in countries:
-            country_store.append([country])
+        # Combo box to choose the image position
+        img_position_selector = Gtk.ListStore(str)
+        options = ["stretch", "fit", "fill", "center", "tile"]
+        for option in options:
+            img_position_selector.append([option])
 
-        country_combo = Gtk.ComboBox.new_with_model(country_store)
-        country_combo.connect("changed", self.on_country_combo_changed)
+        img_pos_combo = Gtk.ComboBox.new_with_model(img_position_selector)
+        img_pos_combo.set_active(2)
+        img_pos_combo.connect("changed", self.on_country_combo_changed)
         renderer_text = Gtk.CellRendererText()
-        country_combo.pack_start(renderer_text, True)
-        country_combo.add_attribute(renderer_text, "text", 0)
-        self.pack_start(country_combo, False, False, True)
+        img_pos_combo.pack_start(renderer_text, True)
+        img_pos_combo.add_attribute(renderer_text, "text", 0)
+        self.pack_start(img_pos_combo, False, False, True)
 
-    def select(self, button):
+    def select_btn(self, button):
         if common.selected_wallpaper:
-            print(common.selected_wallpaper.thumb_file)
             self.img.set_from_file(common.selected_wallpaper.thumb_file)
+            button.set_property("name", "display-btn-selected")
 
     def on_country_combo_changed(self, combo):
         tree_iter = combo.get_active_iter()
@@ -179,26 +180,28 @@ class GUI:
 
         main_box.pack_start(common.preview, False, False, 0)
 
-        # Display details of currently selected picture
+        # Label to display details of currently selected picture
         common.selected_picture_label = Gtk.Label()
         common.selected_picture_label.set_text('Select a picture')
 
         main_box.pack_start(common.selected_picture_label, False, False, 0)
 
-        # Source folder selection
+        # Button to set the wallpapers folder
         folder_button = Gtk.Button(common.settings.src_path)
         main_box.pack_start(folder_button, False, False, 0)
 
         folder_button.connect_after('clicked', self.on_folder_clicked)
 
-        # We need a horizontal container to display outputs
+        # We need a horizontal container to display outputs in columns
         displays_box = Gtk.Box()
         displays_box.set_spacing(15)
         displays_box.set_orientation(Gtk.Orientation.HORIZONTAL)
         window.add(main_box)
 
         for display in displays:
-            display_box = DisplayBox(display.get('name'))
+            # Label format: name (width x height)
+            display_box = DisplayBox(
+                "{} ({} x {})".format(display.get('name'), display.get('width'), display.get('height')))
             displays_box.pack_start(display_box, True, False, 0)
 
         main_box.pack_start(displays_box, False, False, 0)
@@ -279,7 +282,7 @@ def on_configure_event(window, e):
             common.cols = cols
             common.preview.refresh(False)
 
-        #window.reshow_with_initial_size()
+        # window.reshow_with_initial_size()
 
         common.preview.show()
         print("Refresh!")
@@ -304,10 +307,18 @@ def main():
                 font-weight: bold;
                 font-size: 12px;
             }
+            button#display-btn {
+                font-weight: normal;
+                font-size: 12px;
+            }
+            button#display-btn-selected {
+                font-weight: bold;
+                font-size: 12px;
+            }
             """
     provider.load_from_data(css)
 
-    set_env()   # set paths and stuff
+    set_env()  # set paths and stuff
     displays = check_displays()
     common.cols = len(displays) if len(displays) > 3 else 3
     app = GUI(displays)
