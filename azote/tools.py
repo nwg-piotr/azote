@@ -90,6 +90,27 @@ def file_allowed(path):
     return ext in common.allowed_file_types
 
 
+def update_status_bar():
+    num_files = 0
+    total_size = 0
+    if os.path.isdir(common.thumb_dir):
+        for file in os.listdir(common.thumb_dir):
+            num_files += 1
+            file_info = os.stat(os.path.join(common.thumb_dir, file))
+            total_size += file_info.st_size
+    common.status_bar.push(0, "{} thumbnails in cache ({})".format(num_files, convert_bytes(total_size)))
+
+
+def convert_bytes(num):
+    """
+    https://stackoverflow.com/a/39988702/4040598
+    """
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if num < 1024.0:
+            return "%3.1f %s" % (num, x)
+        num /= 1024.0
+
+
 class Settings(object):
     def __init__(self):
         self.file = os.path.join(common.app_dir, "settings.pkl")

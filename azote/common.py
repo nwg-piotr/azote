@@ -6,6 +6,7 @@ DEBUG = 'debug'
 
 wayland = False
 preview = None
+status_bar = None
 buttons_list = None
 selected_wallpaper = None
 selected_picture_label = None

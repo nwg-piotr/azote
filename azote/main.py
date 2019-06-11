@@ -7,7 +7,7 @@ from PIL import Image
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
-from tools import set_env, log, hash_name, create_thumbnails, file_allowed
+from tools import set_env, log, hash_name, create_thumbnails, file_allowed, update_status_bar
 
 
 class Preview(Gtk.ScrolledWindow):
@@ -67,6 +67,8 @@ class Preview(Gtk.ScrolledWindow):
                     col = 0
                     row += 1
                 btn.show()
+
+        update_status_bar()
 
 
 class ThumbButton(Gtk.Button):
@@ -249,6 +251,15 @@ class GUI:
 
         main_box.add(bottom_box)
 
+        hseparator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        main_box.add(hseparator)
+
+        common.status_bar = Gtk.Statusbar()
+        common.status_bar.set_property("name", "status-bar")
+        common.status_bar.set_halign(Gtk.Align.CENTER)
+        main_box.pack_start(common.status_bar, True, False, 0)
+        update_status_bar()
+
         window.show_all()
 
     def destroy(window, self):
@@ -325,11 +336,8 @@ def on_configure_event(window, e):
             common.cols = cols
             common.preview.refresh(False)
 
-        # window.reshow_with_initial_size()
-
         common.preview.show()
         print("Refresh!")
-    print('I have resized:', e.width, cols)
 
 
 def main():
@@ -357,6 +365,9 @@ def main():
             }
             button#display-btn-selected {
                 font-weight: bold;
+                font-size: 12px;
+            }
+            statusbar#status-bar {
                 font-size: 12px;
             }
             """
