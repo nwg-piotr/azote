@@ -14,12 +14,14 @@ class Preview(Gtk.ScrolledWindow):
     def __init__(self):
         super().__init__()
 
-        self.set_border_width(0)
+        self.set_border_width(10)
         self.set_size_request(0, 500)
         self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
 
         common.buttons_list = []
         self.grid = Gtk.Grid()
+        self.grid.set_column_spacing(25)
+        self.grid.set_row_spacing(15)
 
         create_thumbnails(common.settings.src_path)
 
@@ -131,19 +133,43 @@ class DisplayBox(Gtk.Box):
 
         self.set_button.connect_after('clicked', self.select_btn)
 
-        # Combo box to choose the image position
-        img_position_selector = Gtk.ListStore(str)
-        options = ["stretch", "fit", "fill", "center", "tile"]
-        for option in options:
-            img_position_selector.append([option])
+        # Combo box to choose a mode to use for the image
+        mode_selector = Gtk.ListStore(str)
+        modes = ["stretch", "fit", "fill", "center", "tile"]
+        for mode in modes:
+            mode_selector.append([mode])
 
-        img_pos_combo = Gtk.ComboBox.new_with_model(img_position_selector)
-        img_pos_combo.set_active(2)
-        img_pos_combo.connect("changed", self.on_country_combo_changed)
+        # Let's display the mode combo and the color button side-by-side in a vertical box
+        options_box = Gtk.Box()
+        options_box.set_spacing(15)
+        options_box.set_border_width(0)
+        options_box.set_orientation(Gtk.Orientation.HORIZONTAL)
+        #self.add(options_box)
+        self.pack_start(options_box, True, False, 0)
+
+        mode_combo = Gtk.ComboBox.new_with_model(mode_selector)
+        mode_combo.set_active(2)
+        mode_combo.connect("changed", self.on_country_combo_changed)
         renderer_text = Gtk.CellRendererText()
-        img_pos_combo.pack_start(renderer_text, True)
-        img_pos_combo.add_attribute(renderer_text, "text", 0)
-        self.pack_start(img_pos_combo, False, False, True)
+        mode_combo.pack_start(renderer_text, True)
+        mode_combo.add_attribute(renderer_text, "text", 0)
+        #options_box.pack_start(mode_combo, True, False, 0)
+        options_box.add(mode_combo)
+
+        # Color button
+        color_button = Gtk.ColorButton()
+        color = Gdk.RGBA()
+        color.red = 0.0
+        color.green = 0.0
+        color.blue = 0.0
+        color.alpha = 1.0
+        color_button.set_rgba(color)
+        color_button.connect("color-set", self.on_color_chosen, color_button)
+        #options_box.pack_start(color_button, True, True, 0)
+        options_box.add(color_button)
+
+        flip_button = Gtk.Button("Flip image")
+        options_box.add(flip_button)
 
     def select_btn(self, button):
         if common.selected_wallpaper:
@@ -157,6 +183,9 @@ class DisplayBox(Gtk.Box):
             country = model[tree_iter][0]
             print("Selected: country=%s" % country)
 
+    def on_color_chosen(self, user_data, button):
+        print("You chose the color: " + button.get_rgba().to_string())
+
 
 class GUI:
     def __init__(self, displays):
@@ -169,7 +198,7 @@ class GUI:
         window.connect_after('destroy', self.destroy)
 
         main_box = Gtk.Box()
-        main_box.set_spacing(15)
+        main_box.set_spacing(5)
         main_box.set_border_width(10)
         main_box.set_orientation(Gtk.Orientation.VERTICAL)
         window.add(main_box)
@@ -206,13 +235,27 @@ class GUI:
 
         main_box.pack_start(displays_box, False, False, 0)
 
+        # Bottom buttons will also need a horizontal container
+        bottom_box = Gtk.Box()
+        bottom_box.set_spacing(15)
+        bottom_box.set_border_width(10)
+        bottom_box.set_orientation(Gtk.Orientation.HORIZONTAL)
+
+        all_screens_button = Gtk.Button("Divide selected between screens")
+        bottom_box.pack_start(all_screens_button, True, True, 0)
+
+        apply_button = Gtk.Button("Apply")
+        bottom_box.pack_start(apply_button, True, True, 0)
+
+        main_box.add(bottom_box)
+
         window.show_all()
 
     def destroy(window, self):
         Gtk.main_quit()
 
     def on_folder_clicked(self, button):
-        dialog = Gtk.FileChooserDialog("Open Image", button.get_toplevel(), Gtk.FileChooserAction.SELECT_FOLDER);
+        dialog = Gtk.FileChooserDialog("Open folder", button.get_toplevel(), Gtk.FileChooserAction.SELECT_FOLDER);
         dialog.add_button(Gtk.STOCK_CANCEL, 0)
         dialog.add_button(Gtk.STOCK_OK, 1)
         dialog.set_default_response(1)
@@ -243,8 +286,8 @@ def check_displays():
                 displays.append(display)
                 log("Output: {}".format(display), common.INFO)
 
-        """"# for testing
-        display = {'name': 'HDMI-A-2',
+        # for testing
+        """display = {'name': 'HDMI-A-2',
                    'x': 0,
                    'y': 0,
                    'width': 1920,
@@ -291,6 +334,7 @@ def on_configure_event(window, e):
 
 def main():
     screen = Gdk.Screen.get_default()
+    print(Gdk.Screen.get_display(screen))
     provider = Gtk.CssProvider()
     style_context = Gtk.StyleContext()
     style_context.add_provider_for_screen(
