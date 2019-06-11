@@ -293,9 +293,13 @@ def main():
     css = b"""
             button#thumb-btn {
                 background-color: #fefefe;
+                font-weight: normal;
+                font-size: 11px;
             }
             button#thumb-btn-selected {
                 background-color: #66ccff;
+                font-weight: bold;
+                font-size: 12px;
             }
             """
     provider.load_from_data(css)
