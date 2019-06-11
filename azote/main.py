@@ -13,7 +13,7 @@ class Preview(Gtk.ScrolledWindow):
     def __init__(self):
         super().__init__()
 
-        self.set_border_width(10)
+        self.set_border_width(0)
         self.set_size_request(0, 500)
         self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
 
@@ -166,6 +166,7 @@ class GUI:
 
         main_box = Gtk.Box()
         main_box.set_spacing(15)
+        main_box.set_border_width(10)
         main_box.set_orientation(Gtk.Orientation.VERTICAL)
         window.add(main_box)
 

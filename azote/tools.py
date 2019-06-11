@@ -74,7 +74,7 @@ def create_thumbnail(in_path, dest_path, thumb_name, refresh=False):
     try:
         img = Image.open(in_path)
         # convert to thumbnail image
-        img.thumbnail((256, 256), Image.ANTIALIAS)
+        img.thumbnail((240, 240), Image.ANTIALIAS)
         img.save(dest_path, "PNG")
         log('{}: {} -> {}'.format(action, in_path, thumb_name), common.INFO)
     except Exception as e:
