@@ -87,20 +87,24 @@ def create_thumbnail(in_path, dest_path, thumb_name, refresh=False):
         log('{} - {}'.format(action, e), common.ERROR)
 
 
-def flip_image(src_path, filename):
+def flip_selected_wallpaper():
+    """
+    This creates vertically flipped image and its thumbnail and saves to ~/.azote/backgrounds
+    :return: thumbnail path, flipped image path
+    """
     try:
-        img = Image.open(src_path)
+        img = Image.open(common.selected_wallpaper.source_path)
         flipped = img.transpose(Image.FLIP_LEFT_RIGHT)
-        img_path = os.path.join(common.bcg_dir, filename)
+        img_path = os.path.join(common.bcg_dir, "flipped-{}".format(common.selected_wallpaper.filename))
         flipped.save(img_path, "PNG")
 
         flipped.thumbnail((240, 240), Image.ANTIALIAS)
-        thumb_path = os.path.join(common.bcg_dir, "azotethumb-{}".format(filename))
+        thumb_path = os.path.join(common.bcg_dir, "thumbnail-{}".format(common.selected_wallpaper.filename))
         flipped.save(thumb_path, "PNG")
-        return thumb_path
+        return thumb_path, img_path
 
     except Exception as e:
-        log('Failed flipping {} - {}'.format(src_path, e), common.ERROR)
+        log('Failed flipping {} - {}'.format(common.selected_wallpaper.source_path, e), common.ERROR)
 
 
 def is_newer(in_path, dest_path):

@@ -7,7 +7,7 @@ from PIL import Image
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
-from tools import set_env, log, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_image
+from tools import set_env, log, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper
 
 
 class Preview(Gtk.ScrolledWindow):
@@ -96,7 +96,7 @@ class ThumbButton(Gtk.Button):
 
     def select(self, button):
         self.selected = True
-        common.selected_thumbnail = self
+        common.selected_wallpaper = self
         deselect_all()
         button.set_property("name", "thumb-btn-selected")
 
@@ -122,7 +122,7 @@ class DisplayBox(Gtk.Box):
 
         self.set_orientation(Gtk.Orientation.VERTICAL)
 
-        self.image_selected = False
+        self.wallpaper_path = None  # stores the value which will be assigned to corresponding display
 
         self.img = Gtk.Image()
         self.img.set_from_file("images/empty.png")
@@ -175,10 +175,10 @@ class DisplayBox(Gtk.Box):
         options_box.add(self.flip_button)
 
     def on_select_button(self, button):
-        if common.selected_thumbnail:
-            self.img.set_from_file(common.selected_thumbnail.thumb_file)
+        if common.selected_wallpaper:
+            self.img.set_from_file(common.selected_wallpaper.thumb_file)
+            self.wallpaper_path = common.selected_wallpaper.source_path
             button.set_property("name", "display-btn-selected")
-            self.image_selected = True
             self.flip_button.set_sensitive(True)
 
     def on_country_combo_changed(self, combo):
@@ -192,7 +192,10 @@ class DisplayBox(Gtk.Box):
         print("You chose the color: " + button.get_rgba().to_string())
 
     def on_flip_button(self, button):
-        self.img.set_from_file(flip_image(common.selected_thumbnail.source_path, common.selected_thumbnail.filename))
+        # convert images and get (thumbnail path, flipped image path)
+        images = flip_selected_wallpaper()
+        self.img.set_from_file(images[0])
+        self.wallpaper_path = images[1]
         self.flip_button.set_sensitive(False)
 
 
@@ -236,10 +239,12 @@ class GUI:
         displays_box.set_orientation(Gtk.Orientation.HORIZONTAL)
         window.add(main_box)
 
+        common.display_boxes_list = []
         for display in displays:
             # Label format: name (width x height)
             display_box = DisplayBox(
                 "{} ({} x {})".format(display.get('name'), display.get('width'), display.get('height')))
+            common.display_boxes_list.append(display_box)
             displays_box.pack_start(display_box, True, False, 0)
 
         main_box.pack_start(displays_box, False, False, 0)
@@ -254,6 +259,7 @@ class GUI:
         bottom_box.pack_start(all_screens_button, True, True, 0)
 
         apply_button = Gtk.Button("Apply")
+        apply_button.connect('clicked', self.on_apply_button)
         bottom_box.pack_start(apply_button, True, True, 0)
 
         main_box.add(bottom_box)
@@ -288,6 +294,10 @@ class GUI:
 
         dialog.destroy()
 
+    def on_apply_button(self, button):
+        for box in common.display_boxes_list:
+            print(box.wallpaper_path)
+
 
 def check_displays():
     displays = []
@@ -305,7 +315,7 @@ def check_displays():
                 log("Output: {}".format(display), common.INFO)
 
         # for testing
-        """display = {'name': 'HDMI-A-2',
+        display = {'name': 'HDMI-A-2',
                    'x': 0,
                    'y': 0,
                    'width': 1920,
@@ -313,7 +323,7 @@ def check_displays():
         displays.append(display)
         log("Output: {}".format(display), common.INFO)
 
-        display = {'name': 'HDMI-A-3',
+        """display = {'name': 'HDMI-A-3',
                    'x': 0,
                    'y': 0,
                    'width': 1920,

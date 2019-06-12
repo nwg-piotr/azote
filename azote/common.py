@@ -8,7 +8,8 @@ wayland = False
 preview = None
 status_bar = None
 buttons_list = None
-selected_thumbnail = None
+display_boxes_list = None
+selected_wallpaper = None
 selected_picture_label = None
 
 cols = 3                # number of columns in pictures preview
