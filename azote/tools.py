@@ -2,6 +2,7 @@ import os
 import glob
 import hashlib
 import logging
+import PIL
 from PIL import Image
 import common
 import pickle
@@ -19,6 +20,11 @@ def set_env():
     common.thumb_dir = os.path.join(common.app_dir,"thumbnails")
     if not os.path.isdir(common.thumb_dir):
         os.mkdir(common.thumb_dir)
+
+    # backgrounds folder
+    common.bcg_dir = os.path.join(common.app_dir, "backgrounds")
+    if not os.path.isdir(common.bcg_dir):
+        os.mkdir(common.bcg_dir)
 
     # logging
     common.log_file = os.path.join(common.app_dir, "log.txt")
@@ -79,6 +85,22 @@ def create_thumbnail(in_path, dest_path, thumb_name, refresh=False):
         log('{}: {} -> {}'.format(action, in_path, thumb_name), common.INFO)
     except Exception as e:
         log('{} - {}'.format(action, e), common.ERROR)
+
+
+def flip_image(src_path, filename):
+    try:
+        img = Image.open(src_path)
+        flipped = img.transpose(Image.FLIP_LEFT_RIGHT)
+        img_path = os.path.join(common.bcg_dir, filename)
+        flipped.save(img_path, "PNG")
+
+        flipped.thumbnail((240, 240), Image.ANTIALIAS)
+        thumb_path = os.path.join(common.bcg_dir, "azotethumb-{}".format(filename))
+        flipped.save(thumb_path, "PNG")
+        return thumb_path
+
+    except Exception as e:
+        log('Failed flipping {} - {}'.format(src_path, e), common.ERROR)
 
 
 def is_newer(in_path, dest_path):

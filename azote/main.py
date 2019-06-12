@@ -7,7 +7,7 @@ from PIL import Image
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
-from tools import set_env, log, hash_name, create_thumbnails, file_allowed, update_status_bar
+from tools import set_env, log, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_image
 
 
 class Preview(Gtk.ScrolledWindow):
@@ -96,7 +96,7 @@ class ThumbButton(Gtk.Button):
 
     def select(self, button):
         self.selected = True
-        common.selected_wallpaper = self
+        common.selected_thumbnail = self
         deselect_all()
         button.set_property("name", "thumb-btn-selected")
 
@@ -122,18 +122,20 @@ class DisplayBox(Gtk.Box):
 
         self.set_orientation(Gtk.Orientation.VERTICAL)
 
+        self.image_selected = False
+
         self.img = Gtk.Image()
         self.img.set_from_file("images/empty.png")
 
-        self.set_button = Gtk.Button()
-        self.set_button.set_label(display_name)                 # label on top: name (with x height)
-        self.set_button.set_image(self.img)                     # preview of selected wallpaper
-        self.set_button.set_image_position(3)                   # label on top, image below
-        self.set_button.set_property("name", "display-btn")     # to assign css style
+        self.select_button = Gtk.Button()
+        self.select_button.set_label(display_name)                 # label on top: name (with x height)
+        self.select_button.set_image(self.img)                     # preview of selected wallpaper
+        self.select_button.set_image_position(3)                   # label on top, image below
+        self.select_button.set_property("name", "display-btn")     # to assign css style
 
-        self.pack_start(self.set_button, False, False, 10)
+        self.pack_start(self.select_button, False, False, 10)
 
-        self.set_button.connect_after('clicked', self.select_btn)
+        self.select_button.connect_after('clicked', self.on_select_button)
 
         # Combo box to choose a mode to use for the image
         mode_selector = Gtk.ListStore(str)
@@ -146,7 +148,6 @@ class DisplayBox(Gtk.Box):
         options_box.set_spacing(15)
         options_box.set_border_width(0)
         options_box.set_orientation(Gtk.Orientation.HORIZONTAL)
-        #self.add(options_box)
         self.pack_start(options_box, True, False, 0)
 
         mode_combo = Gtk.ComboBox.new_with_model(mode_selector)
@@ -155,7 +156,6 @@ class DisplayBox(Gtk.Box):
         renderer_text = Gtk.CellRendererText()
         mode_combo.pack_start(renderer_text, True)
         mode_combo.add_attribute(renderer_text, "text", 0)
-        #options_box.pack_start(mode_combo, True, False, 0)
         options_box.add(mode_combo)
 
         # Color button
@@ -167,16 +167,19 @@ class DisplayBox(Gtk.Box):
         color.alpha = 1.0
         color_button.set_rgba(color)
         color_button.connect("color-set", self.on_color_chosen, color_button)
-        #options_box.pack_start(color_button, True, True, 0)
         options_box.add(color_button)
 
-        flip_button = Gtk.Button("Flip image")
-        options_box.add(flip_button)
+        self.flip_button = Gtk.Button("Flip image")
+        self.flip_button.set_sensitive(False)
+        self.flip_button.connect('clicked', self.on_flip_button)
+        options_box.add(self.flip_button)
 
-    def select_btn(self, button):
-        if common.selected_wallpaper:
-            self.img.set_from_file(common.selected_wallpaper.thumb_file)
+    def on_select_button(self, button):
+        if common.selected_thumbnail:
+            self.img.set_from_file(common.selected_thumbnail.thumb_file)
             button.set_property("name", "display-btn-selected")
+            self.image_selected = True
+            self.flip_button.set_sensitive(True)
 
     def on_country_combo_changed(self, combo):
         tree_iter = combo.get_active_iter()
@@ -187,6 +190,10 @@ class DisplayBox(Gtk.Box):
 
     def on_color_chosen(self, user_data, button):
         print("You chose the color: " + button.get_rgba().to_string())
+
+    def on_flip_button(self, button):
+        self.img.set_from_file(flip_image(common.selected_thumbnail.source_path, common.selected_thumbnail.filename))
+        self.flip_button.set_sensitive(False)
 
 
 class GUI:
