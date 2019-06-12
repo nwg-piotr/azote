@@ -21,6 +21,7 @@ thumb_dir = ''          # ~/.azote/thumbnails
 tmp_dir = ''            # ~/.azote/temp
 bcg_dir = ''            # ~/.azote/backgrounds
 log_file = ''           # ~/.azote/log.txt
+cmd_file = ''           # ~/.azote/command.sh
 logging_enabled = True
 outputs = None          # detected display names
 

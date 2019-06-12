@@ -1,5 +1,7 @@
 import os
 import sys
+import subprocess
+import stat
 import i3ipc
 import common
 import gi
@@ -7,7 +9,8 @@ from PIL import Image
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
-from tools import set_env, log, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, copy_backgrounds
+from tools import set_env, log, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
+    copy_backgrounds, rgba_to_hex
 
 
 class Preview(Gtk.ScrolledWindow):
@@ -163,15 +166,15 @@ class DisplayBox(Gtk.Box):
         options_box.add(mode_combo)
 
         # Color button
-        color_button = Gtk.ColorButton()
+        self.color_button = Gtk.ColorButton()
         color = Gdk.RGBA()
         color.red = 0.0
         color.green = 0.0
         color.blue = 0.0
         color.alpha = 1.0
-        color_button.set_rgba(color)
-        color_button.connect("color-set", self.on_color_chosen, color_button)
-        options_box.add(color_button)
+        self.color_button.set_rgba(color)
+        self.color_button.connect("color-set", self.on_color_chosen, self.color_button)
+        options_box.add(self.color_button)
 
         self.flip_button = Gtk.Button("Flip image")
         self.flip_button.set_sensitive(False)
@@ -185,6 +188,15 @@ class DisplayBox(Gtk.Box):
             button.set_property("name", "display-btn-selected")
             self.flip_button.set_sensitive(True)
 
+            # clear color selection: image will be used
+            color = Gdk.RGBA()
+            color.red = 0.0
+            color.green = 0.0
+            color.blue = 0.0
+            color.alpha = 1.0
+            self.color_button.set_rgba(color)
+            self.color = None
+
     def on_country_combo_changed(self, combo):
         tree_iter = combo.get_active_iter()
         if tree_iter is not None:
@@ -193,7 +205,9 @@ class DisplayBox(Gtk.Box):
             self.mode = mode
 
     def on_color_chosen(self, user_data, button):
-        self.color = button.get_rgba().to_string()
+        self.color = rgba_to_hex(button.get_rgba())
+        # clear selected image to indicate it won't be used
+        self.img.set_from_file("images/empty.png")
 
     def on_flip_button(self, button):
         # convert images and get (thumbnail path, flipped image path)
@@ -298,10 +312,30 @@ class GUI:
         dialog.destroy()
 
     def on_apply_button(self, button):
+        """
+        This will only create commands for swaybg, at least for now
+        """
+        # Copy modified wallpapers (if any) from temporary to backgrounds folder
         copy_backgrounds()
+
+        # Prepare the shell script
+        command = ['#!/usr/bin/env bash', 'pkill swaybg']
         for box in common.display_boxes_list:
-            if box.wallpaper_path:
-                print(box.display_name, box.wallpaper_path, box.mode, box.color)
+            if box.color:
+                # if a color chosen, the wallpaper won't appear
+                command.append("swaybg -o {} -c{} &".format(box.display_name, box.color))
+            elif box.wallpaper_path:
+                command.append("swaybg -o {} -i {} -m {} &".format(box.display_name, box.wallpaper_path, box.mode))
+
+        # save to ~/.azote/command.sh
+        with open(common.cmd_file, 'w') as f:
+            for item in command:
+                f.write("%s\n" % item)
+        # make the file executable
+        st = os.stat(common.cmd_file)
+        os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
+
+        subprocess.call(common.cmd_file, shell=True)
 
 
 def check_displays():
@@ -320,13 +354,13 @@ def check_displays():
                 log("Output found: {}".format(display), common.INFO)
 
         # for testing
-        display = {'name': 'HDMI-A-2',
+        """display = {'name': 'HDMI-A-2',
                    'x': 0,
                    'y': 0,
                    'width': 1920,
                    'height': 1080}
         displays.append(display)
-        """log("Output: {}".format(display), common.INFO)
+        log("Output: {}".format(display), common.INFO)
 
         display = {'name': 'HDMI-A-3',
                    'x': 0,

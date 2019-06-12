@@ -41,6 +41,9 @@ def set_env():
     logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
                         level=logging.INFO)
 
+    # command file
+    common.cmd_file = os.path.join(common.app_dir, "command.sh")
+
     log('Azote launched', common.INFO)
 
     # check if Wayland available
@@ -156,6 +159,16 @@ def convert_bytes(num):
         if num < 1024.0:
             return "%3.1f %s" % (num, x)
         num /= 1024.0
+
+
+def rgba_to_hex(color):
+    """
+    Return hexadecimal string for :class:`Gdk.RGBA` `color`
+    http://wrhansen.blogspot.com/2012/09/how-to-convert-gdkrgba-to-hex-string-in.html
+    """
+    return "#{0:02x}{1:02x}{2:02x}".format(int(color.red * 255),
+                                           int(color.green * 255),
+                                           int(color.blue * 255))
 
 
 class Settings(object):
