@@ -41,7 +41,7 @@ def set_env():
     logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
                         level=logging.INFO)
 
-    log('Launched', common.INFO)
+    log('Azote launched', common.INFO)
 
     # check if Wayland available
     common.wayland = 'wayland' in subprocess.check_output("echo $XDG_SESSION_TYPE", shell=True).decode("utf-8")
