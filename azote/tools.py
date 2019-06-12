@@ -116,8 +116,8 @@ def flip_selected_wallpaper():
     try:
         img = Image.open(common.selected_wallpaper.source_path)
         flipped = img.transpose(Image.FLIP_LEFT_RIGHT)
-        img_path = os.path.join(common.tmp_dir, "flipped-{}".format(common.selected_wallpaper.filename))
-        flipped.save(img_path, "PNG")
+        img_path = os.path.join(common.bcg_dir, "flipped-{}".format(common.selected_wallpaper.filename))
+        flipped.save(os.path.join(common.tmp_dir, "flipped-{}".format(common.selected_wallpaper.filename)), "PNG")
 
         flipped.thumbnail((240, 240), Image.ANTIALIAS)
         thumb_path = os.path.join(common.tmp_dir, "thumbnail-{}".format(common.selected_wallpaper.filename))
