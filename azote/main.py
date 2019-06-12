@@ -317,7 +317,7 @@ def check_displays():
                            'width': output.rect.width,
                            'height': output.rect.height}
                 displays.append(display)
-                log("Output: {}".format(display), common.INFO)
+                log("Output found: {}".format(display), common.INFO)
 
         # for testing
         display = {'name': 'HDMI-A-2',

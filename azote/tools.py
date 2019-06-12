@@ -25,10 +25,9 @@ def log(message, level=None):
 
 def set_env():
 
-    common.settings = Settings()
-
     # application folder
     common.app_dir = os.path.join(os.getenv("HOME"), ".azote")
+    print(common.app_dir)
     if not os.path.isdir(common.app_dir):
         os.mkdir(common.app_dir)
 
@@ -36,22 +35,6 @@ def set_env():
     common.thumb_dir = os.path.join(common.app_dir,"thumbnails")
     if not os.path.isdir(common.thumb_dir):
         os.mkdir(common.thumb_dir)
-
-    # temporary folder
-    common.tmp_dir = os.path.join(common.app_dir, "temp")
-    if not os.path.isdir(common.tmp_dir):
-        os.mkdir(common.tmp_dir)
-    cnt = 0
-    for file in os.listdir(common.tmp_dir):
-        os.remove(os.path.join(common.tmp_dir, file))  # clear on start
-        cnt += 1
-    if cnt > 0:
-        log("Removed {} temporary files".format(cnt), common.INFO)
-
-    # backgrounds folder
-    common.bcg_dir = os.path.join(common.app_dir, "backgrounds")
-    if not os.path.isdir(common.bcg_dir):
-        os.mkdir(common.bcg_dir)
 
     # logging
     common.log_file = os.path.join(common.app_dir, "log.txt")
@@ -62,7 +45,24 @@ def set_env():
 
     # check if Wayland available
     common.wayland = 'wayland' in subprocess.check_output("echo $XDG_SESSION_TYPE", shell=True).decode("utf-8")
-    log("Wayland session: {}".format(common.wayland), common.INFO)
+    log("Wayland: {}".format(common.wayland), common.INFO)
+
+    # temporary folder
+    common.tmp_dir = os.path.join(common.app_dir, "temp")
+    if not os.path.isdir(common.tmp_dir):
+        os.mkdir(common.tmp_dir)
+    # remove all files inside on start
+    for file in os.listdir(common.tmp_dir):
+        path = os.path.join(common.tmp_dir, file)
+        os.remove(path)  # clear on start
+        log("Removed {}".format(path), common.INFO)
+
+    # backgrounds folder
+    common.bcg_dir = os.path.join(common.app_dir, "backgrounds")
+    if not os.path.isdir(common.bcg_dir):
+        os.mkdir(common.bcg_dir)
+
+    common.settings = Settings()
 
 
 def copy_backgrounds():
@@ -161,6 +161,7 @@ def convert_bytes(num):
 class Settings(object):
     def __init__(self):
         self.file = os.path.join(common.app_dir, "settings.pkl")
+        print("Settings file", self.file)
 
         # Try to find user's Pictures directory
         user_dirs = os.path.join(os.getenv("HOME"), '.config/user-dirs.dirs')
@@ -183,7 +184,6 @@ class Settings(object):
     def load(self):
         if not os.path.isfile(self.file):
             log('Creating initial settings', common.INFO)
-            log('Pictures dir: {}'.format(self.src_path), common.INFO)
             self.save()
 
         with open(self.file, 'rb') as input_data:
