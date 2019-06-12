@@ -117,18 +117,22 @@ class DisplayBox(Gtk.Box):
     """
     The box contains elements to preview certain displays and assign wallpapers to them
     """
-    def __init__(self, display_name):
+    def __init__(self, name, width, height):
         super().__init__()
 
         self.set_orientation(Gtk.Orientation.VERTICAL)
 
-        self.wallpaper_path = None  # stores the value which will be assigned to corresponding display
+        # Values to assigned to corresponding display when apply button pressed
+        self.display_name = name
+        self.wallpaper_path = None
+        self.mode = 'fill'
+        self.color = None
 
         self.img = Gtk.Image()
         self.img.set_from_file("images/empty.png")
 
         self.select_button = Gtk.Button()
-        self.select_button.set_label(display_name)                 # label on top: name (with x height)
+        self.select_button.set_label("{} ({} x {})".format(name, width, height))  # label on top: name (with x height)
         self.select_button.set_image(self.img)                     # preview of selected wallpaper
         self.select_button.set_image_position(3)                   # label on top, image below
         self.select_button.set_property("name", "display-btn")     # to assign css style
@@ -185,11 +189,11 @@ class DisplayBox(Gtk.Box):
         tree_iter = combo.get_active_iter()
         if tree_iter is not None:
             model = combo.get_model()
-            country = model[tree_iter][0]
-            print("Selected: country=%s" % country)
+            mode = model[tree_iter][0]
+            self.mode = mode
 
     def on_color_chosen(self, user_data, button):
-        print("You chose the color: " + button.get_rgba().to_string())
+        self.color = button.get_rgba().to_string()
 
     def on_flip_button(self, button):
         # convert images and get (thumbnail path, flipped image path)
@@ -242,8 +246,7 @@ class GUI:
         common.display_boxes_list = []
         for display in displays:
             # Label format: name (width x height)
-            display_box = DisplayBox(
-                "{} ({} x {})".format(display.get('name'), display.get('width'), display.get('height')))
+            display_box = DisplayBox(display.get('name'), display.get('width'), display.get('height'))
             common.display_boxes_list.append(display_box)
             displays_box.pack_start(display_box, True, False, 0)
 
@@ -296,7 +299,8 @@ class GUI:
 
     def on_apply_button(self, button):
         for box in common.display_boxes_list:
-            print(box.wallpaper_path)
+            if box.wallpaper_path:
+                print(box.display_name, box.wallpaper_path, box.mode, box.color)
 
 
 def check_displays():
@@ -321,9 +325,9 @@ def check_displays():
                    'width': 1920,
                    'height': 1080}
         displays.append(display)
-        log("Output: {}".format(display), common.INFO)
+        """log("Output: {}".format(display), common.INFO)
 
-        """display = {'name': 'HDMI-A-3',
+        display = {'name': 'HDMI-A-3',
                    'x': 0,
                    'y': 0,
                    'width': 1920,
