@@ -7,7 +7,7 @@ from PIL import Image
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
-from tools import set_env, log, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper
+from tools import set_env, log, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, copy_backgrounds
 
 
 class Preview(Gtk.ScrolledWindow):
@@ -298,6 +298,7 @@ class GUI:
         dialog.destroy()
 
     def on_apply_button(self, button):
+        copy_backgrounds()
         for box in common.display_boxes_list:
             if box.wallpaper_path:
                 print(box.display_name, box.wallpaper_path, box.mode, box.color)

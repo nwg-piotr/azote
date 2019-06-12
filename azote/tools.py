@@ -2,41 +2,11 @@ import os
 import glob
 import hashlib
 import logging
-import PIL
 from PIL import Image
 import common
 import pickle
 import subprocess
-
-
-def set_env():
-
-    # application folder
-    common.app_dir = os.getenv("HOME") + "/.azote"
-    if not os.path.isdir(common.app_dir):
-        os.mkdir(common.app_dir)
-
-    # thumbnails folder
-    common.thumb_dir = os.path.join(common.app_dir,"thumbnails")
-    if not os.path.isdir(common.thumb_dir):
-        os.mkdir(common.thumb_dir)
-
-    # backgrounds folder
-    common.bcg_dir = os.path.join(common.app_dir, "backgrounds")
-    if not os.path.isdir(common.bcg_dir):
-        os.mkdir(common.bcg_dir)
-
-    # logging
-    common.log_file = os.path.join(common.app_dir, "log.txt")
-    logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
-                        level=logging.INFO)
-
-    log('Launched', common.INFO)
-    common.settings = Settings()
-
-    # check if Wayland available
-    common.wayland = 'wayland' in subprocess.check_output("echo $XDG_SESSION_TYPE", shell=True).decode("utf-8")
-    log("Wayland session: {}".format(common.wayland), common.INFO)
+from shutil import copyfile
 
 
 def log(message, level=None):
@@ -51,6 +21,57 @@ def log(message, level=None):
             logging.info(message)
         else:
             logging.debug(message)
+
+
+def set_env():
+
+    common.settings = Settings()
+
+    # application folder
+    common.app_dir = os.path.join(os.getenv("HOME"), ".azote")
+    if not os.path.isdir(common.app_dir):
+        os.mkdir(common.app_dir)
+
+    # thumbnails folder
+    common.thumb_dir = os.path.join(common.app_dir,"thumbnails")
+    if not os.path.isdir(common.thumb_dir):
+        os.mkdir(common.thumb_dir)
+
+    # temporary folder
+    common.tmp_dir = os.path.join(common.app_dir, "temp")
+    if not os.path.isdir(common.tmp_dir):
+        os.mkdir(common.tmp_dir)
+    cnt = 0
+    for file in os.listdir(common.tmp_dir):
+        os.remove(os.path.join(common.tmp_dir, file))  # clear on start
+        cnt += 1
+    if cnt > 0:
+        log("Removed {} temporary files".format(cnt), common.INFO)
+
+    # backgrounds folder
+    common.bcg_dir = os.path.join(common.app_dir, "backgrounds")
+    if not os.path.isdir(common.bcg_dir):
+        os.mkdir(common.bcg_dir)
+
+    # logging
+    common.log_file = os.path.join(common.app_dir, "log.txt")
+    logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
+                        level=logging.INFO)
+
+    log('Launched', common.INFO)
+
+    # check if Wayland available
+    common.wayland = 'wayland' in subprocess.check_output("echo $XDG_SESSION_TYPE", shell=True).decode("utf-8")
+    log("Wayland session: {}".format(common.wayland), common.INFO)
+
+
+def copy_backgrounds():
+    # Clear current folder content
+    for file in os.listdir(common.bcg_dir):
+        os.remove(os.path.join(common.bcg_dir, file))
+    # Copy manipulated (flip, split) files from the temporary folder
+    for file in os.listdir(common.tmp_dir):
+        copyfile(os.path.join(common.tmp_dir, file), os.path.join(common.bcg_dir, file))
 
 
 def hash_name(full_path):
@@ -95,11 +116,11 @@ def flip_selected_wallpaper():
     try:
         img = Image.open(common.selected_wallpaper.source_path)
         flipped = img.transpose(Image.FLIP_LEFT_RIGHT)
-        img_path = os.path.join(common.bcg_dir, "flipped-{}".format(common.selected_wallpaper.filename))
+        img_path = os.path.join(common.tmp_dir, "flipped-{}".format(common.selected_wallpaper.filename))
         flipped.save(img_path, "PNG")
 
         flipped.thumbnail((240, 240), Image.ANTIALIAS)
-        thumb_path = os.path.join(common.bcg_dir, "thumbnail-{}".format(common.selected_wallpaper.filename))
+        thumb_path = os.path.join(common.tmp_dir, "thumbnail-{}".format(common.selected_wallpaper.filename))
         flipped.save(thumb_path, "PNG")
         return thumb_path, img_path
 

@@ -18,6 +18,7 @@ allowed_file_types = ['jpg', 'jpeg', 'png']
 
 app_dir = ''            # ~/.azote
 thumb_dir = ''          # ~/.azote/thumbnails
+tmp_dir = ''            # ~/.azote/temp
 bcg_dir = ''            # ~/.azote/backgrounds
 log_file = ''           # ~/.azote/log.txt
 logging_enabled = True
