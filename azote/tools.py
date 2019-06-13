@@ -136,10 +136,19 @@ def split_selected_wallpaper(num_parts):
         img = Image.open(common.selected_wallpaper.source_path)
         width, height = img.size
         part_width = width // num_parts
+        paths_list = []
         for i in range(num_parts):
             box = (i * part_width, 0, i * part_width + part_width, height)
             part = img.crop(box)
+            img_path = os.path.join(common.bcg_dir, "part{}-{}".format(i, common.selected_wallpaper.filename))
             part.save(os.path.join(common.tmp_dir, "part{}-{}".format(i, common.selected_wallpaper.filename)), "PNG")
+
+            part.thumbnail((240, 240), Image.ANTIALIAS)
+            thumb_path = os.path.join(common.tmp_dir, "thumb-part{}-{}".format(i, common.selected_wallpaper.filename))
+            part.save(thumb_path, "PNG")
+            paths = (img_path, thumb_path)
+            paths_list.append(paths)
+        return paths_list
 
     except Exception as e:
         log('Failed splitting {} - {}'.format(common.selected_wallpaper.source_path, e), common.ERROR)

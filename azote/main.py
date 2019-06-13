@@ -350,10 +350,21 @@ class GUI:
 
     def on_divide_2_button(self, button):
         if common.selected_wallpaper:
-            split_selected_wallpaper(2)
+            paths = split_selected_wallpaper(2)
+            print(paths)
+            for i in range(len(paths)):
+                box = common.display_boxes_list[i]
+                box.wallpaper_path = paths[i][0]
+                box.img.set_from_file(paths[i][1])
 
     def on_divide_3_button(self, button):
-        print(common.displays)
+        if common.selected_wallpaper:
+            paths = split_selected_wallpaper(3)
+            print(paths)
+            for i in range(len(paths)):
+                box = common.display_boxes_list[i]
+                box.wallpaper_path = paths[i][0]
+                box.img.set_from_file(paths[i][1])
 
 
 def check_displays():
@@ -372,8 +383,8 @@ def check_displays():
                 log("Output found: {}".format(display), common.INFO)
 
         # for testing
-        """display = {'name': 'HDMI-A-2',
-                   'x': 10,
+        display = {'name': 'HDMI-A-2',
+                   'x': 1920,
                    'y': 0,
                    'width': 1920,
                    'height': 1080}
@@ -381,16 +392,16 @@ def check_displays():
         log("Output: {}".format(display), common.INFO)
 
         display = {'name': 'HDMI-A-3',
-                   'x': 0,
+                   'x': 3840,
                    'y': 0,
                    'width': 1920,
                    'height': 1080}
         displays.append(display)
         log("Output: {}".format(display), common.INFO)
 
-        display = {'name': 'HDMI-A-4',
-                   'x': 1366,
-                   'y': 728,
+        """display = {'name': 'HDMI-A-4',
+                   'x': 3840,
+                   'y': 0,
                    'width': 1920,
                    'height': 1080}
         displays.append(display)
