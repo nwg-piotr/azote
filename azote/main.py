@@ -218,7 +218,7 @@ class DisplayBox(Gtk.Box):
 
 
 class GUI:
-    def __init__(self, displays):
+    def __init__(self):
 
         window = Gtk.Window()
 
@@ -258,7 +258,7 @@ class GUI:
         window.add(main_box)
 
         common.display_boxes_list = []
-        for display in displays:
+        for display in common.displays:
             # Label format: name (width x height)
             display_box = DisplayBox(display.get('name'), display.get('width'), display.get('height'))
             common.display_boxes_list.append(display_box)
@@ -272,8 +272,14 @@ class GUI:
         bottom_box.set_border_width(10)
         bottom_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
-        all_screens_button = Gtk.Button("Divide selected between screens")
-        bottom_box.pack_start(all_screens_button, True, True, 0)
+        divide_2_button = Gtk.Button("Divide selected in 2")
+        bottom_box.pack_start(divide_2_button, True, True, 0)
+        divide_2_button.connect('clicked', self.on_divide_2_button)
+
+        if len(common.displays) > 2:
+            divide_3_button = Gtk.Button("Divide selected in 3")
+            bottom_box.pack_start(divide_3_button, True, True, 0)
+            divide_3_button.connect('clicked', self.on_divide_3_button)
 
         apply_button = Gtk.Button("Apply")
         apply_button.connect('clicked', self.on_apply_button)
@@ -337,13 +343,19 @@ class GUI:
 
         subprocess.call(common.cmd_file, shell=True)
 
+    def on_divide_2_button(self, button):
+        print(common.displays)
+
+    def on_divide_3_button(self, button):
+        print(common.displays)
+
 
 def check_displays():
     displays = []
     try:
         i3 = i3ipc.Connection()
-        common.outputs = i3.get_outputs()
-        for output in common.outputs:
+        outputs = i3.get_outputs()
+        for output in outputs:
             if output.active:  # dunno WTF xroot-0 is: i3 returns such an output with "active":false
                 display = {'name': output.name,
                            'x': output.rect.x,
@@ -355,7 +367,7 @@ def check_displays():
 
         # for testing
         """display = {'name': 'HDMI-A-2',
-                   'x': 0,
+                   'x': 10,
                    'y': 0,
                    'width': 1920,
                    'height': 1080}
@@ -378,6 +390,9 @@ def check_displays():
         displays.append(display)
         log("Output: {}".format(display), common.INFO)"""
 
+        # sort displays list by x, y: from left to right, then from bottom to top
+        displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
+
         return displays
     except Exception as e:
         log(e, common.ERROR)
@@ -398,7 +413,6 @@ def on_configure_event(window, e):
 
 def main():
     screen = Gdk.Screen.get_default()
-    print(Gdk.Screen.get_display(screen))
     provider = Gtk.CssProvider()
     style_context = Gtk.StyleContext()
     style_context.add_provider_for_screen(
@@ -430,9 +444,9 @@ def main():
     provider.load_from_data(css)
 
     set_env()  # set paths and stuff
-    displays = check_displays()
-    common.cols = len(displays) if len(displays) > 3 else 3
-    app = GUI(displays)
+    common.displays = check_displays()
+    common.cols = len(common.displays) if len(common.displays) > 3 else 3
+    app = GUI()
     Gtk.main()
 
 

@@ -23,6 +23,6 @@ bcg_dir = ''            # ~/.azote/backgrounds
 log_file = ''           # ~/.azote/log.txt
 cmd_file = ''           # ~/.azote/command.sh
 logging_enabled = True
-outputs = None          # detected display names
+displays = None         # detected displays details
 
 settings = None         # object saved to / restored from ~/.azote/settings.pkl
