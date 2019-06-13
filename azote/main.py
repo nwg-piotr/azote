@@ -164,7 +164,7 @@ class DisplayBox(Gtk.Box):
 
         mode_combo = Gtk.ComboBox.new_with_model(mode_selector)
         mode_combo.set_active(2)
-        mode_combo.connect("changed", self.on_country_combo_changed)
+        mode_combo.connect("changed", self.on_mode_combo_changed)
         renderer_text = Gtk.CellRendererText()
         mode_combo.pack_start(renderer_text, True)
         mode_combo.add_attribute(renderer_text, "text", 0)
@@ -202,7 +202,7 @@ class DisplayBox(Gtk.Box):
             self.color_button.set_rgba(color)
             self.color = None
 
-    def on_country_combo_changed(self, combo):
+    def on_mode_combo_changed(self, combo):
         tree_iter = combo.get_active_iter()
         if tree_iter is not None:
             model = combo.get_model()
@@ -277,10 +277,34 @@ class GUI:
         bottom_box.set_border_width(10)
         bottom_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
-        divide_2_button = Gtk.Button("Split into 2")
-        bottom_box.pack_start(divide_2_button, True, True, 0)
-        divide_2_button.connect('clicked', self.on_divide_2_button)
+        """
+        select_first_label = Gtk.Label()
+        select_first_label.set_text('First:')
+        bottom_box.add(select_first_label)
 
+        # Which display to start splitting from?
+        first_selector = Gtk.ListStore(str)
+        names = []
+        for display in common.displays:
+            names.append(display.get('name'))
+        for name in names:
+            first_selector.append([name])
+
+        first_combo = Gtk.ComboBox.new_with_model(first_selector)
+        first_combo.set_active(0)
+        #first_combo.connect("changed", self.on_mode_combo_changed)
+        renderer_text = Gtk.CellRendererText()
+        first_combo.pack_start(renderer_text, True)
+        first_combo.add_attribute(renderer_text, "text", 0)
+
+        bottom_box.add(first_combo)
+        """
+
+        divide_button = Gtk.Button("Split image")
+        bottom_box.pack_start(divide_button, True, True, 0)
+        divide_button.connect('clicked', self.on_divide_button)
+
+        """
         if len(common.displays) > 2:
             divide_3_button = Gtk.Button("Split into 3")
             bottom_box.pack_start(divide_3_button, True, True, 0)
@@ -290,6 +314,7 @@ class GUI:
             divide_3_button = Gtk.Button("Split into 4")
             bottom_box.pack_start(divide_3_button, True, True, 0)
             divide_3_button.connect('clicked', self.on_divide_4_button)
+        """
 
         apply_button = Gtk.Button("Apply")
         apply_button.connect('clicked', self.on_apply_button)
@@ -353,15 +378,16 @@ class GUI:
 
         subprocess.call(common.cmd_file, shell=True)
 
-    def on_divide_2_button(self, button):
+    def on_divide_button(self, button):
         if common.selected_wallpaper:
-            self.unset_boxes()
-            paths = split_selected_wallpaper(2)
+            # self.unset_boxes()
+            paths = split_selected_wallpaper(len(common.displays))
             for i in range(len(paths)):
                 box = common.display_boxes_list[i]
                 box.wallpaper_path = paths[i][0]
                 box.img.set_from_file(paths[i][1])
 
+    """
     def on_divide_3_button(self, button):
         if common.selected_wallpaper:
             self.unset_boxes()
@@ -384,7 +410,7 @@ class GUI:
         for box in common.display_boxes_list:
             box.wallpaper_path = None
             box.img.set_from_file("images/empty.png")
-
+    """
 
 
 def check_displays():

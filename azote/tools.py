@@ -106,13 +106,7 @@ def create_thumbnail(in_path, dest_path, thumb_name, refresh=False):
         # convert to thumbnail image
         img.thumbnail((240, 135), Image.ANTIALIAS)
 
-        # We want the thumbnail to be always 240 x 135. Do we need to expand the image?
-        width, height = img.size
-        border_h = (240 - width) // 2
-        border_v = (135 - height) // 2
-        if border_v > 0 or border_h > 0:
-            border = (border_h, border_v, border_h, border_v)
-            img = ImageOps.expand(img, border=border)
+        img = expand_img(img)
 
         img.save(dest_path, "PNG")
         log('{}: {} -> {}'.format(action, in_path, thumb_name), common.INFO)
@@ -132,6 +126,8 @@ def flip_selected_wallpaper():
         flipped.save(os.path.join(common.tmp_dir, "flipped-{}".format(common.selected_wallpaper.filename)), "PNG")
 
         flipped.thumbnail((240, 135), Image.ANTIALIAS)
+        flipped = expand_img(flipped)
+
         thumb_path = os.path.join(common.tmp_dir, "thumbnail-{}".format(common.selected_wallpaper.filename))
         flipped.save(thumb_path, "PNG")
         return thumb_path, img_path
@@ -153,7 +149,11 @@ def split_selected_wallpaper(num_parts):
             part.save(os.path.join(common.tmp_dir, "part{}-{}".format(i, common.selected_wallpaper.filename)), "PNG")
 
             part.thumbnail((240, 135), Image.ANTIALIAS)
+
             thumb_path = os.path.join(common.tmp_dir, "thumb-part{}-{}".format(i, common.selected_wallpaper.filename))
+
+            part = expand_img(part)
+
             part.save(thumb_path, "PNG")
             paths = (img_path, thumb_path)
             paths_list.append(paths)
@@ -161,6 +161,18 @@ def split_selected_wallpaper(num_parts):
 
     except Exception as e:
         log('Failed splitting {} - {}'.format(common.selected_wallpaper.source_path, e), common.ERROR)
+
+
+def expand_img(image):
+    # We want the thumbnail to be always 240 x 135. Let's expand if necessary.
+    width, height = image.size
+    border_h = (240 - width) // 2
+    border_v = (135 - height) // 2
+    if border_v > 0 or border_h > 0:
+        border = (border_h, border_v, border_h, border_v)
+        return ImageOps.expand(image, border=border)
+    else:
+        return image
 
 
 def is_newer(in_path, dest_path):
