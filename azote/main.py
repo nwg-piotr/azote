@@ -286,6 +286,11 @@ class GUI:
             bottom_box.pack_start(divide_3_button, True, True, 0)
             divide_3_button.connect('clicked', self.on_divide_3_button)
 
+        if len(common.displays) > 3:
+            divide_3_button = Gtk.Button("Split into 4")
+            bottom_box.pack_start(divide_3_button, True, True, 0)
+            divide_3_button.connect('clicked', self.on_divide_4_button)
+
         apply_button = Gtk.Button("Apply")
         apply_button.connect('clicked', self.on_apply_button)
         bottom_box.pack_start(apply_button, True, True, 0)
@@ -350,8 +355,8 @@ class GUI:
 
     def on_divide_2_button(self, button):
         if common.selected_wallpaper:
+            self.unset_boxes()
             paths = split_selected_wallpaper(2)
-            print(paths)
             for i in range(len(paths)):
                 box = common.display_boxes_list[i]
                 box.wallpaper_path = paths[i][0]
@@ -359,12 +364,27 @@ class GUI:
 
     def on_divide_3_button(self, button):
         if common.selected_wallpaper:
+            self.unset_boxes()
             paths = split_selected_wallpaper(3)
-            print(paths)
             for i in range(len(paths)):
                 box = common.display_boxes_list[i]
                 box.wallpaper_path = paths[i][0]
                 box.img.set_from_file(paths[i][1])
+
+    def on_divide_4_button(self, button):
+        self.unset_boxes()
+        if common.selected_wallpaper:
+            paths = split_selected_wallpaper(4)
+            for i in range(len(paths)):
+                box = common.display_boxes_list[i]
+                box.wallpaper_path = paths[i][0]
+                box.img.set_from_file(paths[i][1])
+
+    def unset_boxes(self):
+        for box in common.display_boxes_list:
+            box.wallpaper_path = None
+            box.img.set_from_file("images/empty.png")
+
 
 
 def check_displays():
@@ -399,13 +419,13 @@ def check_displays():
         displays.append(display)
         log("Output: {}".format(display), common.INFO)
 
-        """display = {'name': 'HDMI-A-4',
-                   'x': 3840,
+        display = {'name': 'HDMI-A-4',
+                   'x': 5760,
                    'y': 0,
                    'width': 1920,
                    'height': 1080}
         displays.append(display)
-        log("Output: {}".format(display), common.INFO)"""
+        log("Output: {}".format(display), common.INFO)
 
         # sort displays list by x, y: from left to right, then from bottom to top
         displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
