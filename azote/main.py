@@ -411,7 +411,7 @@ def check_displays():
         displays.append(display)
         log("Output: {}".format(display), common.INFO)
 
-        display = {'name': 'HDMI-A-3',
+        """display = {'name': 'HDMI-A-3',
                    'x': 3840,
                    'y': 0,
                    'width': 1920,
@@ -425,7 +425,7 @@ def check_displays():
                    'width': 1920,
                    'height': 1080}
         displays.append(display)
-        log("Output: {}".format(display), common.INFO)
+        log("Output: {}".format(display), common.INFO)"""
 
         # sort displays list by x, y: from left to right, then from bottom to top
         displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
