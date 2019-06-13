@@ -10,7 +10,7 @@ from PIL import Image
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from tools import set_env, log, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, rgba_to_hex
+    copy_backgrounds, rgba_to_hex, split_selected_wallpaper
 
 
 class Preview(Gtk.ScrolledWindow):
@@ -272,12 +272,12 @@ class GUI:
         bottom_box.set_border_width(10)
         bottom_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
-        divide_2_button = Gtk.Button("Divide selected in 2")
+        divide_2_button = Gtk.Button("Split into 2")
         bottom_box.pack_start(divide_2_button, True, True, 0)
         divide_2_button.connect('clicked', self.on_divide_2_button)
 
         if len(common.displays) > 2:
-            divide_3_button = Gtk.Button("Divide selected in 3")
+            divide_3_button = Gtk.Button("Split into 3")
             bottom_box.pack_start(divide_3_button, True, True, 0)
             divide_3_button.connect('clicked', self.on_divide_3_button)
 
@@ -344,7 +344,8 @@ class GUI:
         subprocess.call(common.cmd_file, shell=True)
 
     def on_divide_2_button(self, button):
-        print(common.displays)
+        if common.selected_wallpaper:
+            split_selected_wallpaper(2)
 
     def on_divide_3_button(self, button):
         print(common.displays)

@@ -131,6 +131,20 @@ def flip_selected_wallpaper():
         log('Failed flipping {} - {}'.format(common.selected_wallpaper.source_path, e), common.ERROR)
 
 
+def split_selected_wallpaper(num_parts):
+    try:
+        img = Image.open(common.selected_wallpaper.source_path)
+        width, height = img.size
+        part_width = width // num_parts
+        for i in range(num_parts):
+            box = (i * part_width, 0, i * part_width + part_width, height)
+            part = img.crop(box)
+            part.save(os.path.join(common.tmp_dir, "part{}-{}".format(i, common.selected_wallpaper.filename)), "PNG")
+
+    except Exception as e:
+        log('Failed splitting {} - {}'.format(common.selected_wallpaper.source_path, e), common.ERROR)
+
+
 def is_newer(in_path, dest_path):
     return os.path.getmtime(in_path) > os.path.getmtime(dest_path)
 
