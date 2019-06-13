@@ -4,7 +4,7 @@ WARNING = 'warning'
 INFO = 'info'
 DEBUG = 'debug'
 
-wayland = False
+wm = None
 preview = None
 status_bar = None
 buttons_list = None

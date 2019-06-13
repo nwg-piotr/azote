@@ -47,8 +47,8 @@ def set_env():
     log('Azote launched', common.INFO)
 
     # check if Wayland available
-    common.wayland = 'wayland' in subprocess.check_output("echo $XDG_SESSION_TYPE", shell=True).decode("utf-8")
-    log("Wayland: {}".format(common.wayland), common.INFO)
+    common.wm = subprocess.check_output("wmctrl -m | grep 'Name' | awk '{print $2}'", shell=True).decode("utf-8").strip()
+    log("WM: {}".format(common.wm), common.INFO)
 
     # temporary folder
     common.tmp_dir = os.path.join(common.app_dir, "temp")

@@ -1,3 +1,8 @@
+"""
+Wallpapers browser / setter for Sway and X11 window managers, as a frontend to swaybg and feh
+
+Dependencies: python-gobject, i3ipc-python, python-pillow, wmctrl, feh
+"""
 import os
 import sys
 import subprocess
