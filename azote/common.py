@@ -24,6 +24,7 @@ app_dir = ''            # ~/.azote
 thumb_dir = ''          # ~/.azote/thumbnails
 tmp_dir = ''            # ~/.azote/temp
 bcg_dir = ''            # ~/.azote/backgrounds-sway or ~/.azote/backgrounds-feh
+sample_dir = ''         # ~/.azote/sample
 log_file = ''           # ~/.azote/log.txt
 cmd_file = ''           # ~/.azote/command.sh
 logging_enabled = True

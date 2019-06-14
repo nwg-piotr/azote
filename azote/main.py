@@ -329,7 +329,7 @@ class GUI:
         dialog.add_button(Gtk.STOCK_CANCEL, 0)
         dialog.add_button(Gtk.STOCK_OK, 1)
         dialog.set_default_response(1)
-        dialog.set_default_size(300, 300)
+        dialog.set_default_size(500, 600)
 
         response = dialog.run()
         if response == 1:

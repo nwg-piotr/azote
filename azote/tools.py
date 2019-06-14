@@ -130,6 +130,14 @@ def set_env():
     if not os.path.isdir(common.bcg_dir):
         os.mkdir(common.bcg_dir)
 
+    # Sample folder (will be set on 1st run only)
+    common.sample_dir = os.path.join(common.app_dir, "sample")
+    if not os.path.isdir(common.sample_dir):
+        os.mkdir(common.sample_dir)
+    copyfile('images/azote-wallpaper.jpg', os.path.join(common.sample_dir, 'azote-wallpaper.jpg'))
+    copyfile('images/azote-wallpaper1.jpg', os.path.join(common.sample_dir, 'azote-wallpaper1.jpg'))
+    copyfile('images/azote-wallpaper2.jpg', os.path.join(common.sample_dir, 'azote-wallpaper2.jpg'))
+
     common.settings = Settings()
 
     log("Environment: {}".format(common.env), common.INFO)
@@ -286,20 +294,7 @@ class Settings(object):
     def __init__(self):
         self.file = os.path.join(common.app_dir, "settings.pkl")
 
-        # Try to find user's Pictures directory
-        user_dirs = os.path.join(os.getenv("HOME"), '.config/user-dirs.dirs')
-        if os.path.isfile(user_dirs):
-            lines = open(user_dirs, 'r').read().rstrip().splitlines()
-            for line in lines:
-                if line.startswith('XDG_PICTURES_DIR'):
-                    pic_dir = os.path.join(os.getenv("HOME"), line.split('/')[1][:-1])
-                    if os.path.isdir(pic_dir):
-                        self.src_path = pic_dir
-
-                    else:
-                        self.src_path = os.getenv("HOME")
-        else:
-            self.src_path = os.getenv("HOME")
+        self.src_path = common.sample_dir
 
         self.load()
 
