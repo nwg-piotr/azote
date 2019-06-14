@@ -103,7 +103,7 @@ def set_env():
     logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
                         level=logging.INFO)
 
-    log('Azote launched', common.INFO)
+    log('Spraying Azote!', common.INFO)
 
     common.displays = check_displays()
 
