@@ -11,6 +11,7 @@ from shutil import copyfile
 
 
 def log(message, level=None):
+    print("Logging!")
     if common.logging_enabled:
         if level == "critical":
             logging.critical(message)
@@ -52,56 +53,67 @@ def check_displays():
                     log("Output found: {}".format(display), common.INFO)
 
             # Dummy display for testing
-            display = {'name': 'HDMI-A-2',
+            """display = {'name': 'HDMI-A-2',
                        'x': 1920,
                        'y': 0,
                        'width': 1920,
                        'height': 1080}
             displays.append(display)
-            log("Output: {}".format(display), common.INFO)
+            log("Output: {}".format(display), common.INFO)"""
 
             # sort displays list by x, y: from left to right, then from bottom to top
             displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
             common.env['i3ipc'] = True
 
             return displays
+
         except Exception as e:
             log("i3ipc won't work: {}".format(e))
 
     elif common.env['xrandr']:
-        resp = subprocess.check_output("xrandr | grep 'connected'", shell=True).decode("utf-8")
-        print(resp)
-        exit(0)
+        names = subprocess.check_output("xrandr | grep ' connected' | awk '{print $1}'", shell=True).decode("utf-8").splitlines()
+        res = subprocess.check_output("xrandr | grep '*' | awk '{print $1}'", shell=True).decode("utf-8").splitlines()
+        displays = []
+        for i in range(len(names)):
+            w_h = res[i].split('x')
+            display = {'name': names[i],
+                       'x': 0,
+                       'y': 0,
+                       'width': w_h[0],
+                       'height': w_h[1]}
+            displays.append(display)
+            log("Output found: {}".format(display), common.INFO)
+
+        return displays
 
     else:
-        print(common.env)
-        print("Can't continue")
+        print("Couldn't check displays")
         exit(1)
 
 
 def set_env():
-    common.displays = check_displays()
-
     # application folder
     common.app_dir = os.path.join(os.getenv("HOME"), ".azote")
     print(common.app_dir)
     if not os.path.isdir(common.app_dir):
         os.mkdir(common.app_dir)
 
-    # thumbnails folder
-    common.thumb_dir = os.path.join(common.app_dir,"thumbnails")
-    if not os.path.isdir(common.thumb_dir):
-        os.mkdir(common.thumb_dir)
-
     # logging
     common.log_file = os.path.join(common.app_dir, "log.txt")
     logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
                         level=logging.INFO)
 
+    log('Azote launched', common.INFO)
+
+    common.displays = check_displays()
+
+    # thumbnails folder
+    common.thumb_dir = os.path.join(common.app_dir,"thumbnails")
+    if not os.path.isdir(common.thumb_dir):
+        os.mkdir(common.thumb_dir)
+
     # command file
     common.cmd_file = os.path.join(os.getenv("HOME"), ".azotebg")
-
-    log('Azote launched', common.INFO)
 
     # temporary folder
     common.tmp_dir = os.path.join(common.app_dir, "temp")
@@ -121,8 +133,7 @@ def set_env():
 
     common.settings = Settings()
 
-    log("Environment: {}".format(common.env), common.CRITICAL)
-    print(common.env)
+    log("Environment: {}".format(common.env), common.INFO)
 
 
 def copy_backgrounds():
