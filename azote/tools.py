@@ -42,13 +42,14 @@ def set_env():
                         level=logging.INFO)
 
     # command file
-    common.cmd_file = os.path.join(common.app_dir, "command.sh")
+    common.cmd_file = os.path.join(os.getenv("HOME"), ".azotebg")
 
     log('Azote launched', common.INFO)
 
-    # check if Wayland available
-    common.wm = subprocess.check_output("wmctrl -m | grep 'Name' | awk '{print $2}'", shell=True).decode("utf-8").strip()
-    log("WM: {}".format(common.wm), common.INFO)
+    # Sway or not Sway?
+    wm = subprocess.check_output("wmctrl -m | grep 'Name' | awk '{print $2}'", shell=True).decode("utf-8").strip()
+    log("WM: {}".format(wm), common.INFO)
+    common.sway = 'LG3D' in wm or 'wlroots' in wm
 
     # temporary folder
     common.tmp_dir = os.path.join(common.app_dir, "temp")
@@ -61,7 +62,8 @@ def set_env():
         log("Removed {}".format(path), common.INFO)
 
     # backgrounds folder
-    common.bcg_dir = os.path.join(common.app_dir, "backgrounds")
+    name = 'backgrounds-sway' if common.sway else 'backgrounds-feh'
+    common.bcg_dir = os.path.join(common.app_dir, name)
     if not os.path.isdir(common.bcg_dir):
         os.mkdir(common.bcg_dir)
 

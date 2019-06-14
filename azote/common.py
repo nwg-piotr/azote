@@ -4,7 +4,7 @@ WARNING = 'warning'
 INFO = 'info'
 DEBUG = 'debug'
 
-wm = None
+sway = False
 preview = None
 status_bar = None
 buttons_list = None

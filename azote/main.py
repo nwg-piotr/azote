@@ -133,7 +133,7 @@ class DisplayBox(Gtk.Box):
         # Values to assigned to corresponding display when apply button pressed
         self.display_name = name
         self.wallpaper_path = None
-        self.mode = 'fill'
+        self.mode = 'fill' if common.sway else 'scale'
         self.color = None
 
         self.img = Gtk.Image()
@@ -151,7 +151,12 @@ class DisplayBox(Gtk.Box):
 
         # Combo box to choose a mode to use for the image
         mode_selector = Gtk.ListStore(str)
-        modes = ["stretch", "fit", "fill", "center", "tile"]
+
+        if common.sway:
+            modes = ["stretch", "fit", "fill", "center", "tile"]    # modes available in swaybg
+        else:
+            modes = ["tile", "center", "scale", "seamless"]         # modes available in feh
+
         for mode in modes:
             mode_selector.append([mode])
 
@@ -162,29 +167,33 @@ class DisplayBox(Gtk.Box):
         options_box.set_orientation(Gtk.Orientation.HORIZONTAL)
         self.pack_start(options_box, True, False, 0)
 
-        mode_combo = Gtk.ComboBox.new_with_model(mode_selector)
-        mode_combo.set_active(2)
-        mode_combo.connect("changed", self.on_mode_combo_changed)
+        self.mode_combo = Gtk.ComboBox.new_with_model(mode_selector)
+        self.mode_combo.set_active(2)
+        self.mode_combo.connect("changed", self.on_mode_combo_changed)
         renderer_text = Gtk.CellRendererText()
-        mode_combo.pack_start(renderer_text, True)
-        mode_combo.add_attribute(renderer_text, "text", 0)
-        options_box.add(mode_combo)
+        self.mode_combo.pack_start(renderer_text, True)
+        self.mode_combo.add_attribute(renderer_text, "text", 0)
+        options_box.add(self.mode_combo)
 
-        # Color button
-        self.color_button = Gtk.ColorButton()
-        color = Gdk.RGBA()
-        color.red = 0.0
-        color.green = 0.0
-        color.blue = 0.0
-        color.alpha = 1.0
-        self.color_button.set_rgba(color)
-        self.color_button.connect("color-set", self.on_color_chosen, self.color_button)
-        options_box.add(self.color_button)
+        if common.sway:
+            # Color button
+            self.color_button = Gtk.ColorButton()
+            color = Gdk.RGBA()
+            color.red = 0.0
+            color.green = 0.0
+            color.blue = 0.0
+            color.alpha = 1.0
+            self.color_button.set_rgba(color)
+            self.color_button.connect("color-set", self.on_color_chosen, self.color_button)
+            options_box.add(self.color_button)
 
         self.flip_button = Gtk.Button("Flip image")
         self.flip_button.set_sensitive(False)
         self.flip_button.connect('clicked', self.on_flip_button)
-        options_box.add(self.flip_button)
+        if common.sway:
+            options_box.add(self.flip_button)
+        else:
+            options_box.pack_start(self.flip_button, True, True, 0)
 
     def on_select_button(self, button):
         if common.selected_wallpaper:
@@ -193,14 +202,16 @@ class DisplayBox(Gtk.Box):
             button.set_property("name", "display-btn-selected")
             self.flip_button.set_sensitive(True)
 
-            # clear color selection: image will be used
-            color = Gdk.RGBA()
-            color.red = 0.0
-            color.green = 0.0
-            color.blue = 0.0
-            color.alpha = 1.0
-            self.color_button.set_rgba(color)
-            self.color = None
+            # If not on sway / swaybg, we have no color_button in UI
+            if common.sway:
+                # clear color selection: image will be used
+                color = Gdk.RGBA()
+                color.red = 0.0
+                color.green = 0.0
+                color.blue = 0.0
+                color.alpha = 1.0
+                self.color_button.set_rgba(color)
+                self.color = None
 
     def on_mode_combo_changed(self, combo):
         tree_iter = combo.get_active_iter()
@@ -208,6 +219,13 @@ class DisplayBox(Gtk.Box):
             model = combo.get_model()
             mode = model[tree_iter][0]
             self.mode = mode
+
+        # If our backend is feh, not swaybg, we can not set mode for each wallpaper separately.
+        # Let's copy the same selection to all displays.
+        if not common.sway and common.display_boxes_list:
+            selection = combo.get_active()
+            for box in common.display_boxes_list:
+                box.mode_combo.set_active(selection)
 
     def on_color_chosen(self, user_data, button):
         self.color = rgba_to_hex(button.get_rgba())
@@ -277,44 +295,9 @@ class GUI:
         bottom_box.set_border_width(10)
         bottom_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
-        """
-        select_first_label = Gtk.Label()
-        select_first_label.set_text('First:')
-        bottom_box.add(select_first_label)
-
-        # Which display to start splitting from?
-        first_selector = Gtk.ListStore(str)
-        names = []
-        for display in common.displays:
-            names.append(display.get('name'))
-        for name in names:
-            first_selector.append([name])
-
-        first_combo = Gtk.ComboBox.new_with_model(first_selector)
-        first_combo.set_active(0)
-        #first_combo.connect("changed", self.on_mode_combo_changed)
-        renderer_text = Gtk.CellRendererText()
-        first_combo.pack_start(renderer_text, True)
-        first_combo.add_attribute(renderer_text, "text", 0)
-
-        bottom_box.add(first_combo)
-        """
-
-        divide_button = Gtk.Button("Split image")
+        divide_button = Gtk.Button("Split selected")
         bottom_box.pack_start(divide_button, True, True, 0)
         divide_button.connect('clicked', self.on_divide_button)
-
-        """
-        if len(common.displays) > 2:
-            divide_3_button = Gtk.Button("Split into 3")
-            bottom_box.pack_start(divide_3_button, True, True, 0)
-            divide_3_button.connect('clicked', self.on_divide_3_button)
-
-        if len(common.displays) > 3:
-            divide_3_button = Gtk.Button("Split into 4")
-            bottom_box.pack_start(divide_3_button, True, True, 0)
-            divide_3_button.connect('clicked', self.on_divide_4_button)
-        """
 
         apply_button = Gtk.Button("Apply")
         apply_button.connect('clicked', self.on_apply_button)
@@ -354,29 +337,38 @@ class GUI:
 
     def on_apply_button(self, button):
         """
-        This will only create commands for swaybg, at least for now
+        Create the command for swaybg (Sway) or feh (X11)
         """
         # Copy modified wallpapers (if any) from temporary to backgrounds folder
         copy_backgrounds()
 
-        # Prepare the shell script
-        command = ['#!/usr/bin/env bash', 'pkill swaybg']
-        for box in common.display_boxes_list:
-            if box.color:
-                # if a color chosen, the wallpaper won't appear
-                command.append("swaybg -o {} -c{} &".format(box.display_name, box.color))
-            elif box.wallpaper_path:
-                command.append("swaybg -o {} -i {} -m {} &".format(box.display_name, box.wallpaper_path, box.mode))
+        if common.sway:
+            # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
+            batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
+            for box in common.display_boxes_list:
+                if box.color:
+                    # if a color chosen, the wallpaper won't appear
+                    batch_content.append("swaybg -o {} -c{} &".format(box.display_name, box.color))
+                elif box.wallpaper_path:
+                    batch_content.append("swaybg -o {} -i {} -m {} &".format(box.display_name, box.wallpaper_path, box.mode))
 
-        # save to ~/.azote/command.sh
-        with open(common.cmd_file, 'w') as f:
-            for item in command:
-                f.write("%s\n" % item)
-        # make the file executable
-        st = os.stat(common.cmd_file)
-        os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
+            # save to ~/.azotebg
+            with open(common.cmd_file, 'w') as f:
+                for item in batch_content:
+                    f.write("%s\n" % item)
+            # make the file executable
+            st = os.stat(common.cmd_file)
+            os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
 
-        subprocess.call(common.cmd_file, shell=True)
+            subprocess.call(common.cmd_file, shell=True)
+        else:
+            # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
+            mode = common.display_boxes_list[0].mode    # They are all the same, just check the 1st one
+            command = "feh --bg-{}".format(mode)
+            for box in common.display_boxes_list:
+                command += " {}".format(box.wallpaper_path)
+            print(command)
+            subprocess.call(command, shell=True)
 
     def on_divide_button(self, button):
         if common.selected_wallpaper:
@@ -386,31 +378,6 @@ class GUI:
                 box = common.display_boxes_list[i]
                 box.wallpaper_path = paths[i][0]
                 box.img.set_from_file(paths[i][1])
-
-    """
-    def on_divide_3_button(self, button):
-        if common.selected_wallpaper:
-            self.unset_boxes()
-            paths = split_selected_wallpaper(3)
-            for i in range(len(paths)):
-                box = common.display_boxes_list[i]
-                box.wallpaper_path = paths[i][0]
-                box.img.set_from_file(paths[i][1])
-
-    def on_divide_4_button(self, button):
-        self.unset_boxes()
-        if common.selected_wallpaper:
-            paths = split_selected_wallpaper(4)
-            for i in range(len(paths)):
-                box = common.display_boxes_list[i]
-                box.wallpaper_path = paths[i][0]
-                box.img.set_from_file(paths[i][1])
-
-    def unset_boxes(self):
-        for box in common.display_boxes_list:
-            box.wallpaper_path = None
-            box.img.set_from_file("images/empty.png")
-    """
 
 
 def check_displays():
@@ -429,7 +396,7 @@ def check_displays():
                 log("Output found: {}".format(display), common.INFO)
 
         # for testing
-        display = {'name': 'HDMI-A-2',
+        """display = {'name': 'HDMI-A-2',
                    'x': 1920,
                    'y': 0,
                    'width': 1920,
@@ -437,7 +404,7 @@ def check_displays():
         displays.append(display)
         log("Output: {}".format(display), common.INFO)
 
-        """display = {'name': 'HDMI-A-3',
+        display = {'name': 'HDMI-A-3',
                    'x': 3840,
                    'y': 0,
                    'width': 1920,
