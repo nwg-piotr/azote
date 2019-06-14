@@ -11,7 +11,6 @@ from shutil import copyfile
 
 
 def log(message, level=None):
-    print("Logging!")
     if common.logging_enabled:
         if level == "critical":
             logging.critical(message)
@@ -88,13 +87,13 @@ def check_displays():
 
     else:
         print("Couldn't check displays")
+        log("Couldn't check displays", common.ERROR)
         exit(1)
 
 
 def set_env():
     # application folder
     common.app_dir = os.path.join(os.getenv("HOME"), ".azote")
-    print(common.app_dir)
     if not os.path.isdir(common.app_dir):
         os.mkdir(common.app_dir)
 
@@ -286,7 +285,6 @@ def rgba_to_hex(color):
 class Settings(object):
     def __init__(self):
         self.file = os.path.join(common.app_dir, "settings.pkl")
-        print("Settings file", self.file)
 
         # Try to find user's Pictures directory
         user_dirs = os.path.join(os.getenv("HOME"), '.config/user-dirs.dirs')
@@ -296,7 +294,6 @@ class Settings(object):
                 if line.startswith('XDG_PICTURES_DIR'):
                     pic_dir = os.path.join(os.getenv("HOME"), line.split('/')[1][:-1])
                     if os.path.isdir(pic_dir):
-                        print(pic_dir)
                         self.src_path = pic_dir
 
                     else:

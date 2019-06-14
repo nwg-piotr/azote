@@ -102,6 +102,7 @@ class ThumbButton(Gtk.Button):
         self.connect('clicked', self.select)
 
     def select(self, button):
+        common.split_button.set_sensitive(True)
         self.selected = True
         common.selected_wallpaper = self
         deselect_all()
@@ -212,6 +213,8 @@ class DisplayBox(Gtk.Box):
                 self.color_button.set_rgba(color)
                 self.color = None
 
+            common.apply_button.set_sensitive(True)
+
     def on_mode_combo_changed(self, combo):
         tree_iter = combo.get_active_iter()
         if tree_iter is not None:
@@ -295,13 +298,15 @@ class GUI:
         bottom_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
         if len(common.displays) > 1:
-            divide_button = Gtk.Button("Split selected")
-            bottom_box.pack_start(divide_button, True, True, 0)
-            divide_button.connect('clicked', self.on_divide_button)
+            common.split_button = Gtk.Button("Split selected")
+            bottom_box.pack_start(common.split_button, True, True, 0)
+            common.split_button.set_sensitive(False)
+            common.split_button.connect('clicked', self.on_split_button)
 
-        apply_button = Gtk.Button("Apply")
-        apply_button.connect('clicked', self.on_apply_button)
-        bottom_box.pack_start(apply_button, True, True, 0)
+        common.apply_button = Gtk.Button("Apply")
+        common.apply_button.connect('clicked', self.on_apply_button)
+        common.apply_button.set_sensitive(False)
+        bottom_box.pack_start(common.apply_button, True, True, 0)
 
         main_box.add(bottom_box)
 
@@ -370,8 +375,9 @@ class GUI:
             print(command)
             subprocess.call(command, shell=True)
 
-    def on_divide_button(self, button):
+    def on_split_button(self, button):
         if common.selected_wallpaper:
+            common.apply_button.set_sensitive(True)
             # self.unset_boxes()
             paths = split_selected_wallpaper(len(common.displays))
             for i in range(len(paths)):
