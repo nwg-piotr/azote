@@ -7,15 +7,14 @@ import os
 import sys
 import subprocess
 import stat
-import i3ipc
 import common
 import gi
 from PIL import Image
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
-from tools import set_env, log, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, rgba_to_hex, split_selected_wallpaper
+from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
+    copy_backgrounds, rgba_to_hex, split_selected_wallpaper, check_displays
 
 
 class Preview(Gtk.ScrolledWindow):
@@ -295,9 +294,10 @@ class GUI:
         bottom_box.set_border_width(10)
         bottom_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
-        divide_button = Gtk.Button("Split selected")
-        bottom_box.pack_start(divide_button, True, True, 0)
-        divide_button.connect('clicked', self.on_divide_button)
+        if len(common.displays) > 1:
+            divide_button = Gtk.Button("Split selected")
+            bottom_box.pack_start(divide_button, True, True, 0)
+            divide_button.connect('clicked', self.on_divide_button)
 
         apply_button = Gtk.Button("Apply")
         apply_button.connect('clicked', self.on_apply_button)
@@ -380,55 +380,6 @@ class GUI:
                 box.img.set_from_file(paths[i][1])
 
 
-def check_displays():
-    displays = []
-    try:
-        i3 = i3ipc.Connection()
-        outputs = i3.get_outputs()
-        for output in outputs:
-            if output.active:  # dunno WTF xroot-0 is: i3 returns such an output with "active":false
-                display = {'name': output.name,
-                           'x': output.rect.x,
-                           'y': output.rect.y,
-                           'width': output.rect.width,
-                           'height': output.rect.height}
-                displays.append(display)
-                log("Output found: {}".format(display), common.INFO)
-
-        # for testing
-        """display = {'name': 'HDMI-A-2',
-                   'x': 1920,
-                   'y': 0,
-                   'width': 1920,
-                   'height': 1080}
-        displays.append(display)
-        log("Output: {}".format(display), common.INFO)
-
-        display = {'name': 'HDMI-A-3',
-                   'x': 3840,
-                   'y': 0,
-                   'width': 1920,
-                   'height': 1080}
-        displays.append(display)
-        log("Output: {}".format(display), common.INFO)
-
-        display = {'name': 'HDMI-A-4',
-                   'x': 5760,
-                   'y': 0,
-                   'width': 1920,
-                   'height': 1080}
-        displays.append(display)
-        log("Output: {}".format(display), common.INFO)"""
-
-        # sort displays list by x, y: from left to right, then from bottom to top
-        displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
-
-        return displays
-    except Exception as e:
-        log(e, common.ERROR)
-        return None
-
-
 def on_configure_event(window, e):
     cols = e.width // 256
     if cols != common.cols:
@@ -473,8 +424,7 @@ def main():
             """
     provider.load_from_data(css)
 
-    set_env()  # set paths and stuff
-    common.displays = check_displays()
+    set_env()  # detect displays, check installed modules, set paths and stuff
     common.cols = len(common.displays) if len(common.displays) > 3 else 3
     app = GUI()
     Gtk.main()

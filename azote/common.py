@@ -4,7 +4,9 @@ WARNING = 'warning'
 INFO = 'info'
 DEBUG = 'debug'
 
+env = {"wm": '', "i3ipc": False, "xrandr": False}
 sway = False
+
 preview = None
 status_bar = None
 buttons_list = None
@@ -19,7 +21,7 @@ allowed_file_types = ['jpg', 'jpeg', 'png']
 app_dir = ''            # ~/.azote
 thumb_dir = ''          # ~/.azote/thumbnails
 tmp_dir = ''            # ~/.azote/temp
-bcg_dir = ''            # ~/.azote/backgrounds
+bcg_dir = ''            # ~/.azote/backgrounds-sway or ~/.azote/backgrounds-feh
 log_file = ''           # ~/.azote/log.txt
 cmd_file = ''           # ~/.azote/command.sh
 logging_enabled = True

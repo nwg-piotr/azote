@@ -2,6 +2,7 @@ import os
 import glob
 import hashlib
 import logging
+import i3ipc
 from PIL import Image, ImageOps
 import common
 import pickle
@@ -23,7 +24,63 @@ def log(message, level=None):
             logging.debug(message)
 
 
+def check_displays():
+    # Sway or not Sway?
+    wm = subprocess.check_output("wmctrl -m | grep 'Name' | awk '{print $2}'", shell=True).decode("utf-8").strip()
+    common.sway = 'LG3D' in wm or 'wlroots' in wm
+    if common.sway:
+        common.env['wm'] = 'sway'
+    else:
+        common.env['wm'] = wm
+
+    common.env['xrandr'] = subprocess.call(["which", "xrandr"]) == 0
+
+    if common.env['wm'] == 'sway' or common.env['wm'] == 'i3':
+        # This will return displays if we're on Sway or i3
+        try:
+            displays = []
+            i3 = i3ipc.Connection()
+            outputs = i3.get_outputs()
+            for output in outputs:
+                if output.active:  # dunno WTF xroot-0 is: i3 returns such an output with "active":false
+                    display = {'name': output.name,
+                               'x': output.rect.x,
+                               'y': output.rect.y,
+                               'width': output.rect.width,
+                               'height': output.rect.height}
+                    displays.append(display)
+                    log("Output found: {}".format(display), common.INFO)
+
+            # Dummy display for testing
+            display = {'name': 'HDMI-A-2',
+                       'x': 1920,
+                       'y': 0,
+                       'width': 1920,
+                       'height': 1080}
+            displays.append(display)
+            log("Output: {}".format(display), common.INFO)
+
+            # sort displays list by x, y: from left to right, then from bottom to top
+            displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
+            common.env['i3ipc'] = True
+
+            return displays
+        except Exception as e:
+            log("i3ipc won't work: {}".format(e))
+
+    elif common.env['xrandr']:
+        resp = subprocess.check_output("xrandr | grep 'connected'", shell=True).decode("utf-8")
+        print(resp)
+        exit(0)
+
+    else:
+        print(common.env)
+        print("Can't continue")
+        exit(1)
+
+
 def set_env():
+    common.displays = check_displays()
 
     # application folder
     common.app_dir = os.path.join(os.getenv("HOME"), ".azote")
@@ -46,11 +103,6 @@ def set_env():
 
     log('Azote launched', common.INFO)
 
-    # Sway or not Sway?
-    wm = subprocess.check_output("wmctrl -m | grep 'Name' | awk '{print $2}'", shell=True).decode("utf-8").strip()
-    log("WM: {}".format(wm), common.INFO)
-    common.sway = 'LG3D' in wm or 'wlroots' in wm
-
     # temporary folder
     common.tmp_dir = os.path.join(common.app_dir, "temp")
     if not os.path.isdir(common.tmp_dir):
@@ -68,6 +120,9 @@ def set_env():
         os.mkdir(common.bcg_dir)
 
     common.settings = Settings()
+
+    log("Environment: {}".format(common.env), common.CRITICAL)
+    print(common.env)
 
 
 def copy_backgrounds():
