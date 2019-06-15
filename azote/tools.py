@@ -138,6 +138,10 @@ def set_env():
     copyfile('images/azote-wallpaper1.jpg', os.path.join(common.sample_dir, 'azote-wallpaper1.jpg'))
     copyfile('images/azote-wallpaper2.jpg', os.path.join(common.sample_dir, 'azote-wallpaper2.jpg'))
 
+    # Sway comes with some sample wallpapers
+    if common.sway and os.path.isdir('/usr/share/backgrounds/sway'):
+        common.sample_dir = '/usr/share/backgrounds/sway'
+
     common.settings = Settings()
 
     log("Environment: {}".format(common.env), common.INFO)

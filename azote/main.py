@@ -270,11 +270,31 @@ class GUI:
 
         main_box.pack_start(common.selected_picture_label, False, False, 0)
 
+        # Let's pack 2 folder buttons horizontally
+        folder_buttons_box = Gtk.Box()
+        folder_buttons_box.set_spacing(5)
+        folder_buttons_box.set_border_width(10)
+        folder_buttons_box.set_orientation(Gtk.Orientation.HORIZONTAL)
+
+        # Button to refresh currently selected folder thumbnails
+        refresh_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_refresh.svg')
+        refresh_button.set_image(img)
+        folder_buttons_box.add(refresh_button)
+
+        refresh_button.connect_after('clicked', self.on_refresh_clicked)
+
         # Button to set the wallpapers folder
         folder_button = Gtk.Button(common.settings.src_path)
-        main_box.pack_start(folder_button, False, False, 0)
+        img = Gtk.Image()
+        img.set_from_file('images/icon_open.svg')
+        folder_button.set_image(img)
+        folder_buttons_box.pack_start(folder_button, True, True, 0)
 
         folder_button.connect_after('clicked', self.on_folder_clicked)
+
+        main_box.pack_start(folder_buttons_box, True, True, 0)
 
         # We need a horizontal container to display outputs in columns
         displays_box = Gtk.Box()
@@ -339,6 +359,9 @@ class GUI:
             button.set_label(common.settings.src_path)
 
         dialog.destroy()
+
+    def on_refresh_clicked(self, button):
+        common.preview.refresh()
 
     def on_apply_button(self, button):
         """
