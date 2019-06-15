@@ -4,6 +4,9 @@ Wallpaper manager for Sway, i3 and some other WMs
 **Azote** is a GTK+ 3-based picture browser and a wallpaper setter, as the frontend to [swaybg](https://github.com/swaywm/swaybg) 
 (Sway / Wayland) and [feh](https://feh.finalrewind.org) (X11) commands.
 
+![screenshot](http://nwg.pl/Lychee/uploads/big/221525787069b71288ae49718f772b33.png)
+*All the pictures above come from https://wallhaven.cc*
+
 ## Project assumptions
 
 The most commonly used *desktop background browser and setter* is aimed at X windows, and does not work with [sway](https://swaywm.org). 
