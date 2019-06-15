@@ -6,9 +6,9 @@ Wallpaper manager for Sway, i3 and some other WMs
 
 ## Project assumptions
 
-The most commonly used [Nitrogen](https://github.com/l3ib/nitrogen) does not work with [sway](https://swaywm.org). 
+The most commonly used *desktop background browser and setter* is aimed at X windows, and does not work with [sway](https://swaywm.org). 
 Together with the 1.1 Sway version, the standalone `swaybg` command became available, so it's easy to give it a GUI. 
-In order not to limit the application of the project to the single environment, Azote is also capable of using feh, 
+In order not to limit the program usage to the single environment, Azote is also capable of using feh, 
 when running on i3, Openbox or other X11 window managers.
 
 ### Main features:
@@ -38,13 +38,7 @@ exec ~/.azotebg
 
 **i3**
 
-Edit your `~/.config/i3/config` file. Replace the line which start Nitrogen:
-
-```bash
-exec_always --no-startup-id nitrogen --restore
-```
-
-with:
+In your `~/.config/i3/config` file add:
 
 ```bash
 exec_always --no-startup-id ~/.fehbg
@@ -52,13 +46,7 @@ exec_always --no-startup-id ~/.fehbg
 
 **Openbox**
 
-In your `autostart` replace:
-
-```bash
-nitrogen --restore &
-```
-
-with:
+In your `autostart` add:
 
 ```bash
 ~/.fehbg
