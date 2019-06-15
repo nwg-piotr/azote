@@ -320,10 +320,19 @@ class GUI:
 
         # Bottom buttons will also need a horizontal container
         bottom_box = Gtk.Box()
-        bottom_box.set_spacing(15)
+        bottom_box.set_spacing(5)
         bottom_box.set_border_width(10)
         bottom_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
+        # Button to call About dialog
+        about_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_about.svg')
+        about_button.set_image(img)
+        about_button.set_tooltip_text("About Azote")
+        bottom_box.add(about_button)
+
+        # Button to split wallpaper between displays
         if len(common.displays) > 1:
             common.split_button = Gtk.Button("Split selected")
             bottom_box.pack_start(common.split_button, True, True, 0)
@@ -331,6 +340,7 @@ class GUI:
             common.split_button.set_tooltip_text("Split selected between displays")
             common.split_button.connect('clicked', self.on_split_button)
 
+        # Button to apply settings
         common.apply_button = Gtk.Button("Apply")
         common.apply_button.connect('clicked', self.on_apply_button)
         common.apply_button.set_sensitive(False)
