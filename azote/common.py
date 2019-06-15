@@ -1,3 +1,5 @@
+app_name = 'azote'
+
 CRITICAL = 'critical'
 ERROR = 'error'
 WARNING = 'warning'

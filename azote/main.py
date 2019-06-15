@@ -9,6 +9,7 @@ import subprocess
 import stat
 import common
 import gi
+import pkg_resources
 from PIL import Image
 
 gi.require_version('Gtk', '3.0')
@@ -330,6 +331,7 @@ class GUI:
         img.set_from_file('images/icon_about.svg')
         about_button.set_image(img)
         about_button.set_tooltip_text("About Azote")
+        about_button.connect('clicked', self.on_about_button)
         bottom_box.add(about_button)
 
         # Button to split wallpaper between displays
@@ -426,6 +428,33 @@ class GUI:
                 box = common.display_boxes_list[i]
                 box.wallpaper_path = paths[i][0]
                 box.img.set_from_file(paths[i][1])
+
+    def on_about_button(self, button):
+        dialog = Gtk.AboutDialog()
+        dialog.set_program_name('Azote')
+
+        try:
+            version = pkg_resources.require(common.app_name)[0].version
+            dialog.set_version("v{}".format(version))
+        except Exception as e:
+            print("Couldn't check version: {}".format(e))
+            pass
+
+        logo = GdkPixbuf.Pixbuf.new_from_file_at_size('images/azote.svg', 96, 96)
+
+        dialog.set_logo(logo)
+        dialog.set_copyright('(c) 2019 Piotr Miller')
+        dialog.set_website('http://bottersnike.github.io/Micro-Pi')
+        dialog.set_comments('Wallpaper manager for Sway, i3 and some other WMs')
+        dialog.set_license_type(Gtk.License.GPL_3_0)
+        dialog.set_authors(['Piotr Miller (nwg)'])
+        dialog.set_artists(['edskeye'])
+
+        dialog.show()
+
+        dialog.run()
+        dialog.destroy()
+        return False
 
 
 def on_configure_event(window, e):
