@@ -5,6 +5,7 @@ Wallpaper manager for Sway, i3 and some other WMs
 (Sway / Wayland) and [feh](https://feh.finalrewind.org) (X11) commands.
 
 ![screenshot](http://nwg.pl/Lychee/uploads/big/221525787069b71288ae49718f772b33.png)
+
 *All the pictures above come from https://wallhaven.cc*
 
 ## Project assumptions
