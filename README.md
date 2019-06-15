@@ -63,8 +63,8 @@ The program has not yet been tested with other WMs.
 ### X11 / feh notice
 
 Due to feh limitations, the background color picker won't be available. You'll also be unable to select different modes 
-("tile", "center", "scale", "seamless") for certain displays. The list of modes varies from what you see in Sway 
-("stretch", "fit", "fill", "center", "tile").
+*("tile", "center", "scale", "seamless")* for certain displays. The list of modes varies from what you see in Sway 
+*("stretch", "fit", "fill", "center", "tile")*.
 
 ## Code status
 
