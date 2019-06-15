@@ -51,3 +51,9 @@ In your `autostart` add:
 ```bash
 ~/.fehbg
 ```
+
+The program has not yet been tested with other WMs.
+
+## Code status
+
+Alpha. The first public release coming soon.
