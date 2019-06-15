@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Exec=azote
+Name=Azote
+Terminal=false
+GenericName=Azote wallpaper manager
+GenericName[pl]=Menedżer tapet Azote
+Categories=Utility;GTK;DesktopSettings;
+Icon=/usr/share/azote/azote.svg
+Comment=Browse, flip and set desktop wallpapers
+Comment[pl]=Przeglądaj, odwracaj i ustawiaj tapety pulpitu
+Keywords=background;desktop;
