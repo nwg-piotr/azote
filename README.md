@@ -55,7 +55,7 @@ exec_always --no-startup-id ~/.fehbg
 In your `autostart` add:
 
 ```bash
-~/.fehbg
+~/.fehbg &
 ```
 
 The program has not yet been tested with other WMs.
