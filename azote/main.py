@@ -93,6 +93,7 @@ class ThumbButton(Gtk.Button):
 
         self.set_image(img)
         self.set_image_position(2)  # TOP
+        self.set_tooltip_text("Select this picture")
 
         if len(filename) > 30:
             filename = '…{}'.format(filename[-28::])
@@ -144,6 +145,7 @@ class DisplayBox(Gtk.Box):
         self.select_button.set_image(self.img)                     # preview of selected wallpaper
         self.select_button.set_image_position(3)                   # label on top, image below
         self.select_button.set_property("name", "display-btn")     # to assign css style
+        self.select_button.set_tooltip_text("Set selected wallpaper")
 
         self.pack_start(self.select_button, False, False, 10)
 
@@ -173,6 +175,7 @@ class DisplayBox(Gtk.Box):
         renderer_text = Gtk.CellRendererText()
         self.mode_combo.pack_start(renderer_text, True)
         self.mode_combo.add_attribute(renderer_text, "text", 0)
+        self.mode_combo.set_tooltip_text("Select display mode")
         options_box.add(self.mode_combo)
 
         if common.sway:
@@ -185,11 +188,13 @@ class DisplayBox(Gtk.Box):
             color.alpha = 1.0
             self.color_button.set_rgba(color)
             self.color_button.connect("color-set", self.on_color_chosen, self.color_button)
+            self.color_button.set_tooltip_text("Select background color")
             options_box.add(self.color_button)
 
         self.flip_button = Gtk.Button("Flip image")
         self.flip_button.set_sensitive(False)
         self.flip_button.connect('clicked', self.on_flip_button)
+        self.flip_button.set_tooltip_text("Flip wallpaper horizontally")
         if common.sway:
             options_box.add(self.flip_button)
         else:
@@ -281,6 +286,7 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_refresh.svg')
         refresh_button.set_image(img)
+        refresh_button.set_tooltip_text("Refresh current view")
         folder_buttons_box.add(refresh_button)
 
         refresh_button.connect_after('clicked', self.on_refresh_clicked)
@@ -290,6 +296,7 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_open.svg')
         folder_button.set_image(img)
+        folder_button.set_tooltip_text("Open another folder")
         folder_buttons_box.pack_start(folder_button, True, True, 0)
 
         folder_button.connect_after('clicked', self.on_folder_clicked)
@@ -321,11 +328,13 @@ class GUI:
             common.split_button = Gtk.Button("Split selected")
             bottom_box.pack_start(common.split_button, True, True, 0)
             common.split_button.set_sensitive(False)
+            common.split_button.set_tooltip_text("Split selected between displays")
             common.split_button.connect('clicked', self.on_split_button)
 
         common.apply_button = Gtk.Button("Apply")
         common.apply_button.connect('clicked', self.on_apply_button)
         common.apply_button.set_sensitive(False)
+        common.apply_button.set_tooltip_text("Apply current settings")
         bottom_box.pack_start(common.apply_button, True, True, 0)
 
         main_box.add(bottom_box)
