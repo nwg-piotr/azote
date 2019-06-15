@@ -1,5 +1,14 @@
+#!/usr/bin/env python
+# _*_ coding: utf-8 _*_
+
 """
-Wallpapers browser / setter for Sway and X11 window managers, as a frontend to swaybg and feh
+Wallpaper manager for Sway, i3 and some other WMs, as a frontend to swaybg and feh
+
+Author: Piotr Miller
+e-mail: nwg.piotr@gmail.com
+Website: http://nwg.pl
+Project: https://github.com/nwg-piotr/azote
+License: GPL3
 
 Dependencies: python-gobject, i3ipc-python, python-pillow, wmctrl, feh
 """

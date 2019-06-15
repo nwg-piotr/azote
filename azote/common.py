@@ -1,3 +1,15 @@
+#!/usr/bin/env python
+# _*_ coding: utf-8 _*_
+
+"""
+Wallpaper manager for Sway, i3 and some other WMs, as a frontend to swaybg and feh
+
+Author: Piotr Miller
+e-mail: nwg.piotr@gmail.com
+Website: http://nwg.pl
+Project: https://github.com/nwg-piotr/azote
+License: GPL3
+"""
 app_name = 'azote'
 
 CRITICAL = 'critical'
