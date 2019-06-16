@@ -49,7 +49,7 @@ def str_to_bool(s):
 
 def check_displays():
     # Sway or not Sway?
-    wm = subprocess.check_output("wmctrl -m | grep 'Name' | awk '{print $2}'", shell=True).decode("utf-8").strip()
+    wm = subprocess.check_output("wmctrl -m | awk '/Name/{print $2}'", shell=True).decode("utf-8").strip()
     common.sway = 'LG3D' in wm or 'wlroots' in wm
     if common.sway:
         common.env['wm'] = 'sway'
@@ -94,8 +94,8 @@ def check_displays():
 
     # On i3 we could use i3-msg here, but xrandr should also return what we need. If not on Sway - let's use xrandr
     elif common.env['xrandr']:
-        names = subprocess.check_output("xrandr | grep ' connected' | awk '{print $1}'", shell=True).decode("utf-8").splitlines()
-        res = subprocess.check_output("xrandr | grep '*' | awk '{print $1}'", shell=True).decode("utf-8").splitlines()
+        names = subprocess.check_output("xrandr | awk '/ connected/{print $1}'", shell=True).decode("utf-8").splitlines()
+        res = subprocess.check_output("xrandr | awk '/*/{print $1}'", shell=True).decode("utf-8").splitlines()
         displays = []
         for i in range(len(names)):
             w_h = res[i].split('x')
