@@ -69,3 +69,7 @@ The program has not yet been tested with other WMs.
 The background color picker won't be available. You'll also be unable to select different modes 
 *("tile", "center", "scale", "seamless")* for certain displays. The list of modes varies from what you see in Sway 
 *("stretch", "fit", "fill", "center", "tile")*.
+
+## Packaging
+
+Please use the latest [release](https://github.com/nwg-piotr/azote/releases) assets.
