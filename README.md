@@ -9,6 +9,8 @@
 
 *The pictures above come from https://wallhaven.cc*
 
+Also see [Azote in action on YouTube](https://youtu.be/77mrrTVPE7A).
+
 ## Project assumptions
 
 The most commonly used *desktop background browser and setter* is aimed at X windows, and does not work with [sway](https://swaywm.org). 
