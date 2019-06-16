@@ -17,5 +17,5 @@ setup(
     author_email='nwg.piotr@gmail.com',
     description='Wallpaper manager for Sway, i3 and some other WMs',
     long_description=read("README.md"),
-    install_requires=['i3ipc', 'pygobject', 'pillow']
+    install_requires=['pygobject', 'pillow']
 )

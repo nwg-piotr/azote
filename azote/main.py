@@ -32,7 +32,7 @@ class Preview(Gtk.ScrolledWindow):
         super().__init__()
 
         self.set_border_width(10)
-        self.set_size_request(0, 500)
+        self.set_propagate_natural_height(True)
         self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
 
         common.buttons_list = []
@@ -186,7 +186,7 @@ class DisplayBox(Gtk.Box):
         renderer_text = Gtk.CellRendererText()
         self.mode_combo.pack_start(renderer_text, True)
         self.mode_combo.add_attribute(renderer_text, "text", 0)
-        self.mode_combo.set_tooltip_text("Select display mode")
+        self.mode_combo.set_tooltip_text(common.dict['display_mode'])
         options_box.add(self.mode_combo)
 
         if common.sway:
@@ -199,13 +199,13 @@ class DisplayBox(Gtk.Box):
             color.alpha = 1.0
             self.color_button.set_rgba(color)
             self.color_button.connect("color-set", self.on_color_chosen, self.color_button)
-            self.color_button.set_tooltip_text("Select background color")
+            self.color_button.set_tooltip_text(common.dict['background_color'])
             options_box.add(self.color_button)
 
-        self.flip_button = Gtk.Button("Flip image")
+        self.flip_button = Gtk.Button(common.dict['flip_image'])
         self.flip_button.set_sensitive(False)
         self.flip_button.connect('clicked', self.on_flip_button)
-        self.flip_button.set_tooltip_text("Flip wallpaper horizontally")
+        self.flip_button.set_tooltip_text(common.dict['flip_wallpaper_horizontally'])
         if common.sway:
             options_box.add(self.flip_button)
         else:
@@ -297,7 +297,7 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_refresh.svg')
         refresh_button.set_image(img)
-        refresh_button.set_tooltip_text("Refresh current view")
+        refresh_button.set_tooltip_text(common.dict['refresh_folder_preview'])
         folder_buttons_box.add(refresh_button)
 
         refresh_button.connect_after('clicked', self.on_refresh_clicked)
@@ -307,7 +307,7 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_open.svg')
         folder_button.set_image(img)
-        folder_button.set_tooltip_text("Open another folder")
+        folder_button.set_tooltip_text(common.dict['open_another_folder'])
         folder_buttons_box.pack_start(folder_button, True, True, 0)
 
         folder_button.connect_after('clicked', self.on_folder_clicked)
@@ -340,23 +340,23 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_about.svg')
         about_button.set_image(img)
-        about_button.set_tooltip_text("About Azote")
+        about_button.set_tooltip_text(common.dict['about_azote'])
         about_button.connect('clicked', self.on_about_button)
         bottom_box.add(about_button)
 
         # Button to split wallpaper between displays
         if len(common.displays) > 1:
-            common.split_button = Gtk.Button("Split selected")
+            common.split_button = Gtk.Button(common.dict['split_selection'])
             bottom_box.pack_start(common.split_button, True, True, 0)
             common.split_button.set_sensitive(False)
-            common.split_button.set_tooltip_text("Split selected between displays")
+            common.split_button.set_tooltip_text(common.dict['split_selection_between_displays'])
             common.split_button.connect('clicked', self.on_split_button)
 
         # Button to apply settings
-        common.apply_button = Gtk.Button("Apply")
+        common.apply_button = Gtk.Button(common.dict['apply'])
         common.apply_button.connect('clicked', self.on_apply_button)
         common.apply_button.set_sensitive(False)
-        common.apply_button.set_tooltip_text("Apply current settings")
+        common.apply_button.set_tooltip_text(common.dict['apply_settings'])
         bottom_box.pack_start(common.apply_button, True, True, 0)
 
         main_box.add(bottom_box)
