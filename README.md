@@ -1,5 +1,7 @@
 # Azote
 
+[![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
+
 **Azote** is a GTK+ 3-based picture browser and a wallpaper setter, as the frontend to [swaybg](https://github.com/swaywm/swaybg) 
 (Sway / Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands.
 
@@ -65,7 +67,3 @@ The program has not yet been tested with other WMs.
 Due to feh limitations, the background color picker won't be available. You'll also be unable to select different modes 
 *("tile", "center", "scale", "seamless")* for certain displays. The list of modes varies from what you see in Sway 
 *("stretch", "fit", "fill", "center", "tile")*.
-
-## Code status
-
-Alpha. The first public release coming soon.
