@@ -5,7 +5,7 @@
 **Azote** is a GTK+ 3-based picture browser and a wallpaper setter, as the frontend to [swaybg](https://github.com/swaywm/swaybg) 
 (Sway / Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands.
 
-![screenshot](http://nwg.pl/Lychee/uploads/big/221525787069b71288ae49718f772b33.png)
+![screenshot](http://nwg.pl/Lychee/uploads/big/85643617cb8aec153a05912b8023d0e9.png)
 
 *The pictures above come from https://wallhaven.cc*
 
