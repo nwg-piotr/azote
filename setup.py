@@ -8,7 +8,7 @@ def read(f_name):
 
 setup(
     name='azote',
-    version='0.0.1',
+    version='0.0.2',
     packages=['azote'],
     include_package_data=True,
     url='https://github.com/nwg-piotr/azote',

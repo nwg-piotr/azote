@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # _*_ coding: utf-8 _*_
 
 """
@@ -14,12 +14,14 @@ import os
 import glob
 import hashlib
 import logging
-import i3ipc
 from PIL import Image, ImageOps
 import common
 import pickle
 import subprocess
+import locale
 from shutil import copyfile
+
+import json
 
 
 def log(message, level=None):
@@ -36,6 +38,15 @@ def log(message, level=None):
             logging.debug(message)
 
 
+def str_to_bool(s):
+    if s.upper() == 'TRUE':
+        return True
+    elif s.upper() == 'FALSE':
+        return False
+    else:
+        raise ValueError
+
+
 def check_displays():
     # Sway or not Sway?
     wm = subprocess.check_output("wmctrl -m | grep 'Name' | awk '{print $2}'", shell=True).decode("utf-8").strip()
@@ -47,19 +58,19 @@ def check_displays():
 
     common.env['xrandr'] = subprocess.call(["which", "xrandr"]) == 0
 
-    if common.env['wm'] == 'sway' or common.env['wm'] == 'i3':
-        # This will return displays if we're on Sway or i3
+    if common.env['wm'] == 'sway':
+        # We need swaymsg to check outputs on Sway
         try:
             displays = []
-            i3 = i3ipc.Connection()
-            outputs = i3.get_outputs()
+            json_string = subprocess.check_output("swaymsg -t get_outputs", shell=True).decode("utf-8").strip()
+            outputs = json.loads(json_string)
             for output in outputs:
-                if output.active:  # dunno WTF xroot-0 is: i3 returns such an output with "active":false
-                    display = {'name': output.name,
-                               'x': output.rect.x,
-                               'y': output.rect.y,
-                               'width': output.rect.width,
-                               'height': output.rect.height}
+                if output['active']:  # dunno WTF xroot-0 is: i3 returns such an output with "active":false
+                    display = {'name': output['name'],
+                               'x': output['rect']['x'],
+                               'y': output['rect']['y'],
+                               'width': output['rect']['width'],
+                               'height': output['rect']['height']}
                     displays.append(display)
                     log("Output found: {}".format(display), common.INFO)
 
@@ -81,6 +92,7 @@ def check_displays():
         except Exception as e:
             log("i3ipc won't work: {}".format(e))
 
+    # On i3 we could use i3-msg here, but xrandr should also return what we need. If not on Sway - let's use xrandr
     elif common.env['xrandr']:
         names = subprocess.check_output("xrandr | grep ' connected' | awk '{print $1}'", shell=True).decode("utf-8").splitlines()
         res = subprocess.check_output("xrandr | grep '*' | awk '{print $1}'", shell=True).decode("utf-8").splitlines()
@@ -98,7 +110,6 @@ def check_displays():
         return displays
 
     else:
-        print("Couldn't check displays")
         log("Couldn't check displays", common.ERROR)
         exit(1)
 
@@ -115,6 +126,15 @@ def set_env():
                         level=logging.INFO)
 
     log('Spraying Azote!', common.INFO)
+
+    # We will preload the en_EN dictionary as default values
+    common.dict = Language()
+
+    # Lets check locale value
+    # If running with LC_ALL=C, we'll get (None, None) here. Let's use en_EN in such case.
+    lang = locale.getlocale()[0] if locale.getlocale()[0] is not None else 'en_EN'
+
+    common.dict.load(lang)
 
     common.displays = check_displays()
 
@@ -283,7 +303,7 @@ def update_status_bar():
             num_files += 1
             file_info = os.stat(os.path.join(common.thumb_dir, file))
             total_size += file_info.st_size
-    common.status_bar.push(0, "{} thumbnails in cache ({})".format(num_files, convert_bytes(total_size)))
+    common.status_bar.push(0, common.dict['thumbnails_in_cache'].format(num_files, convert_bytes(total_size)))
 
 
 def convert_bytes(num):
@@ -327,3 +347,30 @@ class Settings(object):
     def save(self):
         with open(self.file, 'wb') as output:
             pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+
+
+class Language(dict):
+    def __init__(self):
+        super().__init__()
+        # We'll initialize with values from en_EN
+        with open(os.path.join('languages', 'en_EN')) as f:
+            lines = f.read().splitlines()
+            for line in lines:
+                if line and not line.startswith('#'):
+                    pair = line.split('=')
+                    key, value = pair[0].strip(), pair[1].strip()
+                    self[key] = value
+
+    def load(self, lang):
+        try:
+            # Overwrite initial values if translation found
+            with open(os.path.join('languages', lang)) as f:
+                lines = f.read().splitlines()
+                for line in lines:
+                    if line and not line.startswith('#'):
+                        pair = line.split('=')
+                        key, value = pair[0].strip(), pair[1].strip()
+                        self[key] = value
+
+        except FileNotFoundError:
+            log("Couldn't load lang {}".format(lang))

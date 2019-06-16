@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # _*_ coding: utf-8 _*_
 
 """
@@ -20,6 +20,8 @@ DEBUG = 'debug'
 
 env = {"wm": '', "i3ipc": False, "xrandr": False}
 sway = False
+
+dict = None             # dictionary "name": lang_string
 
 preview = None
 status_bar = None

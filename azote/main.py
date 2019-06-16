@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # _*_ coding: utf-8 _*_
 
 """
@@ -24,7 +24,7 @@ from PIL import Image
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, rgba_to_hex, split_selected_wallpaper, check_displays
+    copy_backgrounds, rgba_to_hex, split_selected_wallpaper
 
 
 class Preview(Gtk.ScrolledWindow):
@@ -103,7 +103,7 @@ class ThumbButton(Gtk.Button):
 
         self.set_image(img)
         self.set_image_position(2)  # TOP
-        self.set_tooltip_text("Select this picture")
+        self.set_tooltip_text(common.dict['select_this_picture'])
 
         if len(filename) > 30:
             filename = '…{}'.format(filename[-28::])
@@ -113,7 +113,8 @@ class ThumbButton(Gtk.Button):
         self.connect('clicked', self.select)
 
     def select(self, button):
-        common.split_button.set_sensitive(True)
+        if common.split_button:
+            common.split_button.set_sensitive(True)
         self.selected = True
         common.selected_wallpaper = self
         deselect_all()
@@ -155,7 +156,7 @@ class DisplayBox(Gtk.Box):
         self.select_button.set_image(self.img)                     # preview of selected wallpaper
         self.select_button.set_image_position(3)                   # label on top, image below
         self.select_button.set_property("name", "display-btn")     # to assign css style
-        self.select_button.set_tooltip_text("Set selected wallpaper")
+        self.select_button.set_tooltip_text(common.dict['set_selected_wallpaper'])
 
         self.pack_start(self.select_button, False, False, 10)
 
@@ -281,7 +282,7 @@ class GUI:
 
         # Label to display details of currently selected picture
         common.selected_picture_label = Gtk.Label()
-        common.selected_picture_label.set_text('Select a picture')
+        common.selected_picture_label.set_text(common.dict['select_a_picture'])
 
         main_box.pack_start(common.selected_picture_label, False, False, 0)
 
@@ -375,7 +376,7 @@ class GUI:
         Gtk.main_quit()
 
     def on_folder_clicked(self, button):
-        dialog = Gtk.FileChooserDialog("Open folder", button.get_toplevel(), Gtk.FileChooserAction.SELECT_FOLDER);
+        dialog = Gtk.FileChooserDialog("Open folder", button.get_toplevel(), Gtk.FileChooserAction.SELECT_FOLDER)
         dialog.add_button(Gtk.STOCK_CANCEL, 0)
         dialog.add_button(Gtk.STOCK_OK, 1)
         dialog.set_default_response(1)
@@ -453,8 +454,8 @@ class GUI:
 
         dialog.set_logo(logo)
         dialog.set_copyright('(c) 2019 Piotr Miller')
-        dialog.set_website('http://bottersnike.github.io/Micro-Pi')
-        dialog.set_comments('Wallpaper manager for Sway, i3 and some other WMs')
+        dialog.set_website('https://github.com/nwg-piotr/azote')
+        dialog.set_comments(common.dict['app_desc'])
         dialog.set_license_type(Gtk.License.GPL_3_0)
         dialog.set_authors(['Piotr Miller (nwg)'])
         dialog.set_artists(['edskeye'])

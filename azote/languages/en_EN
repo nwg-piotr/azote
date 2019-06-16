@@ -1,0 +1,10 @@
+
+# While adding own translation, leave all '{}' untouched!
+# As '=' is a separator, don't use it inside strings
+# Empty lines are allowed
+
+app_desc = Wallpaper manager for Sway, i3 and other window managers
+select_a_picture = Select a picture
+select_this_picture = Select this picture
+set_selected_wallpaper = Set selected wallpaper
+thumbnails_in_cache = {} thumbnails in cache ({})

@@ -1,0 +1,9 @@
+# While adding own translation, leave all '{}' untouched!
+# As '=' is a separator, don't use it inside strings
+# Empty lines are allowed
+
+app_desc = Menedżer tapet dla Sway, i3 i innych menedżerów okien
+select_a_picture = Wybierz obraz
+select_this_picture = Wybierz ten obraz
+set_selected_wallpaper = Ustaw wybraną tapetę
+thumbnails_in_cache = {} miniatur w cache ({})
