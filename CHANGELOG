@@ -1,0 +1,11 @@
+In next release:
+- "azote/tools.py: death to grep!" PR by Head-on-a-Stick merged
+
+v0.0.2 (pre-release, 2019-06-17)
+- shebangs changed to python3
+- dependency on i3ipc-python dropped
+- a bug manifesting on single-headed setup only (on changing the split_button sensitivity) fixed
+- simple translations introduced
+
+v0.0.1 (pre-release, 2019-06-15)
+Initial release
