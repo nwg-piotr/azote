@@ -511,7 +511,15 @@ def main():
             """
     provider.load_from_data(css)
 
-    set_env()  # detect displays, check installed modules, set paths and stuff
+    lang = None
+    for i in range(1, len(sys.argv)):
+        if sys.argv[i] == 'lang':
+            try:
+                lang = sys.argv[i + 1]
+            except:
+                pass
+
+    set_env(lang)  # detect displays, check installed modules, set paths and stuff
     common.cols = len(common.displays) if len(common.displays) > 3 else 3
     app = GUI()
     Gtk.main()

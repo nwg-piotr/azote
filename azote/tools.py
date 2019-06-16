@@ -114,7 +114,7 @@ def check_displays():
         exit(1)
 
 
-def set_env():
+def set_env(language=None):
     # application folder
     common.app_dir = os.path.join(os.getenv("HOME"), ".azote")
     if not os.path.isdir(common.app_dir):
@@ -130,9 +130,12 @@ def set_env():
     # We will preload the en_EN dictionary as default values
     common.dict = Language()
 
-    # Lets check locale value
-    # If running with LC_ALL=C, we'll get (None, None) here. Let's use en_EN in such case.
-    lang = locale.getlocale()[0] if locale.getlocale()[0] is not None else 'en_EN'
+    if not language:
+        # Lets check locale value
+        # If running with LC_ALL=C, we'll get (None, None) here. Let's use en_EN in such case.
+        lang = locale.getlocale()[0] if locale.getlocale()[0] is not None else 'en_EN'
+    else:
+        lang = language
 
     common.dict.load(lang)
 
@@ -371,6 +374,7 @@ class Language(dict):
                         pair = line.split('=')
                         key, value = pair[0].strip(), pair[1].strip()
                         self[key] = value
+            log("Loaded lang: {}".format(lang), common.INFO)
 
         except FileNotFoundError:
-            log("Couldn't load lang {}".format(lang))
+            log("Couldn't load lang: {}".format(lang), common.WARNING)
