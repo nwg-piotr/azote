@@ -1,4 +1,3 @@
-
 # While adding own translation, leave all '{}' untouched!
 # As '=' is a separator, don't use it inside strings
 # Empty lines are allowed
