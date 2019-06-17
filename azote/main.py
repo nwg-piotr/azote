@@ -312,7 +312,7 @@ class GUI:
 
         folder_button.connect_after('clicked', self.on_folder_clicked)
 
-        main_box.pack_start(folder_buttons_box, True, True, 0)
+        main_box.pack_start(folder_buttons_box, False, True, 0)
 
         # We need a horizontal container to display outputs in columns
         displays_box = Gtk.Box()
