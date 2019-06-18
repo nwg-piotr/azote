@@ -2,8 +2,8 @@
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
 
-**Azote** is a GTK+ 3-based picture browser and a wallpaper setter, as the frontend to [swaybg](https://github.com/swaywm/swaybg) 
-(Sway / Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands.
+**Azote** is a GTK+ 3-based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
+(Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands.
 
 ![screenshot](http://nwg.pl/Lychee/uploads/big/85643617cb8aec153a05912b8023d0e9.png)
 
@@ -70,9 +70,13 @@ The program has not yet been tested with other WMs.
 
 Install [azote](https://aur.archlinux.org/packages/azote) from AUR.
 
-**Debian**
+**Debian & Ubuntu**
 
-Package by @Head-on-a-Stick should be available soon.
+Either download the .deb package or follow the instructions in this link to add the repository and APT key:
+
+https://software.opensuse.org//download.html?project=home%3AHead_on_a_Stick%3Aazote&package=azote
+
+If the repository & key are added then the package will be updated with the usual `apt update && apt upgrade` commands.
 
 **Other distributions**
 
