@@ -488,7 +488,6 @@ def on_configure_event(window, e):
             common.preview.refresh(False)
 
         common.preview.show()
-        print("Refresh!")
 
 
 def main():
