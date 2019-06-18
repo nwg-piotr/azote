@@ -21,7 +21,7 @@ DEBUG = 'debug'
 env = {"wm": '', "i3ipc": False, "xrandr": False}
 sway = False
 
-dict = None             # dictionary "name": lang_string
+lang = None             # dictionary "name": lang_string
 
 preview = None
 status_bar = None

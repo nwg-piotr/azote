@@ -8,14 +8,14 @@ def read(f_name):
 
 setup(
     name='azote',
-    version='0.0.2',
+    version='0.0.3',
+    description='Wallpaper manager for Sway, i3 and some other WMs',
     packages=['azote'],
     include_package_data=True,
     url='https://github.com/nwg-piotr/azote',
     license='GPL3',
     author='Piotr Miller',
     author_email='nwg.piotr@gmail.com',
-    description='Wallpaper manager for Sway, i3 and some other WMs',
-    long_description=read("README.md"),
+    python_requires='>=3.5.0',
     install_requires=['pygobject', 'pillow']
 )

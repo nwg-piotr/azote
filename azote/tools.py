@@ -56,7 +56,8 @@ def check_displays():
     else:
         common.env['wm'] = wm
 
-    common.env['xrandr'] = subprocess.call(["which", "xrandr"]) == 0
+    fnull = open(os.devnull, 'w')
+    common.env['xrandr'] = subprocess.call(["which", "xrandr"], stdout=fnull, stderr=subprocess.STDOUT) == 0
 
     if common.env['wm'] == 'sway':
         # We need swaymsg to check outputs on Sway
@@ -94,7 +95,8 @@ def check_displays():
 
     # On i3 we could use i3-msg here, but xrandr should also return what we need. If not on Sway - let's use xrandr
     elif common.env['xrandr']:
-        names = subprocess.check_output("xrandr | awk '/ connected/{print $1}'", shell=True).decode("utf-8").splitlines()
+        names = subprocess.check_output("xrandr | awk '/ connected/{print $1}'", shell=True).decode(
+            "utf-8").splitlines()
         res = subprocess.check_output("xrandr | awk '/*/{print $1}'", shell=True).decode("utf-8").splitlines()
         displays = []
         for i in range(len(names)):
@@ -128,7 +130,7 @@ def set_env(language=None):
     log('Spraying Azote!', common.INFO)
 
     # We will preload the en_EN dictionary as default values
-    common.dict = Language()
+    common.lang = Language()
 
     if not language:
         # Lets check locale value
@@ -137,12 +139,12 @@ def set_env(language=None):
     else:
         lang = language
 
-    common.dict.load(lang)
+    common.lang.load(lang)
 
     common.displays = check_displays()
 
     # thumbnails folder
-    common.thumb_dir = os.path.join(common.app_dir,"thumbnails")
+    common.thumb_dir = os.path.join(common.app_dir, "thumbnails")
     if not os.path.isdir(common.thumb_dir):
         os.mkdir(common.thumb_dir)
 
@@ -306,7 +308,7 @@ def update_status_bar():
             num_files += 1
             file_info = os.stat(os.path.join(common.thumb_dir, file))
             total_size += file_info.st_size
-    common.status_bar.push(0, common.dict['thumbnails_in_cache'].format(num_files, convert_bytes(total_size)))
+    common.status_bar.push(0, common.lang['thumbnails_in_cache'].format(num_files, convert_bytes(total_size)))
 
 
 def convert_bytes(num):

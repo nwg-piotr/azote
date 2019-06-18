@@ -1,5 +1,8 @@
 In next release:
 - "azote/tools.py: death to grep!" PR by Head-on-a-Stick merged
+- folder selection button - vertical size fixed
+- deprecated GTK+ code brought up to date
+- clearing background color selection on image split button pressed
 
 v0.0.2 (pre-release, 2019-06-17)
 - shebangs changed to python3

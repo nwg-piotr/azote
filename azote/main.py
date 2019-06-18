@@ -10,7 +10,8 @@ Website: http://nwg.pl
 Project: https://github.com/nwg-piotr/azote
 License: GPL3
 
-Dependencies: python-gobject, i3ipc-python, python-pillow, wmctrl, feh
+Dependencies:
+python, python-setuptools, python-gobject, python-cairo, i3ipc-python, python-pillow, wmctrl, feh, xorg-xrandr
 """
 import os
 import sys
@@ -58,7 +59,7 @@ class Preview(Gtk.ScrolledWindow):
                     col = 0
                     row += 1
 
-        self.add_with_viewport(self.grid)
+        self.add(self.grid)
 
     def refresh(self, create_thumbs=True):
         if create_thumbs:
@@ -103,7 +104,7 @@ class ThumbButton(Gtk.Button):
 
         self.set_image(img)
         self.set_image_position(2)  # TOP
-        self.set_tooltip_text(common.dict['select_this_picture'])
+        self.set_tooltip_text(common.lang['select_this_picture'])
 
         if len(filename) > 30:
             filename = '…{}'.format(filename[-28::])
@@ -137,6 +138,7 @@ class DisplayBox(Gtk.Box):
     """
     The box contains elements to preview certain displays and assign wallpapers to them
     """
+
     def __init__(self, name, width, height):
         super().__init__()
 
@@ -153,10 +155,10 @@ class DisplayBox(Gtk.Box):
 
         self.select_button = Gtk.Button()
         self.select_button.set_label("{} ({} x {})".format(name, width, height))  # label on top: name (with x height)
-        self.select_button.set_image(self.img)                     # preview of selected wallpaper
-        self.select_button.set_image_position(3)                   # label on top, image below
-        self.select_button.set_property("name", "display-btn")     # to assign css style
-        self.select_button.set_tooltip_text(common.dict['set_selected_wallpaper'])
+        self.select_button.set_image(self.img)  # preview of selected wallpaper
+        self.select_button.set_image_position(3)  # label on top, image below
+        self.select_button.set_property("name", "display-btn")  # to assign css style
+        self.select_button.set_tooltip_text(common.lang['set_selected_wallpaper'])
 
         self.pack_start(self.select_button, False, False, 10)
 
@@ -166,9 +168,9 @@ class DisplayBox(Gtk.Box):
         mode_selector = Gtk.ListStore(str)
 
         if common.sway:
-            modes = ["stretch", "fit", "fill", "center", "tile"]    # modes available in swaybg
+            modes = ["stretch", "fit", "fill", "center", "tile"]  # modes available in swaybg
         else:
-            modes = ["tile", "center", "scale", "seamless"]         # modes available in feh
+            modes = ["tile", "center", "scale", "seamless"]  # modes available in feh
 
         for mode in modes:
             mode_selector.append([mode])
@@ -186,7 +188,7 @@ class DisplayBox(Gtk.Box):
         renderer_text = Gtk.CellRendererText()
         self.mode_combo.pack_start(renderer_text, True)
         self.mode_combo.add_attribute(renderer_text, "text", 0)
-        self.mode_combo.set_tooltip_text(common.dict['display_mode'])
+        self.mode_combo.set_tooltip_text(common.lang['display_mode'])
         options_box.add(self.mode_combo)
 
         if common.sway:
@@ -199,17 +201,29 @@ class DisplayBox(Gtk.Box):
             color.alpha = 1.0
             self.color_button.set_rgba(color)
             self.color_button.connect("color-set", self.on_color_chosen, self.color_button)
-            self.color_button.set_tooltip_text(common.dict['background_color'])
+            self.color_button.set_tooltip_text(common.lang['background_color'])
             options_box.add(self.color_button)
 
-        self.flip_button = Gtk.Button(common.dict['flip_image'])
+        self.flip_button = Gtk.Button.new_with_label(common.lang['flip_image'])
         self.flip_button.set_sensitive(False)
         self.flip_button.connect('clicked', self.on_flip_button)
-        self.flip_button.set_tooltip_text(common.dict['flip_wallpaper_horizontally'])
+        self.flip_button.set_tooltip_text(common.lang['flip_wallpaper_horizontally'])
         if common.sway:
             options_box.add(self.flip_button)
         else:
             options_box.pack_start(self.flip_button, True, True, 0)
+
+    def clear_color_selection(self):
+        # If not on sway / swaybg, we have no color_button in UI
+        if common.sway:
+            # clear color selection: image will be used
+            color = Gdk.RGBA()
+            color.red = 0.0
+            color.green = 0.0
+            color.blue = 0.0
+            color.alpha = 1.0
+            self.color_button.set_rgba(color)
+            self.color = None
 
     def on_select_button(self, button):
         if common.selected_wallpaper:
@@ -218,16 +232,7 @@ class DisplayBox(Gtk.Box):
             button.set_property("name", "display-btn-selected")
             self.flip_button.set_sensitive(True)
 
-            # If not on sway / swaybg, we have no color_button in UI
-            if common.sway:
-                # clear color selection: image will be used
-                color = Gdk.RGBA()
-                color.red = 0.0
-                color.green = 0.0
-                color.blue = 0.0
-                color.alpha = 1.0
-                self.color_button.set_rgba(color)
-                self.color = None
+            self.clear_color_selection()
 
             common.apply_button.set_sensitive(True)
 
@@ -249,6 +254,7 @@ class DisplayBox(Gtk.Box):
         self.color = rgba_to_hex(button.get_rgba())
         # clear selected image to indicate it won't be used
         self.img.set_from_file("images/empty.png")
+        common.apply_button.set_sensitive(True)
 
     def on_flip_button(self, button):
         # convert images and get (thumbnail path, flipped image path)
@@ -264,7 +270,9 @@ class GUI:
         window = Gtk.Window()
 
         window.set_title("Azote")
-        window.set_wmclass("azote", "azote")
+        logo = GdkPixbuf.Pixbuf.new_from_file('images/azote.svg')
+        window.set_default_icon(logo)
+        window.set_role("azote")
 
         window.connect_after('destroy', self.destroy)
 
@@ -272,7 +280,6 @@ class GUI:
         main_box.set_spacing(5)
         main_box.set_border_width(10)
         main_box.set_orientation(Gtk.Orientation.VERTICAL)
-        window.add(main_box)
 
         # This contains a Gtk.ScrolledWindow with Gtk.Grid() inside, filled with ThumbButton(Gtk.Button) instances
         common.preview = Preview()
@@ -282,7 +289,7 @@ class GUI:
 
         # Label to display details of currently selected picture
         common.selected_picture_label = Gtk.Label()
-        common.selected_picture_label.set_text(common.dict['select_a_picture'])
+        common.selected_picture_label.set_text(common.lang['select_a_picture'])
 
         main_box.pack_start(common.selected_picture_label, False, False, 0)
 
@@ -297,17 +304,17 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_refresh.svg')
         refresh_button.set_image(img)
-        refresh_button.set_tooltip_text(common.dict['refresh_folder_preview'])
+        refresh_button.set_tooltip_text(common.lang['refresh_folder_preview'])
         folder_buttons_box.add(refresh_button)
 
         refresh_button.connect_after('clicked', self.on_refresh_clicked)
 
         # Button to set the wallpapers folder
-        folder_button = Gtk.Button(common.settings.src_path)
+        folder_button = Gtk.Button.new_with_label(common.settings.src_path)
         img = Gtk.Image()
         img.set_from_file('images/icon_open.svg')
         folder_button.set_image(img)
-        folder_button.set_tooltip_text(common.dict['open_another_folder'])
+        folder_button.set_tooltip_text(common.lang['open_another_folder'])
         folder_buttons_box.pack_start(folder_button, True, True, 0)
 
         folder_button.connect_after('clicked', self.on_folder_clicked)
@@ -340,23 +347,23 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_about.svg')
         about_button.set_image(img)
-        about_button.set_tooltip_text(common.dict['about_azote'])
+        about_button.set_tooltip_text(common.lang['about_azote'])
         about_button.connect('clicked', self.on_about_button)
         bottom_box.add(about_button)
 
         # Button to split wallpaper between displays
         if len(common.displays) > 1:
-            common.split_button = Gtk.Button(common.dict['split_selection'])
+            common.split_button = Gtk.Button.new_with_label(common.lang['split_selection'])
             bottom_box.pack_start(common.split_button, True, True, 0)
             common.split_button.set_sensitive(False)
-            common.split_button.set_tooltip_text(common.dict['split_selection_between_displays'])
+            common.split_button.set_tooltip_text(common.lang['split_selection_between_displays'])
             common.split_button.connect('clicked', self.on_split_button)
 
         # Button to apply settings
-        common.apply_button = Gtk.Button(common.dict['apply'])
+        common.apply_button = Gtk.Button.new_with_label(common.lang['apply'])
         common.apply_button.connect('clicked', self.on_apply_button)
         common.apply_button.set_sensitive(False)
-        common.apply_button.set_tooltip_text(common.dict['apply_settings'])
+        common.apply_button.set_tooltip_text(common.lang['apply_settings'])
         bottom_box.pack_start(common.apply_button, True, True, 0)
 
         main_box.add(bottom_box)
@@ -409,7 +416,8 @@ class GUI:
                     # if a color chosen, the wallpaper won't appear
                     batch_content.append("swaybg -o {} -c{} &".format(box.display_name, box.color))
                 elif box.wallpaper_path:
-                    batch_content.append("swaybg -o {} -i {} -m {} &".format(box.display_name, box.wallpaper_path, box.mode))
+                    batch_content.append(
+                        "swaybg -o {} -i {} -m {} &".format(box.display_name, box.wallpaper_path, box.mode))
 
             # save to ~/.azotebg
             with open(common.cmd_file, 'w') as f:
@@ -422,7 +430,7 @@ class GUI:
             subprocess.call(common.cmd_file, shell=True)
         else:
             # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
-            mode = common.display_boxes_list[0].mode    # They are all the same, just check the 1st one
+            mode = common.display_boxes_list[0].mode  # They are all the same, just check the 1st one
             command = "feh --bg-{}".format(mode)
             for box in common.display_boxes_list:
                 command += " {}".format(box.wallpaper_path)
@@ -438,6 +446,10 @@ class GUI:
                 box = common.display_boxes_list[i]
                 box.wallpaper_path = paths[i][0]
                 box.img.set_from_file(paths[i][1])
+
+        if common.display_boxes_list:
+            for box in common.display_boxes_list:
+                box.clear_color_selection()
 
     def on_about_button(self, button):
         dialog = Gtk.AboutDialog()
@@ -455,7 +467,7 @@ class GUI:
         dialog.set_logo(logo)
         dialog.set_copyright('(c) 2019 Piotr Miller')
         dialog.set_website('https://github.com/nwg-piotr/azote')
-        dialog.set_comments(common.dict['app_desc'])
+        dialog.set_comments(common.lang['app_desc'])
         dialog.set_license_type(Gtk.License.GPL_3_0)
         dialog.set_authors(['Piotr Miller (nwg)'])
         dialog.set_artists(['edskeye'])
