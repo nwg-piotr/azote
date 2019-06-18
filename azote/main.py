@@ -270,7 +270,7 @@ class GUI:
         window = Gtk.Window()
 
         window.set_title("Azote")
-        logo = GdkPixbuf.Pixbuf.new_from_file('images/azote.svg')
+        logo = GdkPixbuf.Pixbuf.new_from_file('images/icon.svg')
         window.set_default_icon(logo)
         window.set_role("azote")
 
