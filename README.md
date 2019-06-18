@@ -72,9 +72,7 @@ Install [azote](https://aur.archlinux.org/packages/azote) from AUR.
 
 **Debian & Ubuntu**
 
-Either download the .deb package or follow the instructions in this link to add the repository and APT key:
-
-https://software.opensuse.org//download.html?project=home%3AHead_on_a_Stick%3Aazote&package=azote
+Either download the .deb package or follow the instructions in [this link](https://software.opensuse.org//download.html?project=home%3AHead_on_a_Stick%3Aazote&package=azote) to add the repository and APT key.
 
 If the repository & key are added then the package will be updated with the usual `apt update && apt upgrade` commands.
 
