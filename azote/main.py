@@ -383,6 +383,7 @@ class GUI:
         Gtk.main_quit()
 
     def on_folder_clicked(self, button):
+        # todo check for possible deprecation
         dialog = Gtk.FileChooserDialog("Open folder", button.get_toplevel(), Gtk.FileChooserAction.SELECT_FOLDER)
         dialog.add_button(Gtk.STOCK_CANCEL, 0)
         dialog.add_button(Gtk.STOCK_OK, 1)

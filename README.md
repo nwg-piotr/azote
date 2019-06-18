@@ -64,6 +64,24 @@ In your `autostart` add:
 
 The program has not yet been tested with other WMs.
 
+## Installation
+
+**Arch Linux**
+
+Install [azote](https://aur.archlinux.org/packages/azote) from AUR.
+
+**Debian**
+
+Package by @Head-on-a-Stick should be available soon.
+
+**Other distributions**
+
+Packagers wanted! In case you'd like to install with setup.py script, this it the list of dependencies:
+
+'python' 'python-setuptools' 'python-gobject' 'python-pillow' 'wget' 'feh' 'xorg-xrandr' 'wmctrl'
+
+
+
 ### X11 / feh notice
 
 The background color picker won't be available. You'll also be unable to select different modes 
