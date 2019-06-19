@@ -22,7 +22,7 @@ when running on i3, Openbox or other X11 window managers.
 
 - works on Sway
 - uses own, bigger thumbnails (240 x 135 px)
-- flips wallpapers vertically
+- flips wallpapers horizontally
 - splits wallpapers between 2 or more displays
 
 ## Usage
