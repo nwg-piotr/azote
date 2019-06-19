@@ -111,7 +111,34 @@ class ThumbButton(Gtk.Button):
         self.set_label(filename)
         self.selected = False
 
-        self.connect('clicked', self.select)
+        self.connect('button-press-event', self.on_button_press)
+
+    def on_button_press(self, button, event):
+        if event.type == Gdk.EventType.BUTTON_PRESS:
+            if event.button == 1:
+                # Left click
+                if common.split_button:
+                    common.split_button.set_sensitive(True)
+                self.selected = True
+                common.selected_wallpaper = self
+                deselect_all()
+                button.set_property("name", "thumb-btn-selected")
+
+                with Image.open(self.source_path) as img:
+                    common.selected_picture_label.set_text("{}    ({} x {})".format(self.filename, img.size[0], img.size[1]))
+            elif event.button == 3:
+                # Right click: we'll attach context menu here
+                print(event.button)
+                self.show_menu()
+
+    def show_menu(self, *args):
+        menu = Gtk.Menu()
+        i1 = Gtk.MenuItem("Move to trash")
+        menu.append(i1)
+        i2 = Gtk.MenuItem("Remove permanently")
+        menu.append(i2)
+        menu.show_all()
+        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
     def select(self, button):
         if common.split_button:
