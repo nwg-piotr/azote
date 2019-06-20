@@ -21,6 +21,7 @@ import common
 import gi
 import pkg_resources
 from PIL import Image
+from send2trash import send2trash
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
@@ -127,18 +128,34 @@ class ThumbButton(Gtk.Button):
                 with Image.open(self.source_path) as img:
                     common.selected_picture_label.set_text("{}    ({} x {})".format(self.filename, img.size[0], img.size[1]))
             elif event.button == 3:
-                # Right click: we'll attach context menu here
-                print(event.button)
+                # Right click: context menu
                 self.show_menu()
 
     def show_menu(self, *args):
         menu = Gtk.Menu()
-        i1 = Gtk.MenuItem("Move to trash")
-        menu.append(i1)
-        i2 = Gtk.MenuItem("Remove permanently")
-        menu.append(i2)
+        i0 = Gtk.MenuItem.new_with_label("Open with feh")
+        i0.connect('activate', self.on_feh)
+        menu.append(i0)
+        if self.source_path.startswith(os.getenv("HOME")):
+            i1 = Gtk.MenuItem.new_with_label("Move to trash")
+            i1.connect('activate', self.on_trash)
+            menu.append(i1)
         menu.show_all()
         menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+
+    def on_feh(self, widget):
+        command = 'feh --start-at {} --scale-down --no-fehbg -d -N'.format(self.source_path)
+        subprocess.Popen(command, shell=True)
+        print('feh', self.source_path)
+
+    def on_trash(self, widget):
+        send2trash(self.source_path)
+        send2trash(self.thumb_file)
+        common.preview.refresh()
+        print('trash', self.source_path)
+
+    def on_del(self, widget):
+        print('del', self.source_path)
 
     def select(self, button):
         if common.split_button:
