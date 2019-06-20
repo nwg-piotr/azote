@@ -96,6 +96,7 @@ class ThumbButton(Gtk.Button):
 
         self.set_property("name", "thumb-btn")
 
+        self.folder = folder
         self.filename = filename
         self.source_path = os.path.join(folder, filename)
 
@@ -144,13 +145,14 @@ class ThumbButton(Gtk.Button):
         menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
     def on_feh(self, widget):
-        command = 'feh --start-at {} --scale-down --no-fehbg -d -N'.format(self.source_path)
+        command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(self.source_path, self.folder)
         subprocess.Popen(command, shell=True)
         print('feh', self.source_path)
 
     def on_trash(self, widget):
         send2trash(self.source_path)
-        send2trash(self.thumb_file)
+        if os.path.isfile(self.thumb_file):
+            send2trash(self.thumb_file)
         common.preview.refresh()
         print('trash', self.source_path)
 

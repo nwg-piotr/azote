@@ -17,5 +17,5 @@ setup(
     author='Piotr Miller',
     author_email='nwg.piotr@gmail.com',
     python_requires='>=3.5.0',
-    install_requires=['pygobject', 'pillow', 'Send2Trash']
+    install_requires=['pillow', 'send2trash']
 )
