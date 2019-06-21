@@ -436,6 +436,7 @@ class GUI:
         dialog.destroy()
 
     def on_refresh_clicked(self, button):
+        self.clear_wallpaper_selection()
         common.preview.refresh()
 
     def on_apply_button(self, button):
