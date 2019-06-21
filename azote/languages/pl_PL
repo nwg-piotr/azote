@@ -4,7 +4,7 @@
 
 app_desc = Menedżer tapet dla Sway, i3 i innych menedżerów okien
 about_azote = O programie Azote
-select_a_picture = Wybierz obraz
+no_picture_selected = Nie wybrano obrazu
 select_this_picture = Wybierz ten obraz
 open_another_folder = Wybierz inny folder
 refresh_folder_preview = Odśwież podgląd folderu
@@ -13,8 +13,9 @@ background_color = Kolor tła
 flip_image = Odwróć obraz
 flip_wallpaper_horizontally = Odwróć tapetę w poziomie
 set_selected_wallpaper = Ustaw wybraną tapetę
-split_selection = Podziel wybrany obraz
+open_folder = Otwórz folder
+open_with_feh = Otwórz wybrany w feh
+move_to_trash = Przenieś wybrany do kosza
 split_selection_between_displays = Podziel wybrany obraz pomiędzy ekrany
-apply = Zastosuj
 apply_settings = Zastosuj ustawienia
 thumbnails_in_cache = {} miniatur w cache ({})

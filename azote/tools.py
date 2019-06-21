@@ -235,21 +235,22 @@ def flip_selected_wallpaper():
     This creates vertically flipped image and its thumbnail and saves to ~/.azote/backgrounds
     :return: thumbnail path, flipped image path
     """
-    try:
-        img = Image.open(common.selected_wallpaper.source_path)
-        flipped = img.transpose(Image.FLIP_LEFT_RIGHT)
-        img_path = os.path.join(common.bcg_dir, "flipped-{}".format(common.selected_wallpaper.filename))
-        flipped.save(os.path.join(common.tmp_dir, "flipped-{}".format(common.selected_wallpaper.filename)), "PNG")
+    if common.selected_wallpaper:
+        try:
+            img = Image.open(common.selected_wallpaper.source_path)
+            flipped = img.transpose(Image.FLIP_LEFT_RIGHT)
+            img_path = os.path.join(common.bcg_dir, "flipped-{}".format(common.selected_wallpaper.filename))
+            flipped.save(os.path.join(common.tmp_dir, "flipped-{}".format(common.selected_wallpaper.filename)), "PNG")
 
-        flipped.thumbnail((240, 135), Image.ANTIALIAS)
-        flipped = expand_img(flipped)
+            flipped.thumbnail((240, 135), Image.ANTIALIAS)
+            flipped = expand_img(flipped)
 
-        thumb_path = os.path.join(common.tmp_dir, "thumbnail-{}".format(common.selected_wallpaper.filename))
-        flipped.save(thumb_path, "PNG")
-        return thumb_path, img_path
+            thumb_path = os.path.join(common.tmp_dir, "thumbnail-{}".format(common.selected_wallpaper.filename))
+            flipped.save(thumb_path, "PNG")
+            return thumb_path, img_path
 
-    except Exception as e:
-        log('Failed flipping {} - {}'.format(common.selected_wallpaper.source_path, e), common.ERROR)
+        except Exception as e:
+            log('Failed flipping {} - {}'.format(common.selected_wallpaper.source_path, e), common.ERROR)
 
 
 def split_selected_wallpaper(num_parts):

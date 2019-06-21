@@ -11,7 +11,7 @@ Project: https://github.com/nwg-piotr/azote
 License: GPL3
 
 Dependencies:
-python, python-setuptools, python-gobject, python-cairo, i3ipc-python, python-pillow, wmctrl, feh, xorg-xrandr
+python, python-setuptools, python-gobject, python-cairo, python-pillow, python-send2trash, wmctrl, feh, xorg-xrandr
 """
 import os
 import sys
@@ -21,6 +21,7 @@ import common
 import gi
 import pkg_resources
 from PIL import Image
+from send2trash import send2trash
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
@@ -95,6 +96,7 @@ class ThumbButton(Gtk.Button):
 
         self.set_property("name", "thumb-btn")
 
+        self.folder = folder
         self.filename = filename
         self.source_path = os.path.join(folder, filename)
 
@@ -111,18 +113,23 @@ class ThumbButton(Gtk.Button):
         self.set_label(filename)
         self.selected = False
 
-        self.connect('clicked', self.select)
+        self.connect('clicked', self.on_button_press)
 
-    def select(self, button):
+    def on_button_press(self, button):
         if common.split_button:
             common.split_button.set_sensitive(True)
+        common.feh_button.set_sensitive(True)
+        common.trash_button.set_sensitive(True)
         self.selected = True
         common.selected_wallpaper = self
         deselect_all()
         button.set_property("name", "thumb-btn-selected")
 
         with Image.open(self.source_path) as img:
-            common.selected_picture_label.set_text("{}    ({} x {})".format(self.filename, img.size[0], img.size[1]))
+            filename = self.filename
+            if len(filename) > 30:
+                filename = '…{}'.format(filename[-28::])
+            common.selected_picture_label.set_text("{} ({} x {})".format(filename, img.size[0], img.size[1]))
 
     def deselect(self, button):
         self.selected = False
@@ -287,40 +294,6 @@ class GUI:
 
         main_box.pack_start(common.preview, False, False, 0)
 
-        # Label to display details of currently selected picture
-        common.selected_picture_label = Gtk.Label()
-        common.selected_picture_label.set_text(common.lang['select_a_picture'])
-
-        main_box.pack_start(common.selected_picture_label, False, False, 0)
-
-        # Let's pack 2 folder buttons horizontally
-        folder_buttons_box = Gtk.Box()
-        folder_buttons_box.set_spacing(5)
-        folder_buttons_box.set_border_width(10)
-        folder_buttons_box.set_orientation(Gtk.Orientation.HORIZONTAL)
-
-        # Button to refresh currently selected folder thumbnails
-        refresh_button = Gtk.Button()
-        img = Gtk.Image()
-        img.set_from_file('images/icon_refresh.svg')
-        refresh_button.set_image(img)
-        refresh_button.set_tooltip_text(common.lang['refresh_folder_preview'])
-        folder_buttons_box.add(refresh_button)
-
-        refresh_button.connect_after('clicked', self.on_refresh_clicked)
-
-        # Button to set the wallpapers folder
-        folder_button = Gtk.Button.new_with_label(common.settings.src_path)
-        img = Gtk.Image()
-        img.set_from_file('images/icon_open.svg')
-        folder_button.set_image(img)
-        folder_button.set_tooltip_text(common.lang['open_another_folder'])
-        folder_buttons_box.pack_start(folder_button, True, True, 0)
-
-        folder_button.connect_after('clicked', self.on_folder_clicked)
-
-        main_box.pack_start(folder_buttons_box, False, True, 0)
-
         # We need a horizontal container to display outputs in columns
         displays_box = Gtk.Box()
         displays_box.set_spacing(15)
@@ -342,6 +315,78 @@ class GUI:
         bottom_box.set_border_width(10)
         bottom_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
+        # Button to open in feh
+        common.feh_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_feh.svg')
+        common.feh_button.set_image(img)
+        common.feh_button.set_tooltip_text(common.lang['open_with_feh'])
+        common.feh_button.set_sensitive(False)
+        common.feh_button.connect('clicked', self.on_feh_button)
+        bottom_box.add(common.feh_button)
+
+        # Button to move to trash
+        common.trash_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_trash.svg')
+        common.trash_button.set_image(img)
+        common.trash_button.set_tooltip_text(common.lang['move_to_trash'])
+        common.trash_button.set_sensitive(False)
+        common.trash_button.connect('clicked', self.on_trash_button)
+        bottom_box.add(common.trash_button)
+
+        # Label to display details of currently selected picture
+        common.selected_picture_label = Gtk.Label()
+        common.selected_picture_label.set_property("name", "selected-label")
+        common.selected_picture_label.set_text(common.lang['no_picture_selected'])
+
+        bottom_box.pack_start(common.selected_picture_label, True, True, 0)
+
+        # Button to split wallpaper between displays
+        if len(common.displays) > 1:
+            common.split_button = Gtk.Button()
+            img = Gtk.Image()
+            img.set_from_file('images/icon_split.svg')
+            common.split_button.set_image(img)
+            bottom_box.add(common.split_button)
+            common.split_button.set_sensitive(False)
+            common.split_button.set_tooltip_text(common.lang['split_selection_between_displays'])
+            common.split_button.connect('clicked', self.on_split_button)
+
+        vseparator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
+        bottom_box.add(vseparator)
+
+        # Button to set the wallpapers folder
+        folder_button = Gtk.Button.new_with_label(common.settings.src_path)
+        folder_button.set_property("name", "folder-btn")
+        folder_button.set_tooltip_text(common.lang['open_another_folder'])
+        bottom_box.pack_start(folder_button, True, True, 0)
+
+        folder_button.connect_after('clicked', self.on_folder_clicked)
+
+        # Button to refresh currently selected folder thumbnails
+        refresh_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_refresh.svg')
+        refresh_button.set_image(img)
+        refresh_button.set_tooltip_text(common.lang['refresh_folder_preview'])
+        bottom_box.add(refresh_button)
+
+        refresh_button.connect_after('clicked', self.on_refresh_clicked)
+
+        # Button to apply settings
+        common.apply_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_apply.svg')
+        common.apply_button.set_image(img)
+        common.apply_button.connect('clicked', self.on_apply_button)
+        common.apply_button.set_sensitive(False)
+        common.apply_button.set_tooltip_text(common.lang['apply_settings'])
+        bottom_box.add(common.apply_button)
+
+        vseparator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
+        bottom_box.add(vseparator)
+
         # Button to call About dialog
         about_button = Gtk.Button()
         img = Gtk.Image()
@@ -351,21 +396,6 @@ class GUI:
         about_button.connect('clicked', self.on_about_button)
         bottom_box.add(about_button)
 
-        # Button to split wallpaper between displays
-        if len(common.displays) > 1:
-            common.split_button = Gtk.Button.new_with_label(common.lang['split_selection'])
-            bottom_box.pack_start(common.split_button, True, True, 0)
-            common.split_button.set_sensitive(False)
-            common.split_button.set_tooltip_text(common.lang['split_selection_between_displays'])
-            common.split_button.connect('clicked', self.on_split_button)
-
-        # Button to apply settings
-        common.apply_button = Gtk.Button.new_with_label(common.lang['apply'])
-        common.apply_button.connect('clicked', self.on_apply_button)
-        common.apply_button.set_sensitive(False)
-        common.apply_button.set_tooltip_text(common.lang['apply_settings'])
-        bottom_box.pack_start(common.apply_button, True, True, 0)
-
         main_box.add(bottom_box)
 
         hseparator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
@@ -374,7 +404,7 @@ class GUI:
         common.status_bar = Gtk.Statusbar()
         common.status_bar.set_property("name", "status-bar")
         common.status_bar.set_halign(Gtk.Align.CENTER)
-        main_box.pack_start(common.status_bar, True, False, 0)
+        main_box.add(common.status_bar)
         update_status_bar()
 
         window.show_all()
@@ -383,23 +413,28 @@ class GUI:
         Gtk.main_quit()
 
     def on_folder_clicked(self, button):
-        # todo check for possible deprecation
-        dialog = Gtk.FileChooserDialog("Open folder", button.get_toplevel(), Gtk.FileChooserAction.SELECT_FOLDER)
+        dialog = Gtk.FileChooserDialog(title="Open folder", parent=button.get_toplevel(), action=Gtk.FileChooserAction.SELECT_FOLDER)
         dialog.add_button(Gtk.STOCK_CANCEL, 0)
         dialog.add_button(Gtk.STOCK_OK, 1)
         dialog.set_default_response(1)
-        dialog.set_default_size(500, 600)
+        dialog.set_default_size(800, 400)
+
+        dialog.set_default_size(800, 400)
 
         response = dialog.run()
         if response == 1:
             common.settings.src_path = dialog.get_filename()
             common.settings.save()
             common.preview.refresh()
-            button.set_label(common.settings.src_path)
+            text = common.settings.src_path
+            if len(text) > 40:
+                text = '…{}'.format(text[-38::])
+            button.set_label(text)
 
         dialog.destroy()
 
     def on_refresh_clicked(self, button):
+        self.clear_wallpaper_selection()
         common.preview.refresh()
 
     def on_apply_button(self, button):
@@ -452,6 +487,28 @@ class GUI:
             for box in common.display_boxes_list:
                 box.clear_color_selection()
 
+    def on_feh_button(self, widget):
+        if common.selected_wallpaper:
+            command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
+            subprocess.Popen(command, shell=True)
+            print('feh', self.source_path)
+
+    def on_trash_button(self, widget):
+        menu = Gtk.Menu()
+        i0 = Gtk.MenuItem.new_with_label("Move")
+        i0.connect('activate', self.move_to_trash)
+        menu.append(i0)
+        menu.show_all()
+        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+
+    def move_to_trash(self, widget):
+        send2trash(common.selected_wallpaper.source_path)
+        if os.path.isfile(common.selected_wallpaper.thumb_file):
+            send2trash(common.selected_wallpaper.thumb_file)
+        self.clear_wallpaper_selection()
+        common.preview.refresh()
+        print('trash', common.selected_wallpaper.source_path)
+
     def on_about_button(self, button):
         dialog = Gtk.AboutDialog()
         dialog.set_program_name('Azote')
@@ -479,6 +536,14 @@ class GUI:
         dialog.destroy()
         return False
 
+    def clear_wallpaper_selection(self):
+        common.selected_wallpaper = None
+        common.selected_picture_label.set_text(common.lang['no_picture_selected'])
+        common.split_button.set_sensitive(False)
+        common.apply_button.set_sensitive(False)
+        common.feh_button.set_sensitive(False)
+        common.trash_button.set_sensitive(False)
+
 
 def on_configure_event(window, e):
     cols = e.width // 256
@@ -504,6 +569,9 @@ def main():
                 font-weight: normal;
                 font-size: 11px;
             }
+            button#folder-btn {
+                font-size: 12px;
+            }
             button#thumb-btn-selected {
                 background-color: #66ccff;
                 font-weight: bold;
@@ -518,6 +586,10 @@ def main():
                 font-size: 12px;
             }
             statusbar#status-bar {
+                font-size: 12px;
+            }
+            label#selected-label {
+                background-color: #66ccff;
                 font-size: 12px;
             }
             """
