@@ -470,7 +470,6 @@ class GUI:
             command = "feh --bg-{}".format(mode)
             for box in common.display_boxes_list:
                 command += " {}".format(box.wallpaper_path)
-            print(command)
             subprocess.call(command, shell=True)
 
     def on_split_button(self, button):
@@ -491,7 +490,6 @@ class GUI:
         if common.selected_wallpaper:
             command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
             subprocess.Popen(command, shell=True)
-            print('feh', self.source_path)
 
     def on_trash_button(self, widget):
         menu = Gtk.Menu()
@@ -507,7 +505,6 @@ class GUI:
             send2trash(common.selected_wallpaper.thumb_file)
         self.clear_wallpaper_selection()
         common.preview.refresh()
-        print('trash', common.selected_wallpaper.source_path)
 
     def on_about_button(self, button):
         dialog = Gtk.AboutDialog()
