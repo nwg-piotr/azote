@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cd /usr/lib/python3.7/site-packages/azote
-exec python main.py "$@"
+exec /usr/bin/python main.py "$@"

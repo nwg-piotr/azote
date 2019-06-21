@@ -1,3 +1,10 @@
+v0.1.0 (pre-release, 2019.06.21)
+- program icon slightly altered
+- buttons and labels grouped in a single row
+- new button: "Open selected with feh"
+- new button: "Move selected to trash"
+- new dependency: python-send2trash
+
 v0.0.3 (pre-release, 2019.06.18):
 - "azote/tools.py: death to grep!" PR by Head-on-a-Stick merged
 - folder selection button - vertical size fixed

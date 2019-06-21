@@ -1,15 +1,13 @@
 # Azote
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
-
 **Azote** is a GTK+ 3-based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
 (Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands.
 
-![screenshot](http://nwg.pl/Lychee/uploads/big/85643617cb8aec153a05912b8023d0e9.png)
+![screenshot](http://nwg.pl/Lychee/uploads/big/d4986263320d5b9c9b64fafe18bf1815.png)
 
 *The pictures above come from https://wallhaven.cc*
 
-Also see [Azote in action on YouTube](https://youtu.be/77mrrTVPE7A).
+Also see [Azote in action on YouTube](https://youtu.be/Cjqr0LRL67I).
 
 ## Project assumptions
 
@@ -80,9 +78,7 @@ If the repository & key are added then the package will be updated with the usua
 
 Packagers wanted! In case you'd like to install with setup.py script, this it the list of dependencies:
 
-'python' 'python-setuptools' 'python-gobject' 'python-pillow' 'wget' 'feh' 'xorg-xrandr' 'wmctrl'
-
-
+'python' 'python-setuptools' 'python-gobject' 'python-pillow' 'python-send2trash' 'wget' 'feh' 'xorg-xrandr' 'wmctrl'
 
 ### X11 / feh notice
 
@@ -92,4 +88,7 @@ The background color picker won't be available. You'll also be unable to select 
 
 ## Packaging
 
-Please use the latest [release](https://github.com/nwg-piotr/azote/releases) assets.
+[![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
+
+- Please use the latest [release](https://github.com/nwg-piotr/azote/releases) assets.
+- Seeing [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
