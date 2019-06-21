@@ -524,7 +524,7 @@ class GUI:
         dialog.set_website('https://github.com/nwg-piotr/azote')
         dialog.set_comments(common.lang['app_desc'])
         dialog.set_license_type(Gtk.License.GPL_3_0)
-        dialog.set_authors(['Piotr Miller (nwg)'])
+        dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick'])
         dialog.set_artists(['edskeye'])
 
         dialog.show()
