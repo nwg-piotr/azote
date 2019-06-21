@@ -13,6 +13,7 @@ background_color = Background color
 flip_image = Flip image
 flip_wallpaper_horizontally = Flip wallpaper horizontally
 set_selected_wallpaper = Set selected wallpaper
+open_folder = Open folder
 open_with_feh = Open selected with feh
 move_to_trash = Move selected to trash
 split_selection_between_displays = Split selection between displays

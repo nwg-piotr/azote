@@ -318,7 +318,7 @@ class GUI:
         # Button to open in feh
         common.feh_button = Gtk.Button()
         img = Gtk.Image()
-        img.set_from_file('images/icon_open_file.svg')
+        img.set_from_file('images/icon_feh.svg')
         common.feh_button.set_image(img)
         common.feh_button.set_tooltip_text(common.lang['open_with_feh'])
         common.feh_button.set_sensitive(False)
@@ -358,9 +358,6 @@ class GUI:
 
         # Button to set the wallpapers folder
         folder_button = Gtk.Button.new_with_label(common.settings.src_path)
-        img = Gtk.Image()
-        img.set_from_file('images/icon_open.svg')
-        # folder_button.set_image(img)
         folder_button.set_property("name", "folder-btn")
         folder_button.set_tooltip_text(common.lang['open_another_folder'])
         bottom_box.pack_start(folder_button, True, True, 0)
