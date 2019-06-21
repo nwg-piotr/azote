@@ -177,7 +177,7 @@ class DisplayBox(Gtk.Box):
         if common.sway:
             modes = ["stretch", "fit", "fill", "center", "tile"]  # modes available in swaybg
         else:
-            modes = ["tile", "center", "scale", "seamless"]  # modes available in feh
+            modes = ["scale", "max", "fill", "center", "tile"]  # modes available in feh
 
         for mode in modes:
             mode_selector.append([mode])
