@@ -11,7 +11,7 @@ Project: https://github.com/nwg-piotr/azote
 License: GPL3
 
 Dependencies:
-python, python-setuptools, python-gobject, python-cairo, python-pillow, python-send2trash, wmctrl, feh, xorg-xrandr
+python, python-setuptools, python-gobject, python-cairo, python-pillow, python-send2trash, gtk3, wmctrl, feh, xorg-xrandr
 """
 import os
 import sys
