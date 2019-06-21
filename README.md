@@ -80,9 +80,7 @@ If the repository & key are added then the package will be updated with the usua
 
 Packagers wanted! In case you'd like to install with setup.py script, this it the list of dependencies:
 
-'python' 'python-setuptools' 'python-gobject' 'python-pillow' 'wget' 'feh' 'xorg-xrandr' 'wmctrl'
-
-
+'python' 'python-setuptools' 'python-gobject' 'python-pillow' 'python-send2trash' 'wget' 'feh' 'xorg-xrandr' 'wmctrl'
 
 ### X11 / feh notice
 
@@ -92,4 +90,5 @@ The background color picker won't be available. You'll also be unable to select 
 
 ## Packaging
 
-Please use the latest [release](https://github.com/nwg-piotr/azote/releases) assets.
+- Please use the latest [release](https://github.com/nwg-piotr/azote/releases) assets.
+- Seeing [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
