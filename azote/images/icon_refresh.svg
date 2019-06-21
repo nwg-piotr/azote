@@ -41,21 +41,40 @@
      inkscape:window-height="1036"
      id="namedview8"
      showgrid="false"
-     inkscape:zoom="31.642714"
-     inkscape:cx="8.3507253"
-     inkscape:cy="12.087265"
+     inkscape:zoom="7.1744663"
+     inkscape:cx="16.077131"
+     inkscape:cy="47.000001"
      inkscape:window-x="1930"
      inkscape:window-y="34"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg6" />
-  <path
-     d="M 0,0 H 24 V 24 H 0 Z"
-     id="path2"
-     inkscape:connector-curvature="0"
-     style="fill:none;stroke-width:0.5" />
-  <path
-     inkscape:connector-curvature="0"
-     d="M 19.060663,4.933083 C 17.253283,3.11945 14.757974,1.993746 11.993746,1.993746 6.4652908,1.993746 2,6.471545 2,12 c 0,5.528455 4.4652908,10.006254 9.993746,10.006254 4.659162,0 8.561601,-3.189493 9.668543,-7.50469 h -2.601626 c -1.031895,2.914321 -3.796123,5.003127 -7.066917,5.003127 -4.1463414,0 -7.5046904,-3.358349 -7.5046904,-7.504691 0,-4.146341 3.358349,-7.50469 7.5046904,-7.50469 2.070044,0 3.927455,0.863039 5.284553,2.220137 l -4.033771,4.033771 H 22 V 1.993746 Z"
-     id="path2-5"
-     style="stroke-width:0.62539089;fill:#4d4d4d;fill-opacity:1" />
+     inkscape:current-layer="svg6"
+     inkscape:snap-global="false"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       position="0,1.7095026"
+       orientation="1,0"
+       id="guide853"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="-25.927456,0"
+       orientation="0,1"
+       id="guide855"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,0,255)" />
+  </sodipodi:namedview>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:23.27272797px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.58181822;"
+     x="3.9999998"
+     y="20.727272"
+     id="text823-7"><tspan
+       sodipodi:role="line"
+       id="tspan821-2"
+       x="3.9999998"
+       y="20.727272"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Ionicons;-inkscape-font-specification:Ionicons;stroke-width:0.58181822;fill:#333333;fill-opacity:1;"></tspan></text>
 </svg>

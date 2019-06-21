@@ -4,7 +4,7 @@
 
 app_desc = Wallpaper manager for Sway, i3 and other window managers
 about_azote = About Azote
-select_a_picture = Select a picture
+no_picture_selected = No picture selected
 select_this_picture = Select this picture
 open_another_folder = Open another folder
 refresh_folder_preview = Refresh folder preview
@@ -13,8 +13,8 @@ background_color = Background color
 flip_image = Flip image
 flip_wallpaper_horizontally = Flip wallpaper horizontally
 set_selected_wallpaper = Set selected wallpaper
-split_selection = Split selection
+open_with_feh = Open selected with feh
+move_to_trash = Move selected to trash
 split_selection_between_displays = Split selection between displays
-apply = Apply
 apply_settings = Apply settings
 thumbnails_in_cache = {} thumbnails in cache ({})
