@@ -413,7 +413,7 @@ class GUI:
         Gtk.main_quit()
 
     def on_folder_clicked(self, button):
-        dialog = Gtk.FileChooserDialog(title="Open folder", parent=button.get_toplevel(), action=Gtk.FileChooserAction.SELECT_FOLDER)
+        dialog = Gtk.FileChooserDialog(title=common.lang['open_folder'], parent=button.get_toplevel(), action=Gtk.FileChooserAction.SELECT_FOLDER)
         dialog.add_button(Gtk.STOCK_CANCEL, 0)
         dialog.add_button(Gtk.STOCK_OK, 1)
         dialog.set_default_response(1)
@@ -470,7 +470,6 @@ class GUI:
             command = "feh --bg-{}".format(mode)
             for box in common.display_boxes_list:
                 command += " {}".format(box.wallpaper_path)
-            print(command)
             subprocess.call(command, shell=True)
 
     def on_split_button(self, button):
@@ -491,7 +490,6 @@ class GUI:
         if common.selected_wallpaper:
             command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
             subprocess.Popen(command, shell=True)
-            print('feh', self.source_path)
 
     def on_trash_button(self, widget):
         menu = Gtk.Menu()
@@ -507,7 +505,6 @@ class GUI:
             send2trash(common.selected_wallpaper.thumb_file)
         self.clear_wallpaper_selection()
         common.preview.refresh()
-        print('trash', common.selected_wallpaper.source_path)
 
     def on_about_button(self, button):
         dialog = Gtk.AboutDialog()
@@ -527,7 +524,7 @@ class GUI:
         dialog.set_website('https://github.com/nwg-piotr/azote')
         dialog.set_comments(common.lang['app_desc'])
         dialog.set_license_type(Gtk.License.GPL_3_0)
-        dialog.set_authors(['Piotr Miller (nwg)'])
+        dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick'])
         dialog.set_artists(['edskeye'])
 
         dialog.show()
