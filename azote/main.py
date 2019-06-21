@@ -413,7 +413,7 @@ class GUI:
         Gtk.main_quit()
 
     def on_folder_clicked(self, button):
-        dialog = Gtk.FileChooserDialog(title="Open folder", parent=button.get_toplevel(), action=Gtk.FileChooserAction.SELECT_FOLDER)
+        dialog = Gtk.FileChooserDialog(title=common.lang['open_folder'], parent=button.get_toplevel(), action=Gtk.FileChooserAction.SELECT_FOLDER)
         dialog.add_button(Gtk.STOCK_CANCEL, 0)
         dialog.add_button(Gtk.STOCK_OK, 1)
         dialog.set_default_response(1)

@@ -1,3 +1,9 @@
+v0.1.1 (pre-release, 2019.06.22)
+- "azote/main.py: corrected feh options" PR #8 by Head-on-a-Stick merged
+- some no longer needed print commands removed
+- hardcoded strings replaced with the dictionary
+- all modules removed from install_requires=[] in setup.py
+
 v0.1.0 (pre-release, 2019.06.21)
 - program icon slightly altered
 - buttons and labels grouped in a single row
