@@ -80,6 +80,17 @@ Packagers wanted! In case you'd like to install with setup.py script, this it th
 
 'python' 'python-setuptools' 'python-gobject' 'python-pillow' 'python-send2trash' 'wget' 'feh' 'xorg-xrandr' 'wmctrl'
 
+## Troubleshooting
+
+As well pictures as displays preview are instances of the Gtk.Button class. In case you don't see images inside them,
+please make sure if button images are turned on in the `~/.config/gtk-3.0/settings.ini` file:
+
+```bash
+[Settings]
+(...)
+gtk-button-images=1
+```
+
 ### X11 / feh notice
 
 The background color picker won't be available. You'll also be unable to select different modes 
