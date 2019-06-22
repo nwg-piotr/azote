@@ -18,7 +18,7 @@ WARNING = 'warning'
 INFO = 'info'
 DEBUG = 'debug'
 
-env = {"wm": '', "i3ipc": False, "xrandr": False}
+env = {"wm": '', "i3ipc": False, "xrandr": False, "send2trash": False}
 sway = False
 
 lang = None             # dictionary "name": lang_string
