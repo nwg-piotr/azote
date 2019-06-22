@@ -83,7 +83,7 @@ Packagers wanted! In case you'd like to install with setup.py script, this it th
 ## Troubleshooting
 
 As well pictures as displays preview are instances of the Gtk.Button class. In case you don't see images inside them,
-please make sure if they are turned on in the `~/.config/gtk-3.0/settings.ini` file:
+please make sure if button images are turned on in the `~/.config/gtk-3.0/settings.ini` file:
 
 ```bash
 [Settings]
