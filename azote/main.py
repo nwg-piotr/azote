@@ -21,7 +21,14 @@ import common
 import gi
 import pkg_resources
 from PIL import Image
-from send2trash import send2trash
+
+try:
+    from send2trash import send2trash
+    common.env['send2trash'] = True
+except Exception as e:
+    common.env['send2trash'] = False
+    print('send2trash module not found', e)
+
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
@@ -325,15 +332,16 @@ class GUI:
         common.feh_button.connect('clicked', self.on_feh_button)
         bottom_box.add(common.feh_button)
 
-        # Button to move to trash
-        common.trash_button = Gtk.Button()
-        img = Gtk.Image()
-        img.set_from_file('images/icon_trash.svg')
-        common.trash_button.set_image(img)
-        common.trash_button.set_tooltip_text(common.lang['move_to_trash'])
-        common.trash_button.set_sensitive(False)
-        common.trash_button.connect('clicked', self.on_trash_button)
-        bottom_box.add(common.trash_button)
+        if common.env['send2trash']:
+            # Button to move to trash
+            common.trash_button = Gtk.Button()
+            img = Gtk.Image()
+            img.set_from_file('images/icon_trash.svg')
+            common.trash_button.set_image(img)
+            common.trash_button.set_tooltip_text(common.lang['move_to_trash'])
+            common.trash_button.set_sensitive(False)
+            common.trash_button.connect('clicked', self.on_trash_button)
+            bottom_box.add(common.trash_button)
 
         # Label to display details of currently selected picture
         common.selected_picture_label = Gtk.Label()
