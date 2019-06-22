@@ -1,3 +1,6 @@
+v0.1.2 (pre-release, 2019.06.23)
+- install_requires=['send2trash'] restored in setup.py. A try/except clause checks the module availability.
+
 v0.1.1 (pre-release, 2019.06.22)
 - "azote/main.py: corrected feh options" PR #8 by Head-on-a-Stick merged
 - some no longer needed print commands removed
