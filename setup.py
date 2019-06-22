@@ -17,5 +17,5 @@ setup(
     author='Piotr Miller',
     author_email='nwg.piotr@gmail.com',
     python_requires='>=3.5.0',
-    install_requires=['send2trash']
+    install_requires=[]
 )
