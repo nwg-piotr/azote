@@ -1,5 +1,6 @@
 v0.1.2 (pre-release, 2019.06.23)
-- A try/except clause checks the python send2trash module availability. The python-send2trash dependency to be removed where unavailable.
+- A try/except clause checks the python send2trash module availability.
+  The python-send2trash dependency to be removed where unavailable.
 
 v0.1.1 (pre-release, 2019.06.22)
 - "azote/main.py: corrected feh options" PR #8 by Head-on-a-Stick merged
