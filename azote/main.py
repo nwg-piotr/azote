@@ -126,7 +126,8 @@ class ThumbButton(Gtk.Button):
         if common.split_button:
             common.split_button.set_sensitive(True)
         common.feh_button.set_sensitive(True)
-        common.trash_button.set_sensitive(True)
+        if common.trash_button:
+            common.trash_button.set_sensitive(True)
         self.selected = True
         common.selected_wallpaper = self
         deselect_all()
