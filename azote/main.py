@@ -503,7 +503,7 @@ class GUI:
 
     def on_trash_button(self, widget):
         menu = Gtk.Menu()
-        i0 = Gtk.MenuItem.new_with_label("Move")
+        i0 = Gtk.MenuItem.new_with_label(common.lang['move'])
         i0.connect('activate', self.move_to_trash)
         menu.append(i0)
         menu.show_all()
