@@ -80,9 +80,23 @@ If the repository & key are added then the package will be updated with the usua
 
 **Other distributions**
 
-Packagers wanted! In case you'd like to install with setup.py script, this it the list of dependencies:
+Packagers wanted! 
 
-'python' 'python-setuptools' 'python-gobject' 'python-pillow' 'python-send2trash' 'wget' 'feh' 'xorg-xrandr' 'wmctrl'
+## Dependencies:
+
+- python
+- python-setuptools
+- python-gobject
+- python-pillow 
+- gtk3
+- wget
+- feh 
+- xorg-xrandr
+- wmctrl
+
+**Optionally:** 
+
+- python-send2trash 
 
 ## Troubleshooting
 
