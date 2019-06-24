@@ -1,5 +1,9 @@
+v0.1.3 (pre-release, 2019.06.24)
+- PR #18 by Head-on-a-Stick merged - fix to issue #17 (Wallpaper unselectable w/o python3-send2trash (Debian))
+
 v0.1.2 (pre-release, 2019.06.23)
-- install_requires=['send2trash'] restored in setup.py. A try/except clause checks the module availability.
+- A try/except clause checks the python send2trash module availability.
+  The python-send2trash dependency to be removed where unavailable.
 
 v0.1.1 (pre-release, 2019.06.22)
 - "azote/main.py: corrected feh options" PR #8 by Head-on-a-Stick merged
