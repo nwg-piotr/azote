@@ -60,7 +60,11 @@ In your `autostart` add:
 ~/.fehbg &
 ```
 
-The program has not yet been tested with other WMs.
+**dwm**
+
+Run `~/.fehbg` in whatever way you autostart commands. :)
+
+Azote has not yet been confirmed to work (or not) with other WMs.
 
 ## Installation
 
