@@ -23,4 +23,4 @@ To force use of a certain language (if available), use the `lang` argument:
 azote lang pl_PL
 ```
 
--> forces use of Polish strings.
+-> start Azote in Polish.
