@@ -5,21 +5,21 @@
 
 ![screenshot](http://nwg.pl/Lychee/uploads/big/d4986263320d5b9c9b64fafe18bf1815.png)
 
-*The pictures above come from https://wallhaven.cc*
+*Pictures above come from https://wallhaven.cc*
 
 Also see [Azote in action on YouTube](https://youtu.be/Cjqr0LRL67I).
 
 ## Project assumptions
 
-The most commonly used *desktop background browser and setter* is aimed at X windows, and does not work with [sway](https://swaywm.org). 
-Together with the 1.1 Sway version, the standalone `swaybg` command became available, so it's easy to give it a GUI. 
-In order not to limit the program usage to the single environment, Azote is also capable of using feh, 
+The most commonly used *desktop background browser and setter* is aimed at X windows, and does not work with 
+[sway](https://swaywm.org). Since the `swaybg` command does everything we may need, it's enough to give it a GUI. 
+In order not to limit the program usage to the single environment, Azote is also capable of using feh 
 when running on i3, Openbox or other X11 window managers.
 
 ### Main features:
 
 - works on Sway
-- uses own, bigger thumbnails (240 x 135 px)
+- uses own, bigger thumbnails (240x135px)
 - flips wallpapers horizontally
 - splits wallpapers between 2 or more displays
 
@@ -28,9 +28,10 @@ when running on i3, Openbox or other X11 window managers.
 Select the folder your wallpapers are stored in. If it contains a lot of big pictures, it may take some time for
 Azote to create thumbnails. It's being performed once, unless you clear the `~/.azote/thumbnails` folder.
 
-Azote, as well as feh, saves a batch file to your home directory.
+Azote, as well as feh, saves a batch file to your home directory. It needs to be executed in order to set the wallpaper 
+on subsequent logins or reboot.
 
-**sway**
+### sway
 
 Edit your `~/.config/sway/config` file. Replace your current wallpaper settings, like:
 
@@ -44,27 +45,26 @@ with:
 exec ~/.azotebg
 ```
 
-**i3**
+### X window managers (i3, Openbox, dwm etc.)
 
-In your `~/.config/i3/config` file add:
+You need to execute `~/.fehbg` from your window manager’s startup file.
 
-```bash
-exec_always --no-startup-id ~/.fehbg
-```
+**dwm note:**
 
-**Openbox**
-
-In your `autostart` add:
+If you start dwm from a script, it may look something like this:
 
 ```bash
-~/.fehbg &
+# Statusbar loop
+while true; do
+   xsetroot -name "$( date +"%F %R" )"
+   sleep 1m    # Update time every minute
+done &
+
+# Autostart section
+~/.fehbg & 
+
+exec dwm
 ```
-
-**dwm**
-
-Run `~/.fehbg` in whatever way you autostart commands. :)
-
-Azote has not yet been confirmed to work (or not) with other WMs.
 
 ## Installation
 
@@ -78,26 +78,6 @@ Either download the .deb package or follow the instructions in [this link](https
 
 If the repository & key are added then the package will be updated with the usual `apt update && apt upgrade` commands.
 
-**Other distributions**
-
-Packagers wanted! 
-
-## Dependencies:
-
-- python
-- python-setuptools
-- python-gobject
-- python-pillow 
-- gtk3
-- wget
-- feh 
-- xorg-xrandr
-- wmctrl
-
-**Optionally:** 
-
-- python-send2trash 
-
 ## Troubleshooting
 
 As well pictures as displays preview are instances of the Gtk.Button class. In case you don't see images inside them,
@@ -109,15 +89,32 @@ please make sure if button images are turned on in the `~/.config/gtk-3.0/settin
 gtk-button-images=1
 ```
 
+## Other distributions:
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
+
+Packagers wanted!
+
+**Dependencies:**
+- python
+- python-setuptools
+- python-gobject
+- python-pillow 
+- gtk3
+- wget
+- feh 
+- xorg-xrandr
+- wmctrl
+
+**Optional:** 
+
+- python-send2trash 
+
+- Please use the latest [release](https://github.com/nwg-piotr/azote/releases) assets.
+- Seeing [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
+
 ### X11 / feh notice
 
 The background color picker won't be available. You'll also be unable to select different modes 
 *("tile", "center", "scale", "seamless")* for certain displays. The list of modes varies from what you see in Sway 
 *("stretch", "fit", "fill", "center", "tile")*.
-
-## Packaging
-
-[![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
-
-- Please use the latest [release](https://github.com/nwg-piotr/azote/releases) assets.
-- Seeing [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
