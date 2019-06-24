@@ -11,7 +11,7 @@ Project: https://github.com/nwg-piotr/azote
 License: GPL3
 
 Dependencies:
-python, python-setuptools, python-gobject, python-cairo, python-pillow, python-send2trash, wmctrl, feh, xorg-xrandr
+python, python-setuptools, python-gobject, python-cairo, python-pillow, python-send2trash, gtk3, wmctrl, feh, xorg-xrandr
 """
 import os
 import sys
@@ -545,7 +545,8 @@ class GUI:
     def clear_wallpaper_selection(self):
         common.selected_wallpaper = None
         common.selected_picture_label.set_text(common.lang['no_picture_selected'])
-        common.split_button.set_sensitive(False)
+        if common.split_button:
+            common.split_button.set_sensitive(False)
         common.apply_button.set_sensitive(False)
         common.feh_button.set_sensitive(False)
         common.trash_button.set_sensitive(False)
