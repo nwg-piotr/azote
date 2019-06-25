@@ -16,3 +16,11 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 Use the first element of returned tuple as the file name (as `pl_PL` for Polish). Copy the `en_EN` file, edit translations
 and save under the name you determined. Fork the repository, add your file and make a pull request.
+
+To force use of a certain language (if available), use the `lang` argument:
+
+```bash
+azote lang pl_PL
+```
+
+-> starts Azote in Polish.

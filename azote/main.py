@@ -11,7 +11,8 @@ Project: https://github.com/nwg-piotr/azote
 License: GPL3
 
 Dependencies:
-python, python-setuptools, python-gobject, python-cairo, python-pillow, python-send2trash, gtk3, wmctrl, feh, xorg-xrandr
+python, python-setuptools, python-gobject, python-cairo, python-pillow, gtk3, wmctrl, feh, xorg-xrandr
+Optional: python-send2trash
 """
 import os
 import sys
@@ -502,7 +503,7 @@ class GUI:
 
     def on_trash_button(self, widget):
         menu = Gtk.Menu()
-        i0 = Gtk.MenuItem.new_with_label("Move")
+        i0 = Gtk.MenuItem.new_with_label(common.lang['move'])
         i0.connect('activate', self.move_to_trash)
         menu.append(i0)
         menu.show_all()

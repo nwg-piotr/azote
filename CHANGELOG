@@ -1,3 +1,8 @@
+v1.0.0 (stable, 2019-06-25)
+- missing check if button is not None added
+- missing lang string added, lines sorted
+- AUR - python-send2trash moved to optional dependencies
+
 v0.1.3 (pre-release, 2019.06.24)
 - PR #18 by Head-on-a-Stick merged - fix to issue #17 (Wallpaper unselectable w/o python3-send2trash (Debian))
 
