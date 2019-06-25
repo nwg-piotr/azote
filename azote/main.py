@@ -54,8 +54,7 @@ class Preview(Gtk.ScrolledWindow):
 
         col = 0
         row = 0
-        src_pictures = [f for f in os.listdir(common.settings.src_path) if
-                        os.path.isfile(os.path.join(common.settings.src_path, f))]
+        src_pictures = self.get_files()
 
         for file in src_pictures:
             if file_allowed(file):
@@ -80,8 +79,9 @@ class Preview(Gtk.ScrolledWindow):
 
         col = 0
         row = 0
-        src_pictures = [f for f in os.listdir(common.settings.src_path) if
-                        os.path.isfile(os.path.join(common.settings.src_path, f))]
+        #src_pictures = [f for f in os.listdir(common.settings.src_path) if
+        #                os.path.isfile(os.path.join(common.settings.src_path, f))]
+        src_pictures = self.get_files()
 
         for file in src_pictures:
             if file_allowed(file):
@@ -96,6 +96,22 @@ class Preview(Gtk.ScrolledWindow):
                 btn.show()
 
         update_status_bar()
+
+    def get_files(self):
+
+        file_names = [f for f in os.listdir(common.settings.src_path)
+             if os.path.isfile(os.path.join(common.settings.src_path, f))]
+
+        if common.settings.sorting == 'new':
+            file_names.sort(reverse=True, key=lambda f: os.path.getmtime(os.path.join(common.settings.src_path, f)))
+        elif common.settings.sorting == 'old':
+            file_names.sort(key=lambda f: os.path.getmtime(os.path.join(common.settings.src_path, f)))
+        elif common.settings.sorting == 'az':
+            file_names.sort()
+        elif common.settings.sorting == 'za':
+            file_names.sort(reverse=True)
+
+        return file_names
 
 
 class ThumbButton(Gtk.Button):
@@ -127,7 +143,7 @@ class ThumbButton(Gtk.Button):
         if common.split_button:
             common.split_button.set_sensitive(True)
         common.feh_button.set_sensitive(True)
-        if common.trash_button:
+        if common.trash_button and self.source_path.startswith(os.getenv("HOME")):
             common.trash_button.set_sensitive(True)
         self.selected = True
         common.selected_wallpaper = self
@@ -283,6 +299,11 @@ class SortingButton(Gtk.Button):
     def __init__(self):
         super().__init__()
         self.img = Gtk.Image()
+        self.refresh()
+        self.set_tooltip_text(common.lang['sorting_order'])
+        self.connect('clicked', self.on_clicked)
+
+    def refresh(self):
         if common.settings.sorting == 'old':
             self.img.set_from_file('images/icon_old.svg')
         elif common.settings.sorting == 'az':
@@ -292,29 +313,47 @@ class SortingButton(Gtk.Button):
         else:
             self.img.set_from_file('images/icon_new.svg')
         self.set_image(self.img)
-        self.set_tooltip_text(common.lang['sorting_order'])
-        self.connect('clicked', self.on_clicked)
 
     def on_clicked(self, widget):
-        print("Clicked!")
         menu = Gtk.Menu()
         i0 = Gtk.MenuItem.new_with_label(common.lang['sorting_new'])
-        i0.connect('activate', self.on_menu_selection)
+        i0.connect('activate', self.on_i0)
         menu.append(i0)
         i1 = Gtk.MenuItem.new_with_label(common.lang['sorting_old'])
-        # i1.connect('activate', self.move_to_trash)
+        i1.connect('activate', self.on_i1)
         menu.append(i1)
         i2 = Gtk.MenuItem.new_with_label(common.lang['sorting_az'])
-        # i2.connect('activate', self.move_to_trash)
+        i2.connect('activate', self.on_i2)
         menu.append(i2)
         i3 = Gtk.MenuItem.new_with_label(common.lang['sorting_za'])
-        # i3connect('activate', self.move_to_trash)
+        i3.connect('activate', self.on_i3)
         menu.append(i3)
         menu.show_all()
         menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
-    def on_menu_selection(self, widget):
-        print("---")
+    def on_i0(self, widget):
+        common.settings.sorting = 'new'
+        common.settings.save()
+        self.refresh()
+        common.preview.refresh()
+
+    def on_i1(self, widget):
+        common.settings.sorting = 'old'
+        common.settings.save()
+        self.refresh()
+        common.preview.refresh()
+
+    def on_i2(self, widget):
+        common.settings.sorting = 'az'
+        common.settings.save()
+        self.refresh()
+        common.preview.refresh()
+
+    def on_i3(self, widget):
+        common.settings.sorting = 'za'
+        common.settings.save()
+        self.refresh()
+        common.preview.refresh()
 
 
 class GUI:
@@ -340,7 +379,7 @@ class GUI:
 
         main_box.pack_start(common.preview, False, False, 0)
 
-        # Horizontal box to group preview toolbar buttons
+        """"# Horizontal box to group preview toolbar buttons
         preview_toolbar_box = Gtk.Box()
         preview_toolbar_box.set_spacing(5)
         preview_toolbar_box.set_border_width(10)
@@ -349,6 +388,14 @@ class GUI:
         # Button to change sorting order
         sorting_button = SortingButton()
         preview_toolbar_box.add(sorting_button)
+
+        # Button to set the wallpapers folder
+        folder_button = Gtk.Button.new_with_label(common.settings.src_path)
+        folder_button.set_property("name", "folder-btn")
+        folder_button.set_tooltip_text(common.lang['open_another_folder'])
+        preview_toolbar_box.pack_start(folder_button, True, True, 0)
+
+        folder_button.connect_after('clicked', self.on_folder_clicked)
 
         # Button to refresh currently selected folder thumbnails
         refresh_button = Gtk.Button()
@@ -360,7 +407,7 @@ class GUI:
 
         refresh_button.connect_after('clicked', self.on_refresh_clicked)
 
-        main_box.add(preview_toolbar_box)
+        main_box.add(preview_toolbar_box)"""
 
         # We need a horizontal container to display outputs in columns
         displays_box = Gtk.Box()
@@ -383,6 +430,29 @@ class GUI:
         bottom_box.set_spacing(5)
         bottom_box.set_border_width(10)
         bottom_box.set_orientation(Gtk.Orientation.HORIZONTAL)
+
+        # Button to change sorting order
+        sorting_button = SortingButton()
+        bottom_box.add(sorting_button)
+
+        # Button to refresh currently selected folder thumbnails
+        refresh_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_refresh.svg')
+        refresh_button.set_image(img)
+        refresh_button.set_tooltip_text(common.lang['refresh_folder_preview'])
+        bottom_box.add(refresh_button)
+        refresh_button.connect_after('clicked', self.on_refresh_clicked)
+
+        # Button to set the wallpapers folder
+        folder_button = Gtk.Button.new_with_label(common.settings.src_path)
+        folder_button.set_property("name", "folder-btn")
+        folder_button.set_tooltip_text(common.lang['open_another_folder'])
+        bottom_box.pack_start(folder_button, True, True, 0)
+        folder_button.connect_after('clicked', self.on_folder_clicked)
+
+        vseparator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
+        bottom_box.add(vseparator)
 
         # Button to open in feh
         common.feh_button = Gtk.Button()
@@ -423,26 +493,13 @@ class GUI:
             common.split_button.set_tooltip_text(common.lang['split_selection_between_displays'])
             common.split_button.connect('clicked', self.on_split_button)
 
-        vseparator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
-        bottom_box.add(vseparator)
-
         # Button to set the wallpapers folder
-        folder_button = Gtk.Button.new_with_label(common.settings.src_path)
+        """folder_button = Gtk.Button.new_with_label(common.settings.src_path)
         folder_button.set_property("name", "folder-btn")
         folder_button.set_tooltip_text(common.lang['open_another_folder'])
         bottom_box.pack_start(folder_button, True, True, 0)
 
-        folder_button.connect_after('clicked', self.on_folder_clicked)
-
-        # Button to refresh currently selected folder thumbnails
-        """refresh_button = Gtk.Button()
-        img = Gtk.Image()
-        img.set_from_file('images/icon_refresh.svg')
-        refresh_button.set_image(img)
-        refresh_button.set_tooltip_text(common.lang['refresh_folder_preview'])
-        bottom_box.add(refresh_button)
-
-        refresh_button.connect_after('clicked', self.on_refresh_clicked)"""
+        folder_button.connect_after('clicked', self.on_folder_clicked)"""
 
         # Button to apply settings
         common.apply_button = Gtk.Button()
@@ -502,6 +559,7 @@ class GUI:
             button.set_label(text)
 
         dialog.destroy()
+        self.clear_wallpaper_selection()
 
     def on_refresh_clicked(self, button):
         self.clear_wallpaper_selection()
@@ -615,12 +673,12 @@ class GUI:
 
 
 def on_configure_event(window, e):
-    cols = e.width // 286
+    cols = e.width // 280
     if cols != common.cols:
         common.preview.hide()
         if cols != common.cols:
             common.cols = cols
-            common.preview.refresh(False)
+            common.preview.refresh(create_thumbs=False)
 
         common.preview.show()
 
