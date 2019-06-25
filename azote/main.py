@@ -535,6 +535,7 @@ class GUI:
         dialog.set_comments(common.lang['app_desc'])
         dialog.set_license_type(Gtk.License.GPL_3_0)
         dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick'])
+        dialog.set_translator_credits('xsme (de_DE)')
         dialog.set_artists(['edskeye'])
 
         dialog.show()
@@ -554,7 +555,7 @@ class GUI:
 
 
 def on_configure_event(window, e):
-    cols = e.width // 256
+    cols = e.width // 286
     if cols != common.cols:
         common.preview.hide()
         if cols != common.cols:

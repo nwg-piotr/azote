@@ -1,3 +1,7 @@
+Development
+- column width 256 -> 286 to avoid the column that does not fit on the screen
+- German translation by xsme
+
 v1.0.0 (stable, 2019-06-25)
 - missing check if button is not None added
 - missing lang string added, lines sorted
