@@ -154,7 +154,6 @@ class DisplayBox(Gtk.Box):
     """
     The box contains elements to preview certain displays and assign wallpapers to them
     """
-
     def __init__(self, name, width, height):
         super().__init__()
 
@@ -280,6 +279,44 @@ class DisplayBox(Gtk.Box):
         self.flip_button.set_sensitive(False)
 
 
+class SortingButton(Gtk.Button):
+    def __init__(self):
+        super().__init__()
+        self.img = Gtk.Image()
+        if common.settings.sorting == 'old':
+            self.img.set_from_file('images/icon_old.svg')
+        elif common.settings.sorting == 'az':
+            self.img.set_from_file('images/icon_az.svg')
+        elif common.settings.sorting == 'za':
+            self.img.set_from_file('images/icon_za.svg')
+        else:
+            self.img.set_from_file('images/icon_new.svg')
+        self.set_image(self.img)
+        self.set_tooltip_text(common.lang['sorting_order'])
+        self.connect('clicked', self.on_clicked)
+
+    def on_clicked(self, widget):
+        print("Clicked!")
+        menu = Gtk.Menu()
+        i0 = Gtk.MenuItem.new_with_label(common.lang['sorting_new'])
+        i0.connect('activate', self.on_menu_selection)
+        menu.append(i0)
+        i1 = Gtk.MenuItem.new_with_label(common.lang['sorting_old'])
+        # i1.connect('activate', self.move_to_trash)
+        menu.append(i1)
+        i2 = Gtk.MenuItem.new_with_label(common.lang['sorting_az'])
+        # i2.connect('activate', self.move_to_trash)
+        menu.append(i2)
+        i3 = Gtk.MenuItem.new_with_label(common.lang['sorting_za'])
+        # i3connect('activate', self.move_to_trash)
+        menu.append(i3)
+        menu.show_all()
+        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+
+    def on_menu_selection(self, widget):
+        print("---")
+
+
 class GUI:
     def __init__(self):
 
@@ -303,12 +340,35 @@ class GUI:
 
         main_box.pack_start(common.preview, False, False, 0)
 
+        # Horizontal box to group preview toolbar buttons
+        preview_toolbar_box = Gtk.Box()
+        preview_toolbar_box.set_spacing(5)
+        preview_toolbar_box.set_border_width(10)
+        preview_toolbar_box.set_orientation(Gtk.Orientation.HORIZONTAL)
+
+        # Button to change sorting order
+        sorting_button = SortingButton()
+        preview_toolbar_box.add(sorting_button)
+
+        # Button to refresh currently selected folder thumbnails
+        refresh_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_refresh.svg')
+        refresh_button.set_image(img)
+        refresh_button.set_tooltip_text(common.lang['refresh_folder_preview'])
+        preview_toolbar_box.add(refresh_button)
+
+        refresh_button.connect_after('clicked', self.on_refresh_clicked)
+
+        main_box.add(preview_toolbar_box)
+
         # We need a horizontal container to display outputs in columns
         displays_box = Gtk.Box()
         displays_box.set_spacing(15)
         displays_box.set_orientation(Gtk.Orientation.HORIZONTAL)
         window.add(main_box)
 
+        # Buttons below represent displays preview
         common.display_boxes_list = []
         for display in common.displays:
             # Label format: name (width x height)
@@ -375,14 +435,14 @@ class GUI:
         folder_button.connect_after('clicked', self.on_folder_clicked)
 
         # Button to refresh currently selected folder thumbnails
-        refresh_button = Gtk.Button()
+        """refresh_button = Gtk.Button()
         img = Gtk.Image()
         img.set_from_file('images/icon_refresh.svg')
         refresh_button.set_image(img)
         refresh_button.set_tooltip_text(common.lang['refresh_folder_preview'])
         bottom_box.add(refresh_button)
 
-        refresh_button.connect_after('clicked', self.on_refresh_clicked)
+        refresh_button.connect_after('clicked', self.on_refresh_clicked)"""
 
         # Button to apply settings
         common.apply_button = Gtk.Button()
