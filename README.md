@@ -68,11 +68,11 @@ exec dwm
 
 ## Installation
 
-**Arch Linux**
+### Arch Linux
 
 Install [azote](https://aur.archlinux.org/packages/azote) from AUR.
 
-**Debian & Ubuntu**
+### Debian & Ubuntu
 
 Either download the .deb package or follow the instructions in [this link](https://software.opensuse.org//download.html?project=home%3AHead_on_a_Stick%3Aazote&package=azote) to add the repository and APT key.
 
@@ -89,26 +89,17 @@ please make sure if button images are turned on in the `~/.config/gtk-3.0/settin
 gtk-button-images=1
 ```
 
-## Other distributions:
+## Other Linux distributions:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
 
 Packagers wanted!
 
 **Dependencies:**
-- python
-- python-setuptools
-- python-gobject
-- python-pillow 
-- gtk3
-- wget
-- feh 
-- xorg-xrandr
-- wmctrl
+'python' 'python-setuptools' 'python-gobject' 'python-pillow' 'gtk3' 'wget' 'feh' 'xorg-xrandr' 'wmctrl'
 
 **Optional:** 
-
-- python-send2trash 
+'python-send2trash: trash support'
 
 Please use the [latest release](https://github.com/nwg-piotr/azote/releases/latest) assets.
 
