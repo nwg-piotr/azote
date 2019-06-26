@@ -110,11 +110,12 @@ Packagers wanted!
 
 - python-send2trash 
 
-- Please use the latest [release](https://github.com/nwg-piotr/azote/releases) assets.
-- Seeing [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
+Please use the [latest release](https://github.com/nwg-piotr/azote/releases/latest) assets.
+
+Seeing [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
 
 ### X11 / feh notice
 
 The background color picker won't be available. You'll also be unable to select different modes 
 *("tile", "center", "scale", "seamless")* for certain displays. The list of modes varies from what you see in Sway 
-*("stretch", "fit", "fill", "center", "tile")*.
+*("scale", "max", "fill", "center", "tile")*.
