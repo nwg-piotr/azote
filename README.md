@@ -103,7 +103,7 @@ Packagers wanted!
 
 Please use assets from the [latest release](https://github.com/nwg-piotr/azote/releases/latest).
 
-Seeing [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
+Seeing Arch [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
 
 ### X11 / feh notice
 
