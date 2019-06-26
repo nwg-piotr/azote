@@ -108,5 +108,5 @@ Seeing [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) 
 ### X11 / feh notice
 
 The background color picker won't be available. You'll also be unable to select different modes 
-*("tile", "center", "scale", "seamless")* for certain displays. The list of modes varies from what you see in Sway 
-*("scale", "max", "fill", "center", "tile")*.
+*("scale", "max", "fill", "center", "tile")* for certain displays. The list of modes varies from what you see in Sway 
+*("stretch", "fit", "fill", "center", "tile")*.
