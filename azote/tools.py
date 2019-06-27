@@ -337,6 +337,7 @@ class Settings(object):
         self.file = os.path.join(common.app_dir, "settings.pkl")
 
         self.src_path = common.sample_dir
+        self.sorting = 'new'
 
         self.load()
 
@@ -349,6 +350,11 @@ class Settings(object):
             settings = pickle.load(input_data)
 
         self.src_path = settings.src_path  # holds selected path to source pictures
+        try:
+            self.sorting = settings.sorting  # 'new' 'old' 'az' 'za'
+            log('Image sorting: {}'.format(self.sorting), common.INFO)
+        except AttributeError:
+            self.save()
 
     def save(self):
         with open(self.file, 'wb') as output:

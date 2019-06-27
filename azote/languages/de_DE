@@ -1,0 +1,26 @@
+# Beim Erstellen einer Übersetzung, bitte die ‘{}’ unverändert belassen!
+# '=' ist ein Separator, der nicht in Strings verwendet werden kann.
+
+about_azote = Über azote
+app_desc = Bildschirmhintergrund-Manager für Sway, i3 und andere Window Manager
+apply_settings = Einstellungen anwenden
+background_color = Hintergrundfarbe
+display_mode = Anzeigemodus
+flip_image = Bild spiegeln
+flip_wallpaper_horizontally = Bild horizontal spiegeln
+move = Verschieben
+move_to_trash = Ausgewählte in den Papierkorb verschieben
+no_picture_selected = Kein Bild ausgewählt
+open_another_folder = Anderen Ordner öffnen
+open_folder = Ordner öffnen
+open_with_feh = Ausgewählte mit feh öffnen
+refresh_folder_preview = Ordnervorschau aktualisieren
+select_this_picture = Diesen Hintergrund auswählen
+set_selected_wallpaper = Ausgewählten Hintergrund setzen
+sorting_order = Sortierreihenfolge
+sorting_az = A -> Z
+sorting_za = Z -> A
+sorting_new = Neu an der Spitze
+sorting_old = Alt an der Spitze
+split_selection_between_displays = Auswahl zwischen Bildschirmen aufteilen
+thumbnails_in_cache = {} Vorschaubilder im Zwischenspeicher ({})
