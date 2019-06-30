@@ -6,6 +6,7 @@ Name=Azote
 Terminal=false
 GenericName=Azote wallpaper manager
 GenericName[pl]=Menedżer tapet Azote
+GenericName[de]=Azote Bildschirmhintergrund-Manager
 Categories=Utility;GTK;DesktopSettings;
 Icon=/usr/share/azote/azote.svg
 Comment=Browse, flip and set desktop wallpapers
