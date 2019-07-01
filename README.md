@@ -101,7 +101,6 @@ Packagers wanted!
 - python-gobject
 - python-pillow 
 - gtk3
-- wget
 - feh 
 - xorg-xrandr
 - wmctrl
