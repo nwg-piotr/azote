@@ -78,6 +78,15 @@ Either download the .deb package or follow the instructions in [this link](https
 
 If the repository & key are added then the package will be updated with the usual `apt update && apt upgrade` commands.
 
+### openSUSE
+azote is available in jubalhs home [repository](https://build.opensuse.org/package/show/home:jubalh/azote) on OBS.
+
+```
+zypper ar obs://home:jubalh
+zypper ref
+zypper in azote
+```
+
 ## Troubleshooting
 
 As well pictures as displays preview are instances of the Gtk.Button class. In case you don't see images inside them,
@@ -96,7 +105,15 @@ gtk-button-images=1
 Packagers wanted!
 
 **Dependencies:**
-'python' 'python-setuptools' 'python-gobject' 'python-pillow' 'gtk3' 'wget' 'feh' 'xorg-xrandr' 'wmctrl'
+
+- python
+- python-setuptools
+- python-gobject
+- python-pillow 
+- gtk3
+- feh 
+- xorg-xrandr
+- wmctrl
 
 **Optional:** 
 'python-send2trash: trash support'
