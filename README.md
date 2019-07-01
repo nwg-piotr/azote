@@ -105,7 +105,15 @@ gtk-button-images=1
 Packagers wanted!
 
 **Dependencies:**
-'python' 'python-setuptools' 'python-gobject' 'python-pillow' 'gtk3' 'wget' 'feh' 'xorg-xrandr' 'wmctrl'
+
+- python
+- python-setuptools
+- python-gobject
+- python-pillow 
+- gtk3
+- feh 
+- xorg-xrandr
+- wmctrl
 
 **Optional:** 
 'python-send2trash: trash support'
