@@ -68,15 +68,24 @@ exec dwm
 
 ## Installation
 
-**Arch Linux**
+### Arch Linux
 
 Install [azote](https://aur.archlinux.org/packages/azote) from AUR.
 
-**Debian & Ubuntu**
+### Debian & Ubuntu
 
 Either download the .deb package or follow the instructions in [this link](https://software.opensuse.org//download.html?project=home%3AHead_on_a_Stick%3Aazote&package=azote) to add the repository and APT key.
 
 If the repository & key are added then the package will be updated with the usual `apt update && apt upgrade` commands.
+
+### openSUSE
+azote is available in jubalhs home [repository](https://build.opensuse.org/package/show/home:jubalh/azote) on OBS.
+
+```
+zypper ar obs://home:jubalh
+zypper ref
+zypper in azote
+```
 
 ## Troubleshooting
 
@@ -89,13 +98,14 @@ please make sure if button images are turned on in the `~/.config/gtk-3.0/settin
 gtk-button-images=1
 ```
 
-## Other distributions:
+## Other Linux distributions:
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
 
 Packagers wanted!
 
 **Dependencies:**
+
 - python
 - python-setuptools
 - python-gobject
@@ -106,14 +116,14 @@ Packagers wanted!
 - wmctrl
 
 **Optional:** 
+'python-send2trash: trash support'
 
-- python-send2trash 
+Please use assets from the [latest release](https://github.com/nwg-piotr/azote/releases/latest).
 
-- Please use the latest [release](https://github.com/nwg-piotr/azote/releases) assets.
-- Seeing [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
+Seeing Arch [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
 
 ### X11 / feh notice
 
 The background color picker won't be available. You'll also be unable to select different modes 
-*("tile", "center", "scale", "seamless")* for certain displays. The list of modes varies from what you see in Sway 
+*("scale", "max", "fill", "center", "tile")* for certain displays. The list of modes varies from what you see in Sway 
 *("stretch", "fit", "fill", "center", "tile")*.

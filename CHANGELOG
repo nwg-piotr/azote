@@ -1,11 +1,15 @@
-Development
+v1.1.1 (2019-06-30)
+- launcher script for Void Linux added
+- German description added to the .desktop file
+
+v1.1.0 (2019-06-28)
 - new: German translation by xsme
 - new: sorting order -> settings, sorting order button & menu
 - bug fix: column width 256 -> 280 to avoid the last column that does not fit in the screen
 - bug fix: clear wallpaper selection on folder changed
 - bug fix: do not activate the Trash button if image path not inside the home path
 
-v1.0.0 (stable, 2019-06-25)
+v1.0.0 (2019-06-25)
 - missing check if button is not None added
 - missing lang string added, lines sorted
 - AUR - python-send2trash moved to optional dependencies
