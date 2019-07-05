@@ -183,6 +183,37 @@ def set_env(language=None):
 
     log("Environment: {}".format(common.env), common.INFO)
 
+    # check programs capable of opening files of allowed extensions
+    if os.path.isfile('/usr/share/applications/mimeinfo.cache'):
+        common.associations = {}  # Will stay None if the mimeinfo.cache file not found
+
+        with open(os.path.join('/usr/share/applications/mimeinfo.cache')) as f:
+            mimeinfo_cache = f.read().splitlines()
+
+        for file_type in common.allowed_file_types:
+            for line in mimeinfo_cache:
+                if line.startswith('image/{}'.format(file_type)):
+                    line = line.split('=')[1]  # cut out leading 'image/ext'
+                    openers = line[:-1].split(';')  # cut out trailing ';' to avoid empty last element after splitting
+                    for i in range(len(openers)):
+                        # cut out '.desktop' on the fly
+                        openers[i] = openers[i].split('.')[0]
+                    # Add to the dictionary of lists of associated programs, the key is the file extension
+                    common.associations[file_type] = openers
+                    continue
+        """
+        Not necessarily all programs register jpg and jpeg extension (e.g. gimp registers jpeg only).
+        Let's create sets, join them and replace lists for both jpg and jpeg keys.
+        """
+        jpg = set(common.associations['jpg'])
+        jpeg = set(common.associations['jpeg'])
+        together = jpg | jpeg
+        common.associations['jpg'] = together
+        common.associations['jpeg'] = together
+        print(common.associations)
+
+        log("File associations: {}".format(common.associations), common.INFO)
+
 
 def copy_backgrounds():
     # Clear current folder content

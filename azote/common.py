@@ -37,6 +37,7 @@ trash_button = None
 cols = 3                # number of columns in pictures preview
 
 allowed_file_types = ['jpg', 'jpeg', 'png']
+associations = None     # dictionary {'extension": [program1, program2, program3, ...]}
 
 app_dir = ''            # ~/.azote
 thumb_dir = ''          # ~/.azote/thumbnails
