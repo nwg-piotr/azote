@@ -87,6 +87,10 @@ zypper ref
 zypper in azote
 ```
 
+### Void Linux
+
+Binary package `azote` available in the Void repository. 
+
 ## Troubleshooting
 
 As well pictures as displays preview are instances of the Gtk.Button class. In case you don't see images inside them,

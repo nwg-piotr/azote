@@ -1,3 +1,7 @@
+v1.1.2 (2019-07-01)
+- "Use python3 explicitly" PR #26 by @jubalh merged
+- inconsistency in the version numbering resolved
+
 v1.1.1 (2019-06-30)
 - launcher script for Void Linux added
 - German description added to the .desktop file
