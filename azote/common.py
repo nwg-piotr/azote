@@ -31,7 +31,7 @@ selected_wallpaper = None
 selected_picture_label = None
 split_button = None
 apply_button = None
-feh_button = None
+open_button = None
 trash_button = None
 
 cols = 3                # number of columns in pictures preview

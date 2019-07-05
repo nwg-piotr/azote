@@ -142,7 +142,7 @@ class ThumbButton(Gtk.Button):
     def on_button_press(self, button):
         if common.split_button:
             common.split_button.set_sensitive(True)
-        common.feh_button.set_sensitive(True)
+        common.open_button.set_sensitive(True)
         if common.trash_button and self.source_path.startswith(os.getenv("HOME")):
             common.trash_button.set_sensitive(True)
         self.selected = True
@@ -455,14 +455,14 @@ class GUI:
         bottom_box.add(vseparator)
 
         # Button to open in feh
-        common.feh_button = Gtk.Button()
+        common.open_button = Gtk.Button()
         img = Gtk.Image()
         img.set_from_file('images/icon_feh.svg')
-        common.feh_button.set_image(img)
-        common.feh_button.set_tooltip_text(common.lang['open_with_feh'])
-        common.feh_button.set_sensitive(False)
-        common.feh_button.connect('clicked', self.on_feh_button)
-        bottom_box.add(common.feh_button)
+        common.open_button.set_image(img)
+        common.open_button.set_tooltip_text(common.lang['open_with_feh'])
+        common.open_button.set_sensitive(False)
+        common.open_button.connect('clicked', self.on_open_button)
+        bottom_box.add(common.open_button)
 
         if common.env['send2trash']:
             # Button to move to trash
@@ -614,10 +614,19 @@ class GUI:
             for box in common.display_boxes_list:
                 box.clear_color_selection()
 
-    def on_feh_button(self, widget):
+    def on_open_button(self, widget):
         if common.selected_wallpaper:
             command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
             subprocess.Popen(command, shell=True)
+            openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
+            menu = Gtk.Menu()
+            if openers:
+                for opener in openers:
+                    item = Gtk.MenuItem.new_with_label('Open with {}'.format(opener))
+                    menu.append(item)
+            menu.show_all()
+            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+
 
     def on_trash_button(self, widget):
         menu = Gtk.Menu()
@@ -668,7 +677,7 @@ class GUI:
         if common.split_button:
             common.split_button.set_sensitive(False)
         common.apply_button.set_sensitive(False)
-        common.feh_button.set_sensitive(False)
+        common.open_button.set_sensitive(False)
         common.trash_button.set_sensitive(False)
 
 
