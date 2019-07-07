@@ -124,11 +124,11 @@ class ThumbButton(Gtk.Button):
         self.filename = filename
         self.source_path = os.path.join(folder, filename)
 
-        img = Gtk.Image()
+        self.img = Gtk.Image()
         self.thumb_file = "{}.png".format(os.path.join(common.thumb_dir, hash_name(self.source_path)))
-        img.set_from_file(self.thumb_file)
+        self.img.set_from_file(self.thumb_file)
 
-        self.set_image(img)
+        self.set_image(self.img)
         self.set_image_position(2)  # TOP
         self.set_tooltip_text(common.lang['select_this_picture'])
 
@@ -142,7 +142,10 @@ class ThumbButton(Gtk.Button):
     def on_button_press(self, button):
         if common.split_button:
             common.split_button.set_sensitive(True)
+
         common.open_button.set_sensitive(True)
+        common.apply_to_all_button.set_sensitive(True)
+
         if common.trash_button and self.source_path.startswith(os.getenv("HOME")):
             common.trash_button.set_sensitive(True)
         self.selected = True
@@ -379,36 +382,6 @@ class GUI:
 
         main_box.pack_start(common.preview, False, False, 0)
 
-        """"# Horizontal box to group preview toolbar buttons
-        preview_toolbar_box = Gtk.Box()
-        preview_toolbar_box.set_spacing(5)
-        preview_toolbar_box.set_border_width(10)
-        preview_toolbar_box.set_orientation(Gtk.Orientation.HORIZONTAL)
-
-        # Button to change sorting order
-        sorting_button = SortingButton()
-        preview_toolbar_box.add(sorting_button)
-
-        # Button to set the wallpapers folder
-        folder_button = Gtk.Button.new_with_label(common.settings.src_path)
-        folder_button.set_property("name", "folder-btn")
-        folder_button.set_tooltip_text(common.lang['open_another_folder'])
-        preview_toolbar_box.pack_start(folder_button, True, True, 0)
-
-        folder_button.connect_after('clicked', self.on_folder_clicked)
-
-        # Button to refresh currently selected folder thumbnails
-        refresh_button = Gtk.Button()
-        img = Gtk.Image()
-        img.set_from_file('images/icon_refresh.svg')
-        refresh_button.set_image(img)
-        refresh_button.set_tooltip_text(common.lang['refresh_folder_preview'])
-        preview_toolbar_box.add(refresh_button)
-
-        refresh_button.connect_after('clicked', self.on_refresh_clicked)
-
-        main_box.add(preview_toolbar_box)"""
-
         # We need a horizontal container to display outputs in columns
         displays_box = Gtk.Box()
         displays_box.set_spacing(15)
@@ -493,22 +466,29 @@ class GUI:
             common.split_button.set_tooltip_text(common.lang['split_selection_between_displays'])
             common.split_button.connect('clicked', self.on_split_button)
 
-        # Button to set the wallpapers folder
-        """folder_button = Gtk.Button.new_with_label(common.settings.src_path)
-        folder_button.set_property("name", "folder-btn")
-        folder_button.set_tooltip_text(common.lang['open_another_folder'])
-        bottom_box.pack_start(folder_button, True, True, 0)
-
-        folder_button.connect_after('clicked', self.on_folder_clicked)"""
+        # Button to apply selected wallpaper to all displays (connected at the moment or not)
+        common.apply_to_all_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_all.svg')
+        common.apply_to_all_button.set_image(img)
+        common.apply_to_all_button.connect('clicked', self.on_apply_to_all_button)
+        common.apply_to_all_button.set_sensitive(False)
+        common.apply_to_all_button.set_tooltip_text(common.lang['apply_to_all'])
+        bottom_box.add(common.apply_to_all_button)
 
         # Button to apply settings
+        names = ''
+        for display in common.displays:
+            names += '{} '.format(display['name'])
+        print(names)
+
         common.apply_button = Gtk.Button()
         img = Gtk.Image()
         img.set_from_file('images/icon_apply.svg')
         common.apply_button.set_image(img)
         common.apply_button.connect('clicked', self.on_apply_button)
         common.apply_button.set_sensitive(False)
-        common.apply_button.set_tooltip_text(common.lang['apply_settings'])
+        common.apply_button.set_tooltip_text(common.lang['apply_settings'].format(names))
         bottom_box.add(common.apply_button)
 
         vseparator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
@@ -541,6 +521,7 @@ class GUI:
 
     def on_folder_clicked(self, button):
         dialog = Gtk.FileChooserDialog(title=common.lang['open_folder'], parent=button.get_toplevel(), action=Gtk.FileChooserAction.SELECT_FOLDER)
+        dialog.set_current_folder(common.settings.src_path)
         dialog.add_button(Gtk.STOCK_CANCEL, 0)
         dialog.add_button(Gtk.STOCK_OK, 1)
         dialog.set_default_response(1)
@@ -600,6 +581,60 @@ class GUI:
                 command += " {}".format(box.wallpaper_path)
             subprocess.call(command, shell=True)
 
+    def on_apply_to_all_button(self, button):
+
+        """
+        This will create commands to set the same wallpaper to all displays, connected at the time or not
+        """
+        # Firstly we need to set the selected image thumbnail to all previews currently visible
+        for box in common.display_boxes_list:
+            box.img.set_from_file(common.selected_wallpaper.thumb_file)
+            box.wallpaper_path = common.selected_wallpaper.source_path
+
+        common.apply_button.set_sensitive(False)
+
+        if common.sway:
+            # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
+            batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
+            batch_content.append(
+                "swaybg -o* -i {} -m fill &".format(common.selected_wallpaper.source_path))
+
+            # save to ~/.azotebg
+            with open(common.cmd_file, 'w') as f:
+                for item in batch_content:
+                    f.write("%s\n" % item)
+            # make the file executable
+            st = os.stat(common.cmd_file)
+            os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
+
+            subprocess.call(common.cmd_file, shell=True)
+
+    def sway_apply_to_all(self, mode='fill'):
+        """
+                This will create commands to set the same wallpaper to all displays, connected at the time or not
+                """
+        # Firstly we need to set the selected image thumbnail to all previews currently visible
+        for box in common.display_boxes_list:
+            box.img.set_from_file(common.selected_wallpaper.thumb_file)
+        common.apply_button.set_sensitive(False)
+
+        if common.sway:
+            # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
+            batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
+            batch_content.append(
+                "swaybg -o* -i {} -m fill &".format(common.selected_wallpaper.source_path))
+
+            # save to ~/.azotebg
+            with open(common.cmd_file, 'w') as f:
+                for item in batch_content:
+                    f.write("%s\n" % item)
+            # make the file executable
+            st = os.stat(common.cmd_file)
+            os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
+
+            subprocess.call(common.cmd_file, shell=True)
+
+
     def on_split_button(self, button):
         if common.selected_wallpaper:
             common.apply_button.set_sensitive(True)
@@ -616,13 +651,13 @@ class GUI:
 
     def on_open_button(self, widget):
         if common.selected_wallpaper:
-            command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
-            subprocess.Popen(command, shell=True)
+            #command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
+            #subprocess.Popen(command, shell=True)
             openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
             menu = Gtk.Menu()
             if openers:
                 for opener in openers:
-                    item = Gtk.MenuItem.new_with_label('Open with {}'.format(opener))
+                    item = Gtk.MenuItem.new_with_label(common.lang['open_with'].format(opener[0]))
                     menu.append(item)
             menu.show_all()
             menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())

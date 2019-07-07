@@ -3,7 +3,8 @@
 
 about_azote = About Azote
 app_desc = Wallpaper manager for Sway, i3 and other window managers
-apply_settings = Apply settings
+apply_settings = Apply to {}
+apply_to_all = Apply selected picture to all screens
 background_color = Background color
 display_mode = Display mode
 flip_image = Flip image
@@ -13,6 +14,7 @@ move_to_trash = Move selected to trash
 no_picture_selected = No picture selected
 open_another_folder = Open another folder
 open_folder = Open folder
+open_with = Open with {}
 open_with_feh = Open selected with feh
 refresh_folder_preview = Refresh folder preview
 select_this_picture = Select this picture

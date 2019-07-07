@@ -3,7 +3,8 @@
 
 about_azote = Über azote
 app_desc = Bildschirmhintergrund-Manager für Sway, i3 und andere Window Manager
-apply_settings = Einstellungen anwenden
+apply_settings = Einstellungen zum {} anwenden
+apply_to_all = Ausgewähltes Bild auf alle Bildschirme anwenden
 background_color = Hintergrundfarbe
 display_mode = Anzeigemodus
 flip_image = Bild spiegeln
@@ -13,6 +14,7 @@ move_to_trash = Ausgewählte in den Papierkorb verschieben
 no_picture_selected = Kein Bild ausgewählt
 open_another_folder = Anderen Ordner öffnen
 open_folder = Ordner öffnen
+open_with = Öffnen mit {}
 open_with_feh = Ausgewählte mit feh öffnen
 refresh_folder_preview = Ordnervorschau aktualisieren
 select_this_picture = Diesen Hintergrund auswählen

@@ -3,7 +3,8 @@
 
 about_azote = O programie Azote
 app_desc = Menedżer tapet dla Sway, i3 i innych menedżerów okien
-apply_settings = Zastosuj ustawienia
+apply_settings = Zastosuj do {}
+apply_to_all = Zastosuj wybrany obraz do wszystkich ekranów
 background_color = Kolor tła
 display_mode = Tryb wyświetlania
 flip_image = Odwróć obraz
@@ -13,6 +14,7 @@ move_to_trash = Przenieś wybrany do kosza
 no_picture_selected = Nie wybrano obrazu
 open_another_folder = Wybierz inny folder
 open_folder = Otwórz folder
+open_with = Otwórz w {}
 open_with_feh = Otwórz wybrany w feh
 refresh_folder_preview = Odśwież podgląd folderu
 select_this_picture = Wybierz ten obraz

@@ -194,13 +194,32 @@ def set_env(language=None):
             for line in mimeinfo_cache:
                 if line.startswith('image/{}'.format(file_type)):
                     line = line.split('=')[1]  # cut out leading 'image/ext'
-                    openers = line[:-1].split(';')  # cut out trailing ';' to avoid empty last element after splitting
-                    for i in range(len(openers)):
-                        # cut out '.desktop' on the fly
-                        openers[i] = openers[i].split('.')[0]
-                    # Add to the dictionary of lists of associated programs, the key is the file extension
-                    common.associations[file_type] = openers
-                    continue
+                    # Paths to .desktop files for opener names found
+                    filenames = line[:-1].split(';')  # cut out trailing ';' to avoid empty last element after splitting
+                    # prepend path
+                    for i in range(len(filenames)):
+                        filenames[i] = '/usr/share/applications/{}'.format(filenames[i])
+
+                    data = []
+                    for i in range(len(filenames)):
+                        # Let's find the program Name= and Exec= in /usr/share/applications/shortcut_name.desktop
+                        shortcut_file = '/usr/share/applications/{}'.format(filenames[i])
+                        name, exec = '', ''
+
+                        if os.path.isfile(filenames[i]):
+                            with open(filenames[i]) as f:
+                                rows = f.read().splitlines()
+                                for row in rows:
+                                    if row.startswith('Name='):
+                                        name = row.split('=')[1]
+                                    elif row.startswith('Name[{}]='.format(common.lang.lang[0:2])):
+                                        name = row.split('=')[1]
+                                    if row.startswith('Exec'):
+                                        exec = row.split('=')[1].split()[0]
+                                        continue
+                            if name and exec:
+                                data.append((name, exec))
+                    common.associations[file_type] = data
         """
         Not necessarily all programs register jpg and jpeg extension (e.g. gimp registers jpeg only).
         Let's create sets, join them and replace lists for both jpg and jpeg keys.
@@ -395,6 +414,7 @@ class Settings(object):
 class Language(dict):
     def __init__(self):
         super().__init__()
+        self.lang = 'en_EN'
         # We'll initialize with values from en_EN
         with open(os.path.join('languages', 'en_EN')) as f:
             lines = f.read().splitlines()
@@ -414,6 +434,8 @@ class Language(dict):
                         pair = line.split('=')
                         key, value = pair[0].strip(), pair[1].strip()
                         self[key] = value
+            self.lang = lang
+            print(lang[0:2])
             log("Loaded lang: {}".format(lang), common.INFO)
 
         except FileNotFoundError:

@@ -31,6 +31,7 @@ selected_wallpaper = None
 selected_picture_label = None
 split_button = None
 apply_button = None
+apply_to_all_button = None
 open_button = None
 trash_button = None
 
