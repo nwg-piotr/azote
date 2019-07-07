@@ -28,6 +28,11 @@ when running on i3, Openbox or other X11 window managers.
 Select the folder your wallpapers are stored in. If it contains a lot of big pictures, it may take some time for
 Azote to create thumbnails. It's being performed once, unless you clear the `~/.azote/thumbnails` folder.
 
+Most of the buttons seem to be self-explanatory, with a little help from their tooltip text. What may not be clear
+at first is the `Apply selected picture to all screens` button. Introduced on request (issue #29), it applies unchanged
+selected picture to all displays, regardless of whether they are currently connected/detected. It may be useful if you
+often connect / disconnect displays.
+
 Azote, as well as feh, saves a batch file to your home directory. It needs to be executed in order to set the wallpaper 
 on subsequent logins or reboot.
 
