@@ -18,7 +18,7 @@ WARNING = 'warning'
 INFO = 'info'
 DEBUG = 'debug'
 
-env = {"wm": '', "i3ipc": False, "xrandr": False, "send2trash": False}
+env = {"wm": '', "xrandr": False, "send2trash": False}
 sway = False
 
 lang = None             # dictionary "name": lang_string
@@ -31,12 +31,14 @@ selected_wallpaper = None
 selected_picture_label = None
 split_button = None
 apply_button = None
-feh_button = None
+apply_to_all_button = None
+open_button = None
 trash_button = None
 
 cols = 3                # number of columns in pictures preview
 
 allowed_file_types = ['jpg', 'jpeg', 'png']
+associations = None     # dictionary {'extension": [program1, program2, program3, ...]}
 
 app_dir = ''            # ~/.azote
 thumb_dir = ''          # ~/.azote/thumbnails
@@ -49,3 +51,6 @@ logging_enabled = True
 displays = None         # detected displays details
 
 settings = None         # object saved to / restored from ~/.azote/settings.pkl
+
+modes_swaybg = ["stretch", "fit", "fill", "center", "tile"]
+modes_feh = ["scale", "max", "fill", "center", "tile"]

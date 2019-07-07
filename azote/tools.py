@@ -19,6 +19,7 @@ import common
 import pickle
 import subprocess
 import locale
+import pkg_resources
 from shutil import copyfile
 
 import json
@@ -86,12 +87,11 @@ def check_displays():
 
             # sort displays list by x, y: from left to right, then from bottom to top
             displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
-            common.env['i3ipc'] = True
 
             return displays
 
         except Exception as e:
-            log("i3ipc won't work: {}".format(e))
+            log("Failed checking displays: {}".format(e))
 
     # On i3 we could use i3-msg here, but xrandr should also return what we need. If not on Sway - let's use xrandr
     elif common.env['xrandr']:
@@ -127,7 +127,12 @@ def set_env(language=None):
     logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
                         level=logging.INFO)
 
-    log('Spraying Azote!', common.INFO)
+    try:
+        version = pkg_resources.require(common.app_name)[0].version
+    except Exception as e:
+        version = ' unknown version: {}'.format(e)
+
+    log('Azote v{}'.format(version), common.INFO)
 
     # We will preload the en_EN dictionary as default values
     common.lang = Language()
@@ -182,6 +187,55 @@ def set_env(language=None):
     common.settings = Settings()
 
     log("Environment: {}".format(common.env), common.INFO)
+
+    # check programs capable of opening files of allowed extensions
+    if os.path.isfile('/usr/share/applications/mimeinfo.cache'):
+        common.associations = {}  # Will stay None if the mimeinfo.cache file not found
+
+        with open(os.path.join('/usr/share/applications/mimeinfo.cache')) as f:
+            mimeinfo_cache = f.read().splitlines()
+
+        for file_type in common.allowed_file_types:
+            for line in mimeinfo_cache:
+                if line.startswith('image/{}'.format(file_type)):
+                    line = line.split('=')[1]  # cut out leading 'image/ext'
+                    # Paths to .desktop files for opener names found
+                    filenames = line[:-1].split(';')  # cut out trailing ';' to avoid empty last element after splitting
+                    # prepend path
+                    for i in range(len(filenames)):
+                        filenames[i] = '/usr/share/applications/{}'.format(filenames[i])
+
+                    data = []
+                    for i in range(len(filenames)):
+                        # Let's find the program Name= and Exec= in /usr/share/applications/shortcut_name.desktop
+                        shortcut_file = '/usr/share/applications/{}'.format(filenames[i])
+                        name, exec = '', ''
+
+                        if os.path.isfile(filenames[i]):
+                            with open(filenames[i]) as f:
+                                rows = f.read().splitlines()
+                                for row in rows:
+                                    if row.startswith('Name='):
+                                        name = row.split('=')[1]
+                                    elif row.startswith('Name[{}]='.format(common.lang.lang[0:2])):
+                                        name = row.split('=')[1]
+                                    if row.startswith('Exec'):
+                                        exec = row.split('=')[1].split()[0]
+                                        continue
+                            if name and exec:
+                                data.append((name, exec))
+                    common.associations[file_type] = data
+        """
+        Not necessarily all programs register jpg and jpeg extension (e.g. gimp registers jpeg only).
+        Let's create sets, join them and replace lists for both jpg and jpeg keys.
+        """
+        jpg = set(common.associations['jpg'])
+        jpeg = set(common.associations['jpeg'])
+        together = jpg | jpeg
+        common.associations['jpg'] = together
+        common.associations['jpeg'] = together
+
+        log("Image associations: {}".format(common.associations), common.INFO)
 
 
 def copy_backgrounds():
@@ -364,6 +418,7 @@ class Settings(object):
 class Language(dict):
     def __init__(self):
         super().__init__()
+        self.lang = 'en_EN'
         # We'll initialize with values from en_EN
         with open(os.path.join('languages', 'en_EN')) as f:
             lines = f.read().splitlines()
@@ -383,6 +438,7 @@ class Language(dict):
                         pair = line.split('=')
                         key, value = pair[0].strip(), pair[1].strip()
                         self[key] = value
+            self.lang = lang
             log("Loaded lang: {}".format(lang), common.INFO)
 
         except FileNotFoundError:

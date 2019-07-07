@@ -79,8 +79,6 @@ class Preview(Gtk.ScrolledWindow):
 
         col = 0
         row = 0
-        #src_pictures = [f for f in os.listdir(common.settings.src_path) if
-        #                os.path.isfile(os.path.join(common.settings.src_path, f))]
         src_pictures = self.get_files()
 
         for file in src_pictures:
@@ -124,11 +122,11 @@ class ThumbButton(Gtk.Button):
         self.filename = filename
         self.source_path = os.path.join(folder, filename)
 
-        img = Gtk.Image()
+        self.img = Gtk.Image()
         self.thumb_file = "{}.png".format(os.path.join(common.thumb_dir, hash_name(self.source_path)))
-        img.set_from_file(self.thumb_file)
+        self.img.set_from_file(self.thumb_file)
 
-        self.set_image(img)
+        self.set_image(self.img)
         self.set_image_position(2)  # TOP
         self.set_tooltip_text(common.lang['select_this_picture'])
 
@@ -142,7 +140,10 @@ class ThumbButton(Gtk.Button):
     def on_button_press(self, button):
         if common.split_button:
             common.split_button.set_sensitive(True)
-        common.feh_button.set_sensitive(True)
+
+        common.open_button.set_sensitive(True)
+        common.apply_to_all_button.set_sensitive(True)
+
         if common.trash_button and self.source_path.startswith(os.getenv("HOME")):
             common.trash_button.set_sensitive(True)
         self.selected = True
@@ -199,12 +200,11 @@ class DisplayBox(Gtk.Box):
         mode_selector = Gtk.ListStore(str)
 
         if common.sway:
-            modes = ["stretch", "fit", "fill", "center", "tile"]  # modes available in swaybg
+            for mode in common.modes_swaybg:
+                mode_selector.append([mode])
         else:
-            modes = ["scale", "max", "fill", "center", "tile"]  # modes available in feh
-
-        for mode in modes:
-            mode_selector.append([mode])
+            for mode in common.modes_feh:
+                mode_selector.append([mode])
 
         # Let's display the mode combo and the color button side-by-side in a vertical box
         options_box = Gtk.Box()
@@ -379,36 +379,6 @@ class GUI:
 
         main_box.pack_start(common.preview, False, False, 0)
 
-        """"# Horizontal box to group preview toolbar buttons
-        preview_toolbar_box = Gtk.Box()
-        preview_toolbar_box.set_spacing(5)
-        preview_toolbar_box.set_border_width(10)
-        preview_toolbar_box.set_orientation(Gtk.Orientation.HORIZONTAL)
-
-        # Button to change sorting order
-        sorting_button = SortingButton()
-        preview_toolbar_box.add(sorting_button)
-
-        # Button to set the wallpapers folder
-        folder_button = Gtk.Button.new_with_label(common.settings.src_path)
-        folder_button.set_property("name", "folder-btn")
-        folder_button.set_tooltip_text(common.lang['open_another_folder'])
-        preview_toolbar_box.pack_start(folder_button, True, True, 0)
-
-        folder_button.connect_after('clicked', self.on_folder_clicked)
-
-        # Button to refresh currently selected folder thumbnails
-        refresh_button = Gtk.Button()
-        img = Gtk.Image()
-        img.set_from_file('images/icon_refresh.svg')
-        refresh_button.set_image(img)
-        refresh_button.set_tooltip_text(common.lang['refresh_folder_preview'])
-        preview_toolbar_box.add(refresh_button)
-
-        refresh_button.connect_after('clicked', self.on_refresh_clicked)
-
-        main_box.add(preview_toolbar_box)"""
-
         # We need a horizontal container to display outputs in columns
         displays_box = Gtk.Box()
         displays_box.set_spacing(15)
@@ -428,7 +398,7 @@ class GUI:
         # Bottom buttons will also need a horizontal container
         bottom_box = Gtk.Box()
         bottom_box.set_spacing(5)
-        bottom_box.set_border_width(10)
+        bottom_box.set_border_width(5)
         bottom_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
         # Button to change sorting order
@@ -455,14 +425,14 @@ class GUI:
         bottom_box.add(vseparator)
 
         # Button to open in feh
-        common.feh_button = Gtk.Button()
+        common.open_button = Gtk.Button()
         img = Gtk.Image()
         img.set_from_file('images/icon_feh.svg')
-        common.feh_button.set_image(img)
-        common.feh_button.set_tooltip_text(common.lang['open_with_feh'])
-        common.feh_button.set_sensitive(False)
-        common.feh_button.connect('clicked', self.on_feh_button)
-        bottom_box.add(common.feh_button)
+        common.open_button.set_image(img)
+        common.open_button.set_tooltip_text(common.lang['open_selected_picture'])
+        common.open_button.set_sensitive(False)
+        common.open_button.connect('clicked', self.on_open_button)
+        bottom_box.add(common.open_button)
 
         if common.env['send2trash']:
             # Button to move to trash
@@ -493,26 +463,46 @@ class GUI:
             common.split_button.set_tooltip_text(common.lang['split_selection_between_displays'])
             common.split_button.connect('clicked', self.on_split_button)
 
-        # Button to set the wallpapers folder
-        """folder_button = Gtk.Button.new_with_label(common.settings.src_path)
-        folder_button.set_property("name", "folder-btn")
-        folder_button.set_tooltip_text(common.lang['open_another_folder'])
-        bottom_box.pack_start(folder_button, True, True, 0)
-
-        folder_button.connect_after('clicked', self.on_folder_clicked)"""
+        # Button to apply selected wallpaper to all displays (connected at the moment or not)
+        common.apply_to_all_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_all.svg')
+        common.apply_to_all_button.set_image(img)
+        common.apply_to_all_button.connect('clicked', self.on_apply_to_all_button)
+        common.apply_to_all_button.set_sensitive(False)
+        common.apply_to_all_button.set_tooltip_text(common.lang['apply_to_all'])
+        bottom_box.add(common.apply_to_all_button)
 
         # Button to apply settings
+        names = ''
+        for display in common.displays:
+            names += '{} '.format(display['name'])
+
         common.apply_button = Gtk.Button()
         img = Gtk.Image()
         img.set_from_file('images/icon_apply.svg')
         common.apply_button.set_image(img)
         common.apply_button.connect('clicked', self.on_apply_button)
         common.apply_button.set_sensitive(False)
-        common.apply_button.set_tooltip_text(common.lang['apply_settings'])
+        common.apply_button.set_tooltip_text(common.lang['apply_settings'].format(names))
         bottom_box.add(common.apply_button)
 
-        vseparator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
-        bottom_box.add(vseparator)
+        main_box.add(bottom_box)
+
+        hseparator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        main_box.add(hseparator)
+
+        # Another horizontal container for the status line + button(s)
+        status_box = Gtk.Box()
+        status_box.set_spacing(5)
+        status_box.set_border_width(5)
+        status_box.set_orientation(Gtk.Orientation.HORIZONTAL)
+
+        common.status_bar = Gtk.Statusbar()
+        common.status_bar.set_property("name", "status-bar")
+        common.status_bar.set_halign(Gtk.Align.CENTER)
+        status_box.pack_start(common.status_bar, True, True, 0)
+        update_status_bar()
 
         # Button to call About dialog
         about_button = Gtk.Button()
@@ -521,18 +511,9 @@ class GUI:
         about_button.set_image(img)
         about_button.set_tooltip_text(common.lang['about_azote'])
         about_button.connect('clicked', self.on_about_button)
-        bottom_box.add(about_button)
+        status_box.add(about_button)
 
-        main_box.add(bottom_box)
-
-        hseparator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-        main_box.add(hseparator)
-
-        common.status_bar = Gtk.Statusbar()
-        common.status_bar.set_property("name", "status-bar")
-        common.status_bar.set_halign(Gtk.Align.CENTER)
-        main_box.add(common.status_bar)
-        update_status_bar()
+        main_box.add(status_box)
 
         window.show_all()
 
@@ -541,6 +522,7 @@ class GUI:
 
     def on_folder_clicked(self, button):
         dialog = Gtk.FileChooserDialog(title=common.lang['open_folder'], parent=button.get_toplevel(), action=Gtk.FileChooserAction.SELECT_FOLDER)
+        dialog.set_current_folder(common.settings.src_path)
         dialog.add_button(Gtk.STOCK_CANCEL, 0)
         dialog.add_button(Gtk.STOCK_OK, 1)
         dialog.set_default_response(1)
@@ -600,6 +582,64 @@ class GUI:
                 command += " {}".format(box.wallpaper_path)
             subprocess.call(command, shell=True)
 
+    def on_apply_to_all_button(self, button):
+        """
+        This will create a single command to set the same wallpaper to all displays, CONNECTED at the time OR NOT.
+        Menu for modes needs to differ for swaybg and feh.
+        """
+        menu = Gtk.Menu()
+        if common.sway:
+            for mode in common.modes_swaybg:
+                item = Gtk.MenuItem.new_with_label(mode)
+                item.connect('activate', self.apply_to_all_swaybg, mode)
+                menu.append(item)
+            menu.show_all()
+            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        else:
+            for mode in common.modes_feh:
+                item = Gtk.MenuItem.new_with_label(mode)
+                item.connect('activate', self.apply_to_all_feh, mode)
+                menu.append(item)
+            menu.show_all()
+            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+
+    def apply_to_all_swaybg(self, item, mode):
+        # Firstly we need to set the selected image thumbnail to all previews currently visible
+        for box in common.display_boxes_list:
+            box.img.set_from_file(common.selected_wallpaper.thumb_file)
+            box.wallpaper_path = common.selected_wallpaper.source_path
+
+        common.apply_button.set_sensitive(False)
+
+        # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
+        batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
+        batch_content.append(
+            "swaybg -o* -i {} -m {} &".format(common.selected_wallpaper.source_path, mode))
+
+        # save to ~/.azotebg
+        with open(common.cmd_file, 'w') as f:
+            for item in batch_content:
+                f.write("%s\n" % item)
+        # make the file executable
+        st = os.stat(common.cmd_file)
+        os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
+
+        subprocess.call(common.cmd_file, shell=True)
+
+    def apply_to_all_feh(self, item, mode):
+        # Firstly we need to set the selected image thumbnail to all previews currently visible
+        for box in common.display_boxes_list:
+            box.img.set_from_file(common.selected_wallpaper.thumb_file)
+            box.wallpaper_path = common.selected_wallpaper.source_path
+
+        common.apply_button.set_sensitive(False)
+
+        # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
+        command = "feh --bg-{}".format(mode)
+        command += " {}".format(common.selected_wallpaper.source_path)
+
+        subprocess.call(command, shell=True)
+
     def on_split_button(self, button):
         if common.selected_wallpaper:
             common.apply_button.set_sensitive(True)
@@ -614,10 +654,28 @@ class GUI:
             for box in common.display_boxes_list:
                 box.clear_color_selection()
 
-    def on_feh_button(self, widget):
+    def on_open_button(self, widget):
         if common.selected_wallpaper:
-            command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
-            subprocess.Popen(command, shell=True)
+            openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
+            menu = Gtk.Menu()
+            if openers:
+                for opener in openers:
+                    # opener = (Name, Exec)
+                    item = Gtk.MenuItem.new_with_label(common.lang['open_with'].format(opener[0]))
+                    item.connect('activate', self.open_with, opener[1])
+                    menu.append(item)
+            menu.show_all()
+            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+
+    def open_with(self, item, opener):
+        # if feh selected as the opener, let's start it with options as below
+        if opener == 'feh':
+            command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
+                common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
+        # elif could specify options for other certain programs here
+        else:
+            command = '{} {}'.format(opener, common.selected_wallpaper.source_path)
+        subprocess.Popen(command, shell=True)
 
     def on_trash_button(self, widget):
         menu = Gtk.Menu()
@@ -668,7 +726,7 @@ class GUI:
         if common.split_button:
             common.split_button.set_sensitive(False)
         common.apply_button.set_sensitive(False)
-        common.feh_button.set_sensitive(False)
+        common.open_button.set_sensitive(False)
         common.trash_button.set_sensitive(False)
 
 
