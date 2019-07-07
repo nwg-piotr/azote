@@ -31,7 +31,7 @@ Azote to create thumbnails. It's being performed once, unless you clear the `~/.
 Most of the buttons seem to be self-explanatory, with a little help from their tooltip text. What may not be clear
 at first is the `Apply selected picture to all screens` button. Introduced on request (issue #29), it applies unchanged
 selected picture to all displays, regardless of whether they are currently connected/detected. It may be useful if you
-often connect / disconnect displays.
+often connect and disconnect displays.
 
 Azote, as well as feh, saves a batch file to your home directory. It needs to be executed in order to set the wallpaper 
 on subsequent logins or reboot.
