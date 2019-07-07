@@ -229,7 +229,7 @@ def set_env(language=None):
         together = jpg | jpeg
         common.associations['jpg'] = together
         common.associations['jpeg'] = together
-        print(common.associations)
+        # print(common.associations)
 
         log("File associations: {}".format(common.associations), common.INFO)
 
@@ -435,7 +435,6 @@ class Language(dict):
                         key, value = pair[0].strip(), pair[1].strip()
                         self[key] = value
             self.lang = lang
-            print(lang[0:2])
             log("Loaded lang: {}".format(lang), common.INFO)
 
         except FileNotFoundError:

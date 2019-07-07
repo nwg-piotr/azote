@@ -432,7 +432,7 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_feh.svg')
         common.open_button.set_image(img)
-        common.open_button.set_tooltip_text(common.lang['open_with_feh'])
+        common.open_button.set_tooltip_text(common.lang['open_selected_picture'])
         common.open_button.set_sensitive(False)
         common.open_button.connect('clicked', self.on_open_button)
         bottom_box.add(common.open_button)
@@ -480,7 +480,6 @@ class GUI:
         names = ''
         for display in common.displays:
             names += '{} '.format(display['name'])
-        print(names)
 
         common.apply_button = Gtk.Button()
         img = Gtk.Image()
