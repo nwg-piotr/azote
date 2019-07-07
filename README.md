@@ -26,7 +26,7 @@ when running on i3, Openbox or other X11 window managers.
 ## Usage
 
 Select the folder your wallpapers are stored in. If it contains a lot of big pictures, it may take some time for
-Azote to create thumbnails. It's being performed once, unless you clear the `~/.azote/thumbnails` folder.
+Azote to create thumbnails. It's being performed once per folder, unless you clear the `~/.azote/thumbnails` folder.
 
 Most of the buttons seem to be self-explanatory, with a little help from their tooltip text. What may not be clear
 at first is the `Apply selected picture to all screens` button. Introduced on request (issue #29), it applies unchanged
