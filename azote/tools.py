@@ -19,6 +19,7 @@ import common
 import pickle
 import subprocess
 import locale
+import pkg_resources
 from shutil import copyfile
 
 import json
@@ -86,12 +87,11 @@ def check_displays():
 
             # sort displays list by x, y: from left to right, then from bottom to top
             displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
-            common.env['i3ipc'] = True
 
             return displays
 
         except Exception as e:
-            log("i3ipc won't work: {}".format(e))
+            log("Failed checking displays: {}".format(e))
 
     # On i3 we could use i3-msg here, but xrandr should also return what we need. If not on Sway - let's use xrandr
     elif common.env['xrandr']:
@@ -127,7 +127,12 @@ def set_env(language=None):
     logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
                         level=logging.INFO)
 
-    log('Spraying Azote!', common.INFO)
+    try:
+        version = pkg_resources.require(common.app_name)[0].version
+    except Exception as e:
+        version = ' unknown version: {}'.format(e)
+
+    log('Azote v{}'.format(version), common.INFO)
 
     # We will preload the en_EN dictionary as default values
     common.lang = Language()
@@ -229,9 +234,8 @@ def set_env(language=None):
         together = jpg | jpeg
         common.associations['jpg'] = together
         common.associations['jpeg'] = together
-        # print(common.associations)
 
-        log("File associations: {}".format(common.associations), common.INFO)
+        log("Image associations: {}".format(common.associations), common.INFO)
 
 
 def copy_backgrounds():

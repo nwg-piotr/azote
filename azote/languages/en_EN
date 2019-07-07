@@ -3,7 +3,7 @@
 
 about_azote = About Azote
 app_desc = Wallpaper manager for Sway, i3 and other window managers
-apply_settings = Apply to {}
+apply_settings = Apply to: {}
 apply_to_all = Apply selected picture to all screens
 background_color = Background color
 display_mode = Display mode

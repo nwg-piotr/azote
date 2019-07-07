@@ -79,8 +79,6 @@ class Preview(Gtk.ScrolledWindow):
 
         col = 0
         row = 0
-        #src_pictures = [f for f in os.listdir(common.settings.src_path) if
-        #                os.path.isfile(os.path.join(common.settings.src_path, f))]
         src_pictures = self.get_files()
 
         for file in src_pictures:
@@ -202,12 +200,11 @@ class DisplayBox(Gtk.Box):
         mode_selector = Gtk.ListStore(str)
 
         if common.sway:
-            modes = ["stretch", "fit", "fill", "center", "tile"]  # modes available in swaybg
+            for mode in common.modes_swaybg:
+                mode_selector.append([mode])
         else:
-            modes = ["scale", "max", "fill", "center", "tile"]  # modes available in feh
-
-        for mode in modes:
-            mode_selector.append([mode])
+            for mode in common.modes_feh:
+                mode_selector.append([mode])
 
         # Let's display the mode combo and the color button side-by-side in a vertical box
         options_box = Gtk.Box()
@@ -401,7 +398,7 @@ class GUI:
         # Bottom buttons will also need a horizontal container
         bottom_box = Gtk.Box()
         bottom_box.set_spacing(5)
-        bottom_box.set_border_width(10)
+        bottom_box.set_border_width(5)
         bottom_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
         # Button to change sorting order
@@ -490,8 +487,22 @@ class GUI:
         common.apply_button.set_tooltip_text(common.lang['apply_settings'].format(names))
         bottom_box.add(common.apply_button)
 
-        vseparator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
-        bottom_box.add(vseparator)
+        main_box.add(bottom_box)
+
+        hseparator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        main_box.add(hseparator)
+
+        # Another horizontal container for the status line + button(s)
+        status_box = Gtk.Box()
+        status_box.set_spacing(5)
+        status_box.set_border_width(5)
+        status_box.set_orientation(Gtk.Orientation.HORIZONTAL)
+
+        common.status_bar = Gtk.Statusbar()
+        common.status_bar.set_property("name", "status-bar")
+        common.status_bar.set_halign(Gtk.Align.CENTER)
+        status_box.pack_start(common.status_bar, True, True, 0)
+        update_status_bar()
 
         # Button to call About dialog
         about_button = Gtk.Button()
@@ -500,18 +511,9 @@ class GUI:
         about_button.set_image(img)
         about_button.set_tooltip_text(common.lang['about_azote'])
         about_button.connect('clicked', self.on_about_button)
-        bottom_box.add(about_button)
+        status_box.add(about_button)
 
-        main_box.add(bottom_box)
-
-        hseparator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-        main_box.add(hseparator)
-
-        common.status_bar = Gtk.Statusbar()
-        common.status_bar.set_property("name", "status-bar")
-        common.status_bar.set_halign(Gtk.Align.CENTER)
-        main_box.add(common.status_bar)
-        update_status_bar()
+        main_box.add(status_box)
 
         window.show_all()
 
@@ -581,10 +583,27 @@ class GUI:
             subprocess.call(command, shell=True)
 
     def on_apply_to_all_button(self, button):
+        """
+        This will create a single command to set the same wallpaper to all displays, CONNECTED at the time OR NOT.
+        Menu for modes needs to differ for swaybg and feh.
+        """
+        menu = Gtk.Menu()
+        if common.sway:
+            for mode in common.modes_swaybg:
+                item = Gtk.MenuItem.new_with_label(mode)
+                item.connect('activate', self.apply_to_all_swaybg, mode)
+                menu.append(item)
+            menu.show_all()
+            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        else:
+            for mode in common.modes_feh:
+                item = Gtk.MenuItem.new_with_label(mode)
+                item.connect('activate', self.apply_to_all_feh, mode)
+                menu.append(item)
+            menu.show_all()
+            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
-        """
-        This will create commands to set the same wallpaper to all displays, connected at the time or not
-        """
+    def apply_to_all_swaybg(self, item, mode):
         # Firstly we need to set the selected image thumbnail to all previews currently visible
         for box in common.display_boxes_list:
             box.img.set_from_file(common.selected_wallpaper.thumb_file)
@@ -592,47 +611,34 @@ class GUI:
 
         common.apply_button.set_sensitive(False)
 
-        if common.sway:
-            # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
-            batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
-            batch_content.append(
-                "swaybg -o* -i {} -m fill &".format(common.selected_wallpaper.source_path))
+        # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
+        batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
+        batch_content.append(
+            "swaybg -o* -i {} -m {} &".format(common.selected_wallpaper.source_path, mode))
 
-            # save to ~/.azotebg
-            with open(common.cmd_file, 'w') as f:
-                for item in batch_content:
-                    f.write("%s\n" % item)
-            # make the file executable
-            st = os.stat(common.cmd_file)
-            os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
+        # save to ~/.azotebg
+        with open(common.cmd_file, 'w') as f:
+            for item in batch_content:
+                f.write("%s\n" % item)
+        # make the file executable
+        st = os.stat(common.cmd_file)
+        os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
 
-            subprocess.call(common.cmd_file, shell=True)
+        subprocess.call(common.cmd_file, shell=True)
 
-    def sway_apply_to_all(self, mode='fill'):
-        """
-                This will create commands to set the same wallpaper to all displays, connected at the time or not
-                """
+    def apply_to_all_feh(self, item, mode):
         # Firstly we need to set the selected image thumbnail to all previews currently visible
         for box in common.display_boxes_list:
             box.img.set_from_file(common.selected_wallpaper.thumb_file)
+            box.wallpaper_path = common.selected_wallpaper.source_path
+
         common.apply_button.set_sensitive(False)
 
-        if common.sway:
-            # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
-            batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
-            batch_content.append(
-                "swaybg -o* -i {} -m fill &".format(common.selected_wallpaper.source_path))
+        # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
+        command = "feh --bg-{}".format(mode)
+        command += " {}".format(common.selected_wallpaper.source_path)
 
-            # save to ~/.azotebg
-            with open(common.cmd_file, 'w') as f:
-                for item in batch_content:
-                    f.write("%s\n" % item)
-            # make the file executable
-            st = os.stat(common.cmd_file)
-            os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
-
-            subprocess.call(common.cmd_file, shell=True)
-
+        subprocess.call(command, shell=True)
 
     def on_split_button(self, button):
         if common.selected_wallpaper:
@@ -650,17 +656,26 @@ class GUI:
 
     def on_open_button(self, widget):
         if common.selected_wallpaper:
-            #command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
-            #subprocess.Popen(command, shell=True)
             openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
             menu = Gtk.Menu()
             if openers:
                 for opener in openers:
+                    # opener = (Name, Exec)
                     item = Gtk.MenuItem.new_with_label(common.lang['open_with'].format(opener[0]))
+                    item.connect('activate', self.open_with, opener[1])
                     menu.append(item)
             menu.show_all()
             menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
+    def open_with(self, item, opener):
+        # if feh selected as the opener, let's start it with options as below
+        if opener == 'feh':
+            command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
+                common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
+        # elif could specify options for other certain programs here
+        else:
+            command = '{} {}'.format(opener, common.selected_wallpaper.source_path)
+        subprocess.Popen(command, shell=True)
 
     def on_trash_button(self, widget):
         menu = Gtk.Menu()

@@ -18,7 +18,7 @@ WARNING = 'warning'
 INFO = 'info'
 DEBUG = 'debug'
 
-env = {"wm": '', "i3ipc": False, "xrandr": False, "send2trash": False}
+env = {"wm": '', "xrandr": False, "send2trash": False}
 sway = False
 
 lang = None             # dictionary "name": lang_string
@@ -51,3 +51,6 @@ logging_enabled = True
 displays = None         # detected displays details
 
 settings = None         # object saved to / restored from ~/.azote/settings.pkl
+
+modes_swaybg = ["stretch", "fit", "fill", "center", "tile"]
+modes_feh = ["scale", "max", "fill", "center", "tile"]
