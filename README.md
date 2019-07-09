@@ -125,7 +125,8 @@ Packagers wanted!
 - wmctrl
 
 **Optional:** 
-'python-send2trash: trash support'
+
+- python-send2trash: trash support
 
 Please use assets from the [latest release](https://github.com/nwg-piotr/azote/releases/latest).
 
