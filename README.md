@@ -98,7 +98,7 @@ Binary package `azote` available in the Void repository.
 
 ## Troubleshooting
 
-As well pictures as displays preview are instances of the Gtk.Button class. In case you don't see images inside them,
+As well pictures as displays preview inherit from the Gtk.Button class. In case you don't see images inside them,
 please make sure if button images are turned on in the `~/.config/gtk-3.0/settings.ini` file:
 
 ```bash
