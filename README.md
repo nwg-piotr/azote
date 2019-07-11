@@ -96,7 +96,7 @@ zypper in azote
 
 Binary package `azote` available in the Void repository. 
 
-**NOTE:** due to a mistake in the template, you may need to install the `python3-setuptool` package manually to prevent
+**NOTE:** due to a mistake in the template #32, you may need to install the `python3-setuptool` package manually to prevent
 Azote from crashing on start. This will be fixed in the next package revision.
 
 ## Troubleshooting
