@@ -96,6 +96,9 @@ zypper in azote
 
 Binary package `azote` available in the Void repository. 
 
+**NOTE:** due to a mistake in the template, you may need to install the `python3-setuptool` package manually to prevent
+Azote from crashing on start. This will be fixed in the next package revision.
+
 ## Troubleshooting
 
 As well pictures as displays preview inherit from the Gtk.Button class. In case you don't see images inside them,
