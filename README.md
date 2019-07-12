@@ -98,7 +98,7 @@ zypper in azote
 
 Binary package `azote` available in the Void repository. 
 
-## Other Linux distributions:
+### Other Linux distributions:
 
 Packagers wanted!
 
