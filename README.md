@@ -73,6 +73,8 @@ exec dwm
 
 ## Installation
 
+[![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
+
 ### Arch Linux
 
 Install [azote](https://aur.archlinux.org/packages/azote) from AUR.
@@ -96,23 +98,7 @@ zypper in azote
 
 Binary package `azote` available in the Void repository. 
 
-**NOTE:** due to a mistake in the template ([issue #32](https://github.com/nwg-piotr/azote/issues/32)), you may need to install the `python3-setuptool` package manually to prevent
-Azote from crashing on start. This will be fixed in the next package revision.
-
-## Troubleshooting
-
-As well pictures as displays preview inherit from the Gtk.Button class. In case you don't see images inside them,
-please make sure that button images are turned on in the `~/.config/gtk-3.0/settings.ini` file:
-
-```bash
-[Settings]
-(...)
-gtk-button-images=1
-```
-
 ## Other Linux distributions:
-
-[![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
 
 Packagers wanted!
 
@@ -134,6 +120,17 @@ Packagers wanted!
 Please use assets from the [latest release](https://github.com/nwg-piotr/azote/releases/latest).
 
 Seeing Arch [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
+
+## Troubleshooting
+
+As well pictures as displays preview inherit from the Gtk.Button class. In case you don't see images inside them,
+please make sure that button images are turned on in the `~/.config/gtk-3.0/settings.ini` file:
+
+```bash
+[Settings]
+(...)
+gtk-button-images=1
+```
 
 ### X11 / feh notice
 
