@@ -711,7 +711,7 @@ class GUI:
         dialog.set_comments(common.lang['app_desc'])
         dialog.set_license_type(Gtk.License.GPL_3_0)
         dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick'])
-        dialog.set_translator_credits('xsme (de_DE)')
+        dialog.set_translator_credits('xsme (de_DE), HumanG33k (fr_FR)')
         dialog.set_artists(['edskeye'])
 
         dialog.show()
