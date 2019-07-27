@@ -1,0 +1,28 @@
+# While adding own translation, leave all '{}' untouched!
+# As '=' is a separator, don't use it inside strings
+
+about_azote = À propos d’Azote
+app_desc = Gestionnaire de fonds d’écran pour Sway, i3 et d’autres gestionnaires de fenêtres
+apply_settings = Appliquer à: {}
+apply_to_all = Appliquer l'image sélectionnée à tous les écrans
+background_color = Couleur de fonds
+display_mode = Mode d’affichage
+flip_image = Retourner l’image
+flip_wallpaper_horizontally = Retourner le fond d’écran horizontalement
+move = Vers la corbeille
+move_to_trash = Déplacer la sélection vers la corbeille
+no_picture_selected =  Aucune image sélectionnée
+open_another_folder =  Ouvrir un autre dossier
+open_folder = Ouvrir le dossier
+open_with = Ovrir avec {}
+open_selected_picture = Ouvrir l'image sélectionnée
+refresh_folder_preview = Rafraîchir l'aperçu du dossier
+select_this_picture = Sélectionner cette image
+set_selected_wallpaper = Définir le fond d'écran sélectionné
+sorting_order = Ordre de tri
+sorting_az = A -> Z
+sorting_za = Z -> A
+sorting_new = Nouveau en haut
+sorting_old = Ancien en haut
+split_selection_between_displays = Répartition de la sélection entre les écrans
+thumbnails_in_cache = {} miniatures en cache ({})

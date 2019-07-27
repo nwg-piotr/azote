@@ -1,3 +1,8 @@
+v1.2.0 (2019-07-07)
+- issue #30 resolved: folder picker starts from the folder currently in use
+- feature requested in issue #29 added: new button 'Apply to all displays'
+- former 'open with feh' button now opens the menu to select from programs capable of opening the image
+
 v1.1.2 (2019-07-01)
 - "Use python3 explicitly" PR #26 by @jubalh merged
 - inconsistency in the version numbering resolved

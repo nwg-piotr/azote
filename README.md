@@ -3,7 +3,7 @@
 **Azote** is a GTK+ 3-based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
 (Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands.
 
-![screenshot](http://nwg.pl/Lychee/uploads/big/ee3da2821c1832e29b489289dd46120d.png)
+![screenshot](http://nwg.pl/Lychee/uploads/big/2ef98871aea09679282675e942f153ed.png)
 
 *Pictures above come from https://wallhaven.cc*
 
@@ -26,7 +26,12 @@ when running on i3, Openbox or other X11 window managers.
 ## Usage
 
 Select the folder your wallpapers are stored in. If it contains a lot of big pictures, it may take some time for
-Azote to create thumbnails. It's being performed once, unless you clear the `~/.azote/thumbnails` folder.
+Azote to create thumbnails. It's being performed once per folder, unless you clear the `~/.azote/thumbnails` folder.
+
+Most of the buttons seem to be self-explanatory, with a little help from their tooltip text. What may not be clear
+at first is the `Apply selected picture to all screens` button. Introduced on request (issue #29), it applies unchanged
+selected picture to all displays, regardless of whether they are currently connected/detected. It may be useful if you
+often connect and disconnect displays.
 
 Azote, as well as feh, saves a batch file to your home directory. It needs to be executed in order to set the wallpaper 
 on subsequent logins or reboot.
@@ -68,6 +73,8 @@ exec dwm
 
 ## Installation
 
+[![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
+
 ### Arch Linux
 
 Install [azote](https://aur.archlinux.org/packages/azote) from AUR.
@@ -91,20 +98,7 @@ zypper in azote
 
 Binary package `azote` available in the Void repository. 
 
-## Troubleshooting
-
-As well pictures as displays preview are instances of the Gtk.Button class. In case you don't see images inside them,
-please make sure if button images are turned on in the `~/.config/gtk-3.0/settings.ini` file:
-
-```bash
-[Settings]
-(...)
-gtk-button-images=1
-```
-
-## Other Linux distributions:
-
-[![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
+### Other Linux distributions:
 
 Packagers wanted!
 
@@ -120,11 +114,23 @@ Packagers wanted!
 - wmctrl
 
 **Optional:** 
-'python-send2trash: trash support'
+
+- python-send2trash: trash support
 
 Please use assets from the [latest release](https://github.com/nwg-piotr/azote/releases/latest).
 
 Seeing Arch [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
+
+## Troubleshooting
+
+As well pictures as displays preview inherit from the Gtk.Button class. In case you don't see images inside them,
+please make sure that button images are turned on in the `~/.config/gtk-3.0/settings.ini` file:
+
+```bash
+[Settings]
+(...)
+gtk-button-images=1
+```
 
 ### X11 / feh notice
 
