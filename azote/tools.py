@@ -24,6 +24,10 @@ from shutil import copyfile
 
 import json
 
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+
 
 def log(message, level=None):
     if common.logging_enabled:
@@ -257,16 +261,33 @@ def hash_name(full_path):
 
 
 def create_thumbnails(scr_path):
-    # get all the files of allowed types from current path
+    # Let's count allowed files first
+    common.progress_bar.hide()
+    counter = 0
     for extension in common.allowed_file_types:
         for in_path in glob.glob(os.path.join(scr_path, "*.{}".format(extension))):
             if file_allowed(in_path):
-                thumb_name = "{}.png".format(hash_name(in_path))
-                dest_path = os.path.join(common.thumb_dir, thumb_name)
-                if not os.path.isfile(dest_path):
-                    create_thumbnail(in_path, dest_path, thumb_name)
-                elif is_newer(in_path, dest_path):
-                    create_thumbnail(in_path, dest_path, thumb_name, True)
+                counter += 1
+    if counter > 0:
+        # get all the files of allowed types from current path
+        common.progress_bar.show()
+        common.progress_bar.set_fraction(0.0)
+        processed = 0
+        for extension in common.allowed_file_types:
+            for in_path in glob.glob(os.path.join(scr_path, "*.{}".format(extension))):
+                if file_allowed(in_path):
+                    thumb_name = "{}.png".format(hash_name(in_path))
+                    dest_path = os.path.join(common.thumb_dir, thumb_name)
+                    if not os.path.isfile(dest_path):
+                        create_thumbnail(in_path, dest_path, thumb_name)
+                    elif is_newer(in_path, dest_path):
+                        create_thumbnail(in_path, dest_path, thumb_name, True)
+                    processed += 1
+                    common.progress_bar.set_fraction(processed / counter)
+                    common.progress_bar.set_text(str(processed))
+                    while Gtk.events_pending():
+                        Gtk.main_iteration()
+        common.progress_bar.hide()
 
 
 def create_thumbnail(in_path, dest_path, thumb_name, refresh=False):

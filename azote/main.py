@@ -44,7 +44,7 @@ class Preview(Gtk.ScrolledWindow):
         self.set_border_width(10)
         self.set_propagate_natural_height(True)
         self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
-
+        
         common.buttons_list = []
         self.grid = Gtk.Grid()
         self.grid.set_column_spacing(25)
@@ -358,8 +358,11 @@ class SortingButton(Gtk.Button):
 
 class GUI:
     def __init__(self):
+        screen = Gdk.Screen.get_default()
+        h = screen.get_height()
 
         window = Gtk.Window()
+        window.set_default_size(240 * 3 + 120, h * 0.95)
 
         window.set_title("Azote")
         logo = GdkPixbuf.Pixbuf.new_from_file('images/icon.svg')
@@ -373,6 +376,14 @@ class GUI:
         main_box.set_border_width(10)
         main_box.set_orientation(Gtk.Orientation.VERTICAL)
 
+        common.progress_bar = Gtk.ProgressBar()
+        common.progress_bar.set_fraction(0.5)
+        common.progress_bar.set_text('0')
+        common.progress_bar.set_show_text(True)
+        common.progress_bar.hide()
+        main_box.pack_start(common.progress_bar, True, True, 0)
+        window.add(main_box)
+
         # This contains a Gtk.ScrolledWindow with Gtk.Grid() inside, filled with ThumbButton(Gtk.Button) instances
         common.preview = Preview()
         window.connect('configure-event', on_configure_event)
@@ -383,7 +394,6 @@ class GUI:
         displays_box = Gtk.Box()
         displays_box.set_spacing(15)
         displays_box.set_orientation(Gtk.Orientation.HORIZONTAL)
-        window.add(main_box)
 
         # Buttons below represent displays preview
         common.display_boxes_list = []
@@ -534,6 +544,7 @@ class GUI:
         if response == 1:
             common.settings.src_path = dialog.get_filename()
             common.settings.save()
+            dialog.destroy()
             common.preview.refresh()
             text = common.settings.src_path
             if len(text) > 40:
