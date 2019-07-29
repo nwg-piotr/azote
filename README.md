@@ -125,7 +125,7 @@ Seeing Arch [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=az
 
 ### No pictures in thumbnails / display preview
 
-As well pictures as displays preview inherit from the Gtk.Button class. In case you don't see images inside them,
+As well thumbnails, as displays preview inherit from the Gtk.Button class. In case you don't see images inside them,
 please make sure that button images are turned on in the `~/.config/gtk-3.0/settings.ini` file:
 
 ```bash
