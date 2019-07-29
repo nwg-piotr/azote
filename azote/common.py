@@ -24,6 +24,7 @@ sway = False
 lang = None             # dictionary "name": lang_string
 
 preview = None
+progress_bar = None
 status_bar = None
 buttons_list = None
 display_boxes_list = None

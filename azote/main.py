@@ -44,7 +44,7 @@ class Preview(Gtk.ScrolledWindow):
         self.set_border_width(10)
         self.set_propagate_natural_height(True)
         self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
-
+        
         common.buttons_list = []
         self.grid = Gtk.Grid()
         self.grid.set_column_spacing(25)
@@ -358,8 +358,11 @@ class SortingButton(Gtk.Button):
 
 class GUI:
     def __init__(self):
+        screen = Gdk.Screen.get_default()
+        h = screen.get_height()
 
         window = Gtk.Window()
+        window.set_default_size(240 * 3 + 160, h * 0.95)
 
         window.set_title("Azote")
         logo = GdkPixbuf.Pixbuf.new_from_file('images/icon.svg')
@@ -373,6 +376,14 @@ class GUI:
         main_box.set_border_width(10)
         main_box.set_orientation(Gtk.Orientation.VERTICAL)
 
+        common.progress_bar = Gtk.ProgressBar()
+        common.progress_bar.set_fraction(0.0)
+        common.progress_bar.set_text('0')
+        common.progress_bar.set_show_text(True)
+        main_box.pack_start(common.progress_bar, True, False, 0)
+        window.add(main_box)
+        window.show_all()
+
         # This contains a Gtk.ScrolledWindow with Gtk.Grid() inside, filled with ThumbButton(Gtk.Button) instances
         common.preview = Preview()
         window.connect('configure-event', on_configure_event)
@@ -383,7 +394,6 @@ class GUI:
         displays_box = Gtk.Box()
         displays_box.set_spacing(15)
         displays_box.set_orientation(Gtk.Orientation.HORIZONTAL)
-        window.add(main_box)
 
         # Buttons below represent displays preview
         common.display_boxes_list = []
@@ -516,6 +526,7 @@ class GUI:
         main_box.add(status_box)
 
         window.show_all()
+        common.progress_bar.hide()
 
     def destroy(window, self):
         Gtk.main_quit()
@@ -526,14 +537,13 @@ class GUI:
         dialog.add_button(Gtk.STOCK_CANCEL, 0)
         dialog.add_button(Gtk.STOCK_OK, 1)
         dialog.set_default_response(1)
-        dialog.set_default_size(800, 400)
-
-        dialog.set_default_size(800, 400)
+        dialog.set_default_size(800, 600)
 
         response = dialog.run()
         if response == 1:
             common.settings.src_path = dialog.get_filename()
             common.settings.save()
+            dialog.destroy()
             common.preview.refresh()
             text = common.settings.src_path
             if len(text) > 40:
