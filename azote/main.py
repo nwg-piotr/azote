@@ -738,7 +738,8 @@ class GUI:
             common.split_button.set_sensitive(False)
         common.apply_button.set_sensitive(False)
         common.open_button.set_sensitive(False)
-        common.trash_button.set_sensitive(False)
+        if common.trash_button:
+            common.trash_button.set_sensitive(False)
 
 
 def on_configure_event(window, e):
