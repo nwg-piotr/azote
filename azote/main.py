@@ -25,11 +25,11 @@ from PIL import Image
 
 try:
     from send2trash import send2trash
+
     common.env['send2trash'] = True
 except Exception as e:
     common.env['send2trash'] = False
     print('send2trash module not found', e)
-
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
@@ -44,7 +44,7 @@ class Preview(Gtk.ScrolledWindow):
         self.set_border_width(10)
         self.set_propagate_natural_height(True)
         self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
-        
+
         common.buttons_list = []
         self.grid = Gtk.Grid()
         self.grid.set_column_spacing(25)
@@ -98,7 +98,7 @@ class Preview(Gtk.ScrolledWindow):
     def get_files(self):
 
         file_names = [f for f in os.listdir(common.settings.src_path)
-             if os.path.isfile(os.path.join(common.settings.src_path, f))]
+                      if os.path.isfile(os.path.join(common.settings.src_path, f))]
 
         if common.settings.sorting == 'new':
             file_names.sort(reverse=True, key=lambda f: os.path.getmtime(os.path.join(common.settings.src_path, f)))
@@ -171,6 +171,7 @@ class DisplayBox(Gtk.Box):
     """
     The box contains elements to preview certain displays and assign wallpapers to them
     """
+
     def __init__(self, name, width, height):
         super().__init__()
 
@@ -532,7 +533,8 @@ class GUI:
         Gtk.main_quit()
 
     def on_folder_clicked(self, button):
-        dialog = Gtk.FileChooserDialog(title=common.lang['open_folder'], parent=button.get_toplevel(), action=Gtk.FileChooserAction.SELECT_FOLDER)
+        dialog = Gtk.FileChooserDialog(title=common.lang['open_folder'], parent=button.get_toplevel(),
+                                       action=Gtk.FileChooserAction.SELECT_FOLDER)
         dialog.set_current_folder(common.settings.src_path)
         dialog.add_button(Gtk.STOCK_CANCEL, 0)
         dialog.add_button(Gtk.STOCK_OK, 1)
@@ -666,16 +668,22 @@ class GUI:
 
     def on_open_button(self, widget):
         if common.selected_wallpaper:
-            openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
-            menu = Gtk.Menu()
-            if openers:
-                for opener in openers:
-                    # opener = (Name, Exec)
-                    item = Gtk.MenuItem.new_with_label(common.lang['open_with'].format(opener[0]))
-                    item.connect('activate', self.open_with, opener[1])
-                    menu.append(item)
-            menu.show_all()
-            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+            if common.associations:  # not None if /usr/share/applications/mimeinfo.cache found and parse
+                openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
+                menu = Gtk.Menu()
+                if openers:
+                    for opener in openers:
+                        # opener = (Name, Exec)
+                        item = Gtk.MenuItem.new_with_label(common.lang['open_with'].format(opener[0]))
+                        item.connect('activate', self.open_with, opener[1])
+                        menu.append(item)
+                menu.show_all()
+                menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+            else:  # fallback in case mimeinfo.cache not found
+                print("No registered program found. Does the /usr/share/applications/mimeinfo.cache file exist?")
+                command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
+                    common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
+                subprocess.Popen(command, shell=True)
 
     def open_with(self, item, opener):
         # if feh selected as the opener, let's start it with options as below
