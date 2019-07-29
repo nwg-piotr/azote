@@ -287,7 +287,7 @@ def create_thumbnails(scr_path):
                     common.progress_bar.set_text(str(processed))
                     while Gtk.events_pending():
                         Gtk.main_iteration()
-        common.progress_bar.hide()
+    common.progress_bar.hide()
 
 
 def create_thumbnail(in_path, dest_path, thumb_name, refresh=False):
