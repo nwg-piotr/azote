@@ -135,9 +135,10 @@ class ThumbButton(Gtk.Button):
         self.set_label(filename)
         self.selected = False
 
-        self.connect('clicked', self.on_button_press)
+        # self.connect('clicked', self.on_button_press)
+        self.connect('button-press-event', self.on_button_press)
 
-    def on_button_press(self, button):
+    def on_button_press(self, button, event):
         if common.split_button:
             common.split_button.set_sensitive(True)
 
@@ -156,6 +157,8 @@ class ThumbButton(Gtk.Button):
             if len(filename) > 30:
                 filename = '…{}'.format(filename[-28::])
             common.selected_picture_label.set_text("{} ({} x {})".format(filename, img.size[0], img.size[1]))
+        if event.type == Gdk.EventType._2BUTTON_PRESS:
+            on_thumb_double_click(button)
 
     def deselect(self, button):
         self.selected = False
@@ -479,7 +482,7 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_all.svg')
         common.apply_to_all_button.set_image(img)
-        common.apply_to_all_button.connect('clicked', self.on_apply_to_all_button)
+        common.apply_to_all_button.connect('clicked', on_apply_to_all_button)
         common.apply_to_all_button.set_sensitive(False)
         common.apply_to_all_button.set_tooltip_text(common.lang['apply_to_all'])
         bottom_box.add(common.apply_to_all_button)
@@ -594,63 +597,7 @@ class GUI:
                 command += " {}".format(box.wallpaper_path)
             subprocess.call(command, shell=True)
 
-    def on_apply_to_all_button(self, button):
-        """
-        This will create a single command to set the same wallpaper to all displays, CONNECTED at the time OR NOT.
-        Menu for modes needs to differ for swaybg and feh.
-        """
-        menu = Gtk.Menu()
-        if common.sway:
-            for mode in common.modes_swaybg:
-                item = Gtk.MenuItem.new_with_label(mode)
-                item.connect('activate', self.apply_to_all_swaybg, mode)
-                menu.append(item)
-            menu.show_all()
-            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-        else:
-            for mode in common.modes_feh:
-                item = Gtk.MenuItem.new_with_label(mode)
-                item.connect('activate', self.apply_to_all_feh, mode)
-                menu.append(item)
-            menu.show_all()
-            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
-    def apply_to_all_swaybg(self, item, mode):
-        # Firstly we need to set the selected image thumbnail to all previews currently visible
-        for box in common.display_boxes_list:
-            box.img.set_from_file(common.selected_wallpaper.thumb_file)
-            box.wallpaper_path = common.selected_wallpaper.source_path
-
-        common.apply_button.set_sensitive(False)
-
-        # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
-        batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
-        batch_content.append(
-            "swaybg -o* -i {} -m {} &".format(common.selected_wallpaper.source_path, mode))
-
-        # save to ~/.azotebg
-        with open(common.cmd_file, 'w') as f:
-            for item in batch_content:
-                f.write("%s\n" % item)
-        # make the file executable
-        st = os.stat(common.cmd_file)
-        os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
-
-        subprocess.call(common.cmd_file, shell=True)
-
-    def apply_to_all_feh(self, item, mode):
-        # Firstly we need to set the selected image thumbnail to all previews currently visible
-        for box in common.display_boxes_list:
-            box.img.set_from_file(common.selected_wallpaper.thumb_file)
-            box.wallpaper_path = common.selected_wallpaper.source_path
-
-        common.apply_button.set_sensitive(False)
-
-        # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
-        command = "feh --bg-{}".format(mode)
-        command += " {}".format(common.selected_wallpaper.source_path)
-
-        subprocess.call(command, shell=True)
 
     def on_split_button(self, button):
         if common.selected_wallpaper:
@@ -756,8 +703,78 @@ def on_configure_event(window, e):
         if cols != common.cols:
             common.cols = cols
             common.preview.refresh(create_thumbs=False)
-
         common.preview.show()
+
+
+def on_apply_to_all_button(button):
+    """
+    This will create a single command to set the same wallpaper to all displays, CONNECTED at the time OR NOT.
+    Menu for modes needs to differ for swaybg and feh.
+    """
+    menu = Gtk.Menu()
+    if common.sway:
+        for mode in common.modes_swaybg:
+            item = Gtk.MenuItem.new_with_label(mode)
+            item.connect('activate', apply_to_all_swaybg, mode)
+            menu.append(item)
+        menu.show_all()
+        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+    else:
+        for mode in common.modes_feh:
+            item = Gtk.MenuItem.new_with_label(mode)
+            item.connect('activate', apply_to_all_feh, mode)
+            menu.append(item)
+        menu.show_all()
+        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+
+
+def on_thumb_double_click(button):
+    """
+    As the function above, but mode 'fill' will always be used
+    """
+    if common.sway:
+        apply_to_all_swaybg(button, 'fill')
+    else:
+        apply_to_all_feh(button, 'fill')
+
+
+def apply_to_all_swaybg(item, mode):
+    # Firstly we need to set the selected image thumbnail to all previews currently visible
+    for box in common.display_boxes_list:
+        box.img.set_from_file(common.selected_wallpaper.thumb_file)
+        box.wallpaper_path = common.selected_wallpaper.source_path
+
+    common.apply_button.set_sensitive(False)
+
+    # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
+    batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
+    batch_content.append(
+        "swaybg -o* -i {} -m {} &".format(common.selected_wallpaper.source_path, mode))
+
+    # save to ~/.azotebg
+    with open(common.cmd_file, 'w') as f:
+        for item in batch_content:
+            f.write("%s\n" % item)
+    # make the file executable
+    st = os.stat(common.cmd_file)
+    os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
+
+    subprocess.call(common.cmd_file, shell=True)
+
+
+def apply_to_all_feh(item, mode):
+    # Firstly we need to set the selected image thumbnail to all previews currently visible
+    for box in common.display_boxes_list:
+        box.img.set_from_file(common.selected_wallpaper.thumb_file)
+        box.wallpaper_path = common.selected_wallpaper.source_path
+
+    common.apply_button.set_sensitive(False)
+
+    # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
+    command = "feh --bg-{}".format(mode)
+    command += " {}".format(common.selected_wallpaper.source_path)
+
+    subprocess.call(command, shell=True)
 
 
 def main():
