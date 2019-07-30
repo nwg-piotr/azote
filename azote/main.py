@@ -23,9 +23,9 @@ import gi
 import pkg_resources
 from PIL import Image
 
+# send2trash module may or may not be available
 try:
     from send2trash import send2trash
-
     common.env['send2trash'] = True
 except Exception as e:
     common.env['send2trash'] = False
@@ -35,6 +35,23 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
     copy_backgrounds, rgba_to_hex, split_selected_wallpaper
+
+
+def get_files():
+
+    file_names = [f for f in os.listdir(common.settings.src_path)
+                  if os.path.isfile(os.path.join(common.settings.src_path, f))]
+
+    if common.settings.sorting == 'new':
+        file_names.sort(reverse=True, key=lambda f: os.path.getmtime(os.path.join(common.settings.src_path, f)))
+    elif common.settings.sorting == 'old':
+        file_names.sort(key=lambda f: os.path.getmtime(os.path.join(common.settings.src_path, f)))
+    elif common.settings.sorting == 'az':
+        file_names.sort()
+    elif common.settings.sorting == 'za':
+        file_names.sort(reverse=True)
+
+    return file_names
 
 
 class Preview(Gtk.ScrolledWindow):
@@ -52,9 +69,8 @@ class Preview(Gtk.ScrolledWindow):
 
         create_thumbnails(common.settings.src_path)
 
-        col = 0
-        row = 0
-        src_pictures = self.get_files()
+        col, row = 0, 0
+        src_pictures = get_files()
 
         for file in src_pictures:
             if file_allowed(file):
@@ -77,9 +93,8 @@ class Preview(Gtk.ScrolledWindow):
             self.grid.remove(button)
             button.destroy()
 
-        col = 0
-        row = 0
-        src_pictures = self.get_files()
+        col, row = 0, 0
+        src_pictures = get_files()
 
         for file in src_pictures:
             if file_allowed(file):
@@ -94,22 +109,6 @@ class Preview(Gtk.ScrolledWindow):
                 btn.show()
 
         update_status_bar()
-
-    def get_files(self):
-
-        file_names = [f for f in os.listdir(common.settings.src_path)
-                      if os.path.isfile(os.path.join(common.settings.src_path, f))]
-
-        if common.settings.sorting == 'new':
-            file_names.sort(reverse=True, key=lambda f: os.path.getmtime(os.path.join(common.settings.src_path, f)))
-        elif common.settings.sorting == 'old':
-            file_names.sort(key=lambda f: os.path.getmtime(os.path.join(common.settings.src_path, f)))
-        elif common.settings.sorting == 'az':
-            file_names.sort()
-        elif common.settings.sorting == 'za':
-            file_names.sort(reverse=True)
-
-        return file_names
 
 
 class ThumbButton(Gtk.Button):
@@ -135,9 +134,10 @@ class ThumbButton(Gtk.Button):
         self.set_label(filename)
         self.selected = False
 
-        self.connect('clicked', self.on_button_press)
+        # self.connect('clicked', self.on_button_press)
+        self.connect('button-press-event', self.on_button_press)
 
-    def on_button_press(self, button):
+    def on_button_press(self, button, event):
         if common.split_button:
             common.split_button.set_sensitive(True)
 
@@ -156,6 +156,8 @@ class ThumbButton(Gtk.Button):
             if len(filename) > 30:
                 filename = '…{}'.format(filename[-28::])
             common.selected_picture_label.set_text("{} ({} x {})".format(filename, img.size[0], img.size[1]))
+        if event.type == Gdk.EventType._2BUTTON_PRESS:
+            on_thumb_double_click(button)
 
     def deselect(self, button):
         self.selected = False
@@ -171,7 +173,6 @@ class DisplayBox(Gtk.Box):
     """
     The box contains elements to preview certain displays and assign wallpapers to them
     """
-
     def __init__(self, name, width, height):
         super().__init__()
 
@@ -357,6 +358,177 @@ class SortingButton(Gtk.Button):
         common.preview.refresh()
 
 
+def on_apply_button(button):
+    """
+    Create the command for swaybg (Sway) or feh (X11)
+    """
+    # Copy modified wallpapers (if any) from temporary to backgrounds folder
+    copy_backgrounds()
+
+    if common.sway:
+        # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
+        batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
+        for box in common.display_boxes_list:
+            if box.color:
+                # if a color chosen, the wallpaper won't appear
+                batch_content.append("swaybg -o {} -c{} &".format(box.display_name, box.color))
+            elif box.wallpaper_path:
+                batch_content.append(
+                    "swaybg -o {} -i {} -m {} &".format(box.display_name, box.wallpaper_path, box.mode))
+
+        # save to ~/.azotebg
+        with open(common.cmd_file, 'w') as f:
+            for item in batch_content:
+                f.write("%s\n" % item)
+        # make the file executable
+        st = os.stat(common.cmd_file)
+        os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
+
+        subprocess.call(common.cmd_file, shell=True)
+    else:
+        # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
+        mode = common.display_boxes_list[0].mode  # They are all the same, just check the 1st one
+        command = "feh --bg-{}".format(mode)
+        for box in common.display_boxes_list:
+            command += " {}".format(box.wallpaper_path)
+        subprocess.call(command, shell=True)
+
+
+def on_split_button(button):
+    if common.selected_wallpaper:
+        common.apply_button.set_sensitive(True)
+        paths = split_selected_wallpaper(len(common.displays))
+        for i in range(len(paths)):
+            box = common.display_boxes_list[i]
+            box.wallpaper_path = paths[i][0]
+            box.img.set_from_file(paths[i][1])
+
+    if common.display_boxes_list:
+        for box in common.display_boxes_list:
+            box.clear_color_selection()
+
+
+def open_with(item, opener):
+    # if feh selected as the opener, let's start it with options as below
+    if opener == 'feh':
+        command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
+            common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
+    # elif could specify options for other certain programs here
+    else:
+        command = '{} {}'.format(opener, common.selected_wallpaper.source_path)
+    subprocess.Popen(command, shell=True)
+
+
+def clear_wallpaper_selection():
+    common.selected_wallpaper = None
+    common.selected_picture_label.set_text(common.lang['no_picture_selected'])
+    if common.split_button:
+        common.split_button.set_sensitive(False)
+    common.apply_button.set_sensitive(False)
+    common.open_button.set_sensitive(False)
+    if common.trash_button:
+        common.trash_button.set_sensitive(False)
+
+
+def on_about_button(button):
+    dialog = Gtk.AboutDialog()
+    dialog.set_program_name('Azote')
+
+    try:
+        version = pkg_resources.require(common.app_name)[0].version
+        dialog.set_version("v{}".format(version))
+    except Exception as e:
+        print("Couldn't check version: {}".format(e))
+        pass
+
+    logo = GdkPixbuf.Pixbuf.new_from_file_at_size('images/azote.svg', 96, 96)
+
+    dialog.set_logo(logo)
+    dialog.set_copyright('(c) 2019 Piotr Miller')
+    dialog.set_website('https://github.com/nwg-piotr/azote')
+    dialog.set_comments(common.lang['app_desc'])
+    dialog.set_license_type(Gtk.License.GPL_3_0)
+    dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick'])
+    dialog.set_translator_credits('xsme (de_DE), HumanG33k (fr_FR)')
+    dialog.set_artists(['edskeye'])
+
+    dialog.show()
+
+    dialog.run()
+    dialog.destroy()
+    return False
+
+
+def move_to_trash(widget):
+    send2trash(common.selected_wallpaper.source_path)
+    if os.path.isfile(common.selected_wallpaper.thumb_file):
+        send2trash(common.selected_wallpaper.thumb_file)
+    clear_wallpaper_selection()
+    common.preview.refresh()
+
+
+def on_trash_button(widget):
+    menu = Gtk.Menu()
+    i0 = Gtk.MenuItem.new_with_label(common.lang['move'])
+    i0.connect('activate', move_to_trash)
+    menu.append(i0)
+    menu.show_all()
+    menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+
+
+def on_open_button(widget):
+    if common.selected_wallpaper:
+        if common.associations:  # not None if /usr/share/applications/mimeinfo.cache found and parse
+            openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
+            menu = Gtk.Menu()
+            if openers:
+                for opener in openers:
+                    # opener = (Name, Exec)
+                    item = Gtk.MenuItem.new_with_label(common.lang['open_with'].format(opener[0]))
+                    item.connect('activate', open_with, opener[1])
+                    menu.append(item)
+            menu.show_all()
+            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        else:  # fallback in case mimeinfo.cache not found
+            print("No registered program found. Does the /usr/share/applications/mimeinfo.cache file exist?")
+            command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
+                common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
+            subprocess.Popen(command, shell=True)
+
+
+def on_refresh_clicked(button):
+    clear_wallpaper_selection()
+    common.preview.refresh()
+
+
+def on_folder_clicked(button):
+    dialog = Gtk.FileChooserDialog(title=common.lang['open_folder'], parent=button.get_toplevel(),
+                                   action=Gtk.FileChooserAction.SELECT_FOLDER)
+    dialog.set_current_folder(common.settings.src_path)
+    dialog.add_button(Gtk.STOCK_CANCEL, 0)
+    dialog.add_button(Gtk.STOCK_OK, 1)
+    dialog.set_default_response(1)
+    dialog.set_default_size(800, 600)
+
+    response = dialog.run()
+    if response == 1:
+        common.settings.src_path = dialog.get_filename()
+        common.settings.save()
+        dialog.destroy()
+        common.preview.refresh()
+        text = common.settings.src_path
+        if len(text) > 40:
+            text = '…{}'.format(text[-38::])
+        button.set_label(text)
+
+    dialog.destroy()
+    clear_wallpaper_selection()
+
+
+def destroy(self):
+    Gtk.main_quit()
+
+
 class GUI:
     def __init__(self):
         screen = Gdk.Screen.get_default()
@@ -370,7 +542,7 @@ class GUI:
         window.set_default_icon(logo)
         window.set_role("azote")
 
-        window.connect_after('destroy', self.destroy)
+        window.connect_after('destroy', destroy)
 
         main_box = Gtk.Box()
         main_box.set_spacing(5)
@@ -423,17 +595,17 @@ class GUI:
         refresh_button.set_image(img)
         refresh_button.set_tooltip_text(common.lang['refresh_folder_preview'])
         bottom_box.add(refresh_button)
-        refresh_button.connect_after('clicked', self.on_refresh_clicked)
+        refresh_button.connect_after('clicked', on_refresh_clicked)
 
         # Button to set the wallpapers folder
         folder_button = Gtk.Button.new_with_label(common.settings.src_path)
         folder_button.set_property("name", "folder-btn")
         folder_button.set_tooltip_text(common.lang['open_another_folder'])
         bottom_box.pack_start(folder_button, True, True, 0)
-        folder_button.connect_after('clicked', self.on_folder_clicked)
+        folder_button.connect_after('clicked', on_folder_clicked)
 
-        vseparator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
-        bottom_box.add(vseparator)
+        v_separator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
+        bottom_box.add(v_separator)
 
         # Button to open in feh
         common.open_button = Gtk.Button()
@@ -442,7 +614,7 @@ class GUI:
         common.open_button.set_image(img)
         common.open_button.set_tooltip_text(common.lang['open_selected_picture'])
         common.open_button.set_sensitive(False)
-        common.open_button.connect('clicked', self.on_open_button)
+        common.open_button.connect('clicked', on_open_button)
         bottom_box.add(common.open_button)
 
         if common.env['send2trash']:
@@ -453,7 +625,7 @@ class GUI:
             common.trash_button.set_image(img)
             common.trash_button.set_tooltip_text(common.lang['move_to_trash'])
             common.trash_button.set_sensitive(False)
-            common.trash_button.connect('clicked', self.on_trash_button)
+            common.trash_button.connect('clicked', on_trash_button)
             bottom_box.add(common.trash_button)
 
         # Label to display details of currently selected picture
@@ -472,14 +644,14 @@ class GUI:
             bottom_box.add(common.split_button)
             common.split_button.set_sensitive(False)
             common.split_button.set_tooltip_text(common.lang['split_selection_between_displays'])
-            common.split_button.connect('clicked', self.on_split_button)
+            common.split_button.connect('clicked', on_split_button)
 
         # Button to apply selected wallpaper to all displays (connected at the moment or not)
         common.apply_to_all_button = Gtk.Button()
         img = Gtk.Image()
         img.set_from_file('images/icon_all.svg')
         common.apply_to_all_button.set_image(img)
-        common.apply_to_all_button.connect('clicked', self.on_apply_to_all_button)
+        common.apply_to_all_button.connect('clicked', on_apply_to_all_button)
         common.apply_to_all_button.set_sensitive(False)
         common.apply_to_all_button.set_tooltip_text(common.lang['apply_to_all'])
         bottom_box.add(common.apply_to_all_button)
@@ -493,15 +665,15 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_apply.svg')
         common.apply_button.set_image(img)
-        common.apply_button.connect('clicked', self.on_apply_button)
+        common.apply_button.connect('clicked', on_apply_button)
         common.apply_button.set_sensitive(False)
         common.apply_button.set_tooltip_text(common.lang['apply_settings'].format(names))
         bottom_box.add(common.apply_button)
 
         main_box.add(bottom_box)
 
-        hseparator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-        main_box.add(hseparator)
+        h_separator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        main_box.add(h_separator)
 
         # Another horizontal container for the status line + button(s)
         status_box = Gtk.Box()
@@ -521,232 +693,13 @@ class GUI:
         img.set_from_file('images/icon_about.svg')
         about_button.set_image(img)
         about_button.set_tooltip_text(common.lang['about_azote'])
-        about_button.connect('clicked', self.on_about_button)
+        about_button.connect('clicked', on_about_button)
         status_box.add(about_button)
 
         main_box.add(status_box)
 
         window.show_all()
         common.progress_bar.hide()
-
-    def destroy(window, self):
-        Gtk.main_quit()
-
-    def on_folder_clicked(self, button):
-        dialog = Gtk.FileChooserDialog(title=common.lang['open_folder'], parent=button.get_toplevel(),
-                                       action=Gtk.FileChooserAction.SELECT_FOLDER)
-        dialog.set_current_folder(common.settings.src_path)
-        dialog.add_button(Gtk.STOCK_CANCEL, 0)
-        dialog.add_button(Gtk.STOCK_OK, 1)
-        dialog.set_default_response(1)
-        dialog.set_default_size(800, 600)
-
-        response = dialog.run()
-        if response == 1:
-            common.settings.src_path = dialog.get_filename()
-            common.settings.save()
-            dialog.destroy()
-            common.preview.refresh()
-            text = common.settings.src_path
-            if len(text) > 40:
-                text = '…{}'.format(text[-38::])
-            button.set_label(text)
-
-        dialog.destroy()
-        self.clear_wallpaper_selection()
-
-    def on_refresh_clicked(self, button):
-        self.clear_wallpaper_selection()
-        common.preview.refresh()
-
-    def on_apply_button(self, button):
-        """
-        Create the command for swaybg (Sway) or feh (X11)
-        """
-        # Copy modified wallpapers (if any) from temporary to backgrounds folder
-        copy_backgrounds()
-
-        if common.sway:
-            # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
-            batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
-            for box in common.display_boxes_list:
-                if box.color:
-                    # if a color chosen, the wallpaper won't appear
-                    batch_content.append("swaybg -o {} -c{} &".format(box.display_name, box.color))
-                elif box.wallpaper_path:
-                    batch_content.append(
-                        "swaybg -o {} -i {} -m {} &".format(box.display_name, box.wallpaper_path, box.mode))
-
-            # save to ~/.azotebg
-            with open(common.cmd_file, 'w') as f:
-                for item in batch_content:
-                    f.write("%s\n" % item)
-            # make the file executable
-            st = os.stat(common.cmd_file)
-            os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
-
-            subprocess.call(common.cmd_file, shell=True)
-        else:
-            # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
-            mode = common.display_boxes_list[0].mode  # They are all the same, just check the 1st one
-            command = "feh --bg-{}".format(mode)
-            for box in common.display_boxes_list:
-                command += " {}".format(box.wallpaper_path)
-            subprocess.call(command, shell=True)
-
-    def on_apply_to_all_button(self, button):
-        """
-        This will create a single command to set the same wallpaper to all displays, CONNECTED at the time OR NOT.
-        Menu for modes needs to differ for swaybg and feh.
-        """
-        menu = Gtk.Menu()
-        if common.sway:
-            for mode in common.modes_swaybg:
-                item = Gtk.MenuItem.new_with_label(mode)
-                item.connect('activate', self.apply_to_all_swaybg, mode)
-                menu.append(item)
-            menu.show_all()
-            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-        else:
-            for mode in common.modes_feh:
-                item = Gtk.MenuItem.new_with_label(mode)
-                item.connect('activate', self.apply_to_all_feh, mode)
-                menu.append(item)
-            menu.show_all()
-            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-
-    def apply_to_all_swaybg(self, item, mode):
-        # Firstly we need to set the selected image thumbnail to all previews currently visible
-        for box in common.display_boxes_list:
-            box.img.set_from_file(common.selected_wallpaper.thumb_file)
-            box.wallpaper_path = common.selected_wallpaper.source_path
-
-        common.apply_button.set_sensitive(False)
-
-        # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
-        batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
-        batch_content.append(
-            "swaybg -o* -i {} -m {} &".format(common.selected_wallpaper.source_path, mode))
-
-        # save to ~/.azotebg
-        with open(common.cmd_file, 'w') as f:
-            for item in batch_content:
-                f.write("%s\n" % item)
-        # make the file executable
-        st = os.stat(common.cmd_file)
-        os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
-
-        subprocess.call(common.cmd_file, shell=True)
-
-    def apply_to_all_feh(self, item, mode):
-        # Firstly we need to set the selected image thumbnail to all previews currently visible
-        for box in common.display_boxes_list:
-            box.img.set_from_file(common.selected_wallpaper.thumb_file)
-            box.wallpaper_path = common.selected_wallpaper.source_path
-
-        common.apply_button.set_sensitive(False)
-
-        # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
-        command = "feh --bg-{}".format(mode)
-        command += " {}".format(common.selected_wallpaper.source_path)
-
-        subprocess.call(command, shell=True)
-
-    def on_split_button(self, button):
-        if common.selected_wallpaper:
-            common.apply_button.set_sensitive(True)
-            # self.unset_boxes()
-            paths = split_selected_wallpaper(len(common.displays))
-            for i in range(len(paths)):
-                box = common.display_boxes_list[i]
-                box.wallpaper_path = paths[i][0]
-                box.img.set_from_file(paths[i][1])
-
-        if common.display_boxes_list:
-            for box in common.display_boxes_list:
-                box.clear_color_selection()
-
-    def on_open_button(self, widget):
-        if common.selected_wallpaper:
-            if common.associations:  # not None if /usr/share/applications/mimeinfo.cache found and parse
-                openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
-                menu = Gtk.Menu()
-                if openers:
-                    for opener in openers:
-                        # opener = (Name, Exec)
-                        item = Gtk.MenuItem.new_with_label(common.lang['open_with'].format(opener[0]))
-                        item.connect('activate', self.open_with, opener[1])
-                        menu.append(item)
-                menu.show_all()
-                menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-            else:  # fallback in case mimeinfo.cache not found
-                print("No registered program found. Does the /usr/share/applications/mimeinfo.cache file exist?")
-                command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
-                    common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
-                subprocess.Popen(command, shell=True)
-
-    def open_with(self, item, opener):
-        # if feh selected as the opener, let's start it with options as below
-        if opener == 'feh':
-            command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
-                common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
-        # elif could specify options for other certain programs here
-        else:
-            command = '{} {}'.format(opener, common.selected_wallpaper.source_path)
-        subprocess.Popen(command, shell=True)
-
-    def on_trash_button(self, widget):
-        menu = Gtk.Menu()
-        i0 = Gtk.MenuItem.new_with_label(common.lang['move'])
-        i0.connect('activate', self.move_to_trash)
-        menu.append(i0)
-        menu.show_all()
-        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-
-    def move_to_trash(self, widget):
-        send2trash(common.selected_wallpaper.source_path)
-        if os.path.isfile(common.selected_wallpaper.thumb_file):
-            send2trash(common.selected_wallpaper.thumb_file)
-        self.clear_wallpaper_selection()
-        common.preview.refresh()
-
-    def on_about_button(self, button):
-        dialog = Gtk.AboutDialog()
-        dialog.set_program_name('Azote')
-
-        try:
-            version = pkg_resources.require(common.app_name)[0].version
-            dialog.set_version("v{}".format(version))
-        except Exception as e:
-            print("Couldn't check version: {}".format(e))
-            pass
-
-        logo = GdkPixbuf.Pixbuf.new_from_file_at_size('images/azote.svg', 96, 96)
-
-        dialog.set_logo(logo)
-        dialog.set_copyright('(c) 2019 Piotr Miller')
-        dialog.set_website('https://github.com/nwg-piotr/azote')
-        dialog.set_comments(common.lang['app_desc'])
-        dialog.set_license_type(Gtk.License.GPL_3_0)
-        dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick'])
-        dialog.set_translator_credits('xsme (de_DE), HumanG33k (fr_FR)')
-        dialog.set_artists(['edskeye'])
-
-        dialog.show()
-
-        dialog.run()
-        dialog.destroy()
-        return False
-
-    def clear_wallpaper_selection(self):
-        common.selected_wallpaper = None
-        common.selected_picture_label.set_text(common.lang['no_picture_selected'])
-        if common.split_button:
-            common.split_button.set_sensitive(False)
-        common.apply_button.set_sensitive(False)
-        common.open_button.set_sensitive(False)
-        if common.trash_button:
-            common.trash_button.set_sensitive(False)
 
 
 def on_configure_event(window, e):
@@ -756,8 +709,77 @@ def on_configure_event(window, e):
         if cols != common.cols:
             common.cols = cols
             common.preview.refresh(create_thumbs=False)
-
         common.preview.show()
+
+
+def on_apply_to_all_button(button):
+    """
+    This will create a single command to set the same wallpaper to all displays, CONNECTED at the time OR NOT.
+    Menu for modes needs to differ for swaybg and feh.
+    """
+    menu = Gtk.Menu()
+    if common.sway:
+        for mode in common.modes_swaybg:
+            item = Gtk.MenuItem.new_with_label(mode)
+            item.connect('activate', apply_to_all_swaybg, mode)
+            menu.append(item)
+        menu.show_all()
+        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+    else:
+        for mode in common.modes_feh:
+            item = Gtk.MenuItem.new_with_label(mode)
+            item.connect('activate', apply_to_all_feh, mode)
+            menu.append(item)
+        menu.show_all()
+        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+
+
+def on_thumb_double_click(button):
+    """
+    As the function above, but mode 'fill' will always be used
+    """
+    if common.sway:
+        apply_to_all_swaybg(button, 'fill')
+    else:
+        apply_to_all_feh(button, 'fill')
+
+
+def apply_to_all_swaybg(item, mode):
+    # Firstly we need to set the selected image thumbnail to all previews currently visible
+    for box in common.display_boxes_list:
+        box.img.set_from_file(common.selected_wallpaper.thumb_file)
+        box.wallpaper_path = common.selected_wallpaper.source_path
+
+    common.apply_button.set_sensitive(False)
+
+    # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
+    batch_content = ['#!/usr/bin/env bash', 'pkill swaybg',
+                     "swaybg -o* -i {} -m {} &".format(common.selected_wallpaper.source_path, mode)]
+
+    # save to ~/.azotebg
+    with open(common.cmd_file, 'w') as f:
+        for item in batch_content:
+            f.write("%s\n" % item)
+    # make the file executable
+    st = os.stat(common.cmd_file)
+    os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
+
+    subprocess.call(common.cmd_file, shell=True)
+
+
+def apply_to_all_feh(item, mode):
+    # Firstly we need to set the selected image thumbnail to all previews currently visible
+    for box in common.display_boxes_list:
+        box.img.set_from_file(common.selected_wallpaper.thumb_file)
+        box.wallpaper_path = common.selected_wallpaper.source_path
+
+    common.apply_button.set_sensitive(False)
+
+    # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
+    command = "feh --bg-{}".format(mode)
+    command += " {}".format(common.selected_wallpaper.source_path)
+
+    subprocess.call(command, shell=True)
 
 
 def main():
