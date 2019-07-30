@@ -123,7 +123,9 @@ Seeing Arch [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=az
 
 ## Troubleshooting
 
-As well pictures as displays preview inherit from the Gtk.Button class. In case you don't see images inside them,
+### No pictures in thumbnails / display preview
+
+As well thumbnails, as displays preview inherit from the Gtk.Button class. In case you don't see images inside them,
 please make sure that button images are turned on in the `~/.config/gtk-3.0/settings.ini` file:
 
 ```bash
@@ -131,6 +133,22 @@ please make sure that button images are turned on in the `~/.config/gtk-3.0/sett
 (...)
 gtk-button-images=1
 ```
+
+### Open selected picture button doesn't work
+
+![Open image menu](http://nwg.pl/Lychee/uploads/big/156b73ac880bca02ed04bd1886404ba8.png)
+
+**Azote v1.2.0 and below** - the button does not work at all.
+
+**Azote v1.3.0 and above** - the button opens selected picture with feh, does not allow to choose a program.
+
+The `/usr/share/applications/mimeinfo.cache` is probably missing from your system. Regenerate it:
+
+```bash
+$ sudo update-desktop-database
+```
+
+See https://specifications.freedesktop.org/desktop-entry-spec/0.9.5/ar01s07.html
 
 ### X11 / feh notice
 

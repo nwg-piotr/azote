@@ -229,17 +229,25 @@ def set_env(language=None):
                             if name and exec:
                                 data.append((name, exec))
                     common.associations[file_type] = data
-        """
-        Not necessarily all programs register jpg and jpeg extension (e.g. gimp registers jpeg only).
-        Let's create sets, join them and replace lists for both jpg and jpeg keys.
-        """
-        jpg = set(common.associations['jpg'])
-        jpeg = set(common.associations['jpeg'])
-        together = jpg | jpeg
-        common.associations['jpg'] = together
-        common.associations['jpeg'] = together
-
+                    """
+                    Not necessarily all programs register jpg and jpeg extension (e.g. gimp registers jpeg only).
+                    Let's create sets, join them and replace lists for both jpg and jpeg keys.
+                    """
+                    try:
+                        jpg = set(common.associations['jpg'])
+                        jpeg = set(common.associations['jpeg'])
+                        together = jpg | jpeg
+                        common.associations['jpg'] = together
+                        common.associations['jpeg'] = together
+                    except KeyError:
+                        pass
         log("Image associations: {}".format(common.associations), common.INFO)
+    else:
+        print('Failed opening /usr/share/applications/mimeinfo.cache')
+        log("Failed creating image associations: /usr/share/applications/mimeinfo.cache file not found."
+            " Setting feh as the only viewer.", common.ERROR)
+
+
 
 
 def copy_backgrounds():
