@@ -212,8 +212,7 @@ def set_env(language=None):
                     data = []
                     for i in range(len(filenames)):
                         # Let's find the program Name= and Exec= in /usr/share/applications/shortcut_name.desktop
-                        shortcut_file = '/usr/share/applications/{}'.format(filenames[i])
-                        name, exec = '', ''
+                        name, exe = '', ''
 
                         if os.path.isfile(filenames[i]):
                             with open(filenames[i]) as f:
@@ -224,10 +223,10 @@ def set_env(language=None):
                                     elif row.startswith('Name[{}]='.format(common.lang.lang[0:2])):
                                         name = row.split('=')[1]
                                     if row.startswith('Exec'):
-                                        exec = row.split('=')[1].split()[0]
+                                        exe = row.split('=')[1].split()[0]
                                         continue
-                            if name and exec:
-                                data.append((name, exec))
+                            if name and exe:
+                                data.append((name, exe))
                     common.associations[file_type] = data
                     """
                     Not necessarily all programs register jpg and jpeg extension (e.g. gimp registers jpeg only).
@@ -246,8 +245,6 @@ def set_env(language=None):
         print('Failed opening /usr/share/applications/mimeinfo.cache')
         log("Failed creating image associations: /usr/share/applications/mimeinfo.cache file not found."
             " Setting feh as the only viewer.", common.ERROR)
-
-
 
 
 def copy_backgrounds():
