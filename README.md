@@ -77,7 +77,8 @@ exec dwm
 
 ### Arch Linux
 
-Install [azote](https://aur.archlinux.org/packages/azote) from AUR.
+Install [azote](https://aur.archlinux.org/packages/azote) from AUR. 
+For the development version install [azote-git](https://aur.archlinux.org/packages/azote-git).
 
 ### Debian & Ubuntu
 

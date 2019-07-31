@@ -1,3 +1,7 @@
+Development:
+- double click on a thumbnail sets the wallpaper on all displays (mode = 'fill')
+- main.py: some methods in classes replaced with static functions
+
 v1.3.0 (2019-07-29)
 - fr_FR translation by HumanG33k added
 - fixed "silent" crash when running Azote w/o send2trash module
