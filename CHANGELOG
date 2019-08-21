@@ -1,4 +1,4 @@
-Development:
+v1.3.1 (2019-08-21)
 - double click on a thumbnail sets the wallpaper on all displays (mode = 'fill')
 - main.py: some methods in classes replaced with static functions
 - fix to the "Azote doesn't handle correctly file paths with spaces" issue #41
