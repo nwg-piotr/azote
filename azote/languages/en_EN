@@ -17,6 +17,7 @@ open_folder = Open folder
 open_with = Open with {}
 open_selected_picture = Open selected picture
 refresh_folder_preview = Refresh folder preview
+remove_image = Remove image
 select_this_picture = Click to select, double to set
 set_selected_wallpaper = Set selected wallpaper
 sorting_order = Sorting order

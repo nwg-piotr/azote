@@ -158,6 +158,8 @@ class ThumbButton(Gtk.Button):
             common.selected_picture_label.set_text("{} ({} x {})".format(filename, img.size[0], img.size[1]))
         if event.type == Gdk.EventType._2BUTTON_PRESS:
             on_thumb_double_click(button)
+        if event.button == 3:
+            on_open_button(button)
 
     def deselect(self, button):
         self.selected = False
@@ -487,6 +489,18 @@ def on_open_button(widget):
                     item = Gtk.MenuItem.new_with_label(common.lang['open_with'].format(opener[0]))
                     item.connect('activate', open_with, opener[1])
                     menu.append(item)
+            if common.env['send2trash']:
+                item = Gtk.SeparatorMenuItem()
+                menu.append(item)
+                item = Gtk.MenuItem.new_with_label(common.lang['remove_image'])
+                menu.append(item)
+                submenu = Gtk.Menu()
+                item1 = Gtk.MenuItem.new_with_label(common.lang['move'])
+                item1.connect('activate', move_to_trash)
+                submenu.append(item1)
+                item.set_submenu(submenu)
+
+
             menu.show_all()
             menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
         else:  # fallback in case mimeinfo.cache not found
