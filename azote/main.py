@@ -749,7 +749,7 @@ def on_apply_to_all_button(button):
 def on_settings_button(button):
     menu = Gtk.Menu()
     
-    item = Gtk.CheckMenuItem.new_with_label('Open button')
+    item = Gtk.CheckMenuItem.new_with_label(common.lang['image_menu'])
     item.set_active(common.settings.show_open_button)
     item.connect('activate', switch_open_button)
     menu.append(item)
