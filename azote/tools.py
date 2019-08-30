@@ -418,8 +418,9 @@ class Settings(object):
 
         self.src_path = common.sample_dir
         self.sorting = 'new'
-        self.show_open_button = common.sway
-        self.show_context_menu = not common.sway
+        # Gtk.Menu() on sway is unreliable, especially called with right click
+        self.show_open_button = common.sway         # shown by default on Sway
+        self.show_context_menu = not common.sway    # turned off by default on Sway
 
         self.load()
 
