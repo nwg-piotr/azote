@@ -309,7 +309,7 @@ class SortingButton(Gtk.Button):
         self.img = Gtk.Image()
         self.refresh()
         self.set_tooltip_text(common.lang['sorting_order'])
-        self.connect('clicked', self.on_clicked)
+        self.connect('clicked', self.on_sorting_button)
 
     def refresh(self):
         if common.settings.sorting == 'old':
@@ -322,7 +322,7 @@ class SortingButton(Gtk.Button):
             self.img.set_from_file('images/icon_new.svg')
         self.set_image(self.img)
 
-    def on_clicked(self, widget):
+    def on_sorting_button(self, widget):
         menu = Gtk.Menu()
         i0 = Gtk.MenuItem.new_with_label(common.lang['sorting_new'])
         i0.connect('activate', self.on_i0)
@@ -337,8 +337,7 @@ class SortingButton(Gtk.Button):
         i3.connect('activate', self.on_i3)
         menu.append(i3)
         menu.show_all()
-        # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-        menu.popup_at_widget(widget, Gdk.Gravity.EAST, Gdk.Gravity.NORTH_WEST, None)
+        menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
 
     def on_i0(self, widget):
         common.settings.sorting = 'new'
@@ -472,16 +471,6 @@ def move_to_trash(widget):
     common.preview.refresh()
 
 
-def on_trash_button(widget):
-    menu = Gtk.Menu()
-    i0 = Gtk.MenuItem.new_with_label(common.lang['move'])
-    i0.connect('activate', move_to_trash)
-    menu.append(i0)
-    menu.show_all()
-    # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-    menu.popup_at_widget(widget, Gdk.Gravity.WEST, Gdk.Gravity.NORTH, None)
-
-
 def show_image_menu(widget):
     if common.selected_wallpaper:
         if common.associations:  # not None if /usr/share/applications/mimeinfo.cache found and parse
@@ -506,10 +495,14 @@ def show_image_menu(widget):
 
             menu.show_all()
             # We don't want the menu to stick out of the window on Sway, as it may be partially not clickable
-            if widget.column and not widget.column == 0:
-                menu.popup_at_widget(widget, Gdk.Gravity.WEST, Gdk.Gravity.NORTH, None)
+
+            if widget.column:
+                if widget.column == 0:
+                    menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
+                else:
+                    menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_EAST, None)
             else:
-                menu.popup_at_widget(widget, Gdk.Gravity.EAST, Gdk.Gravity.NORTH, None)
+                menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH, None)
         else:  # fallback in case mimeinfo.cache not found
             print("No registered program found. Does the /usr/share/applications/mimeinfo.cache file exist?")
             command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
@@ -744,16 +737,14 @@ def on_apply_to_all_button(button):
             item.connect('activate', apply_to_all_swaybg, mode)
             menu.append(item)
         menu.show_all()
-        # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-        menu.popup_at_widget(button, Gdk.Gravity.WEST, Gdk.Gravity.NORTH, None)
+        menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_EAST, None)
     else:
         for mode in common.modes_feh:
             item = Gtk.MenuItem.new_with_label(mode)
             item.connect('activate', apply_to_all_feh, mode)
             menu.append(item)
         menu.show_all()
-        # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-        menu.popup_at_widget(button, Gdk.Gravity.WEST, Gdk.Gravity.NORTH, None)
+        menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_EAST, None)
         
         
 def on_settings_button(button):
@@ -770,8 +761,7 @@ def on_settings_button(button):
     menu.append(item)
     
     menu.show_all()
-    # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-    menu.popup_at_widget(button, Gdk.Gravity.EAST, Gdk.Gravity.NORTH_WEST, None)
+    menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
     
     
 def switch_open_button(item):
