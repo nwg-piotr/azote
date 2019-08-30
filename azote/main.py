@@ -75,6 +75,7 @@ class Preview(Gtk.ScrolledWindow):
         for file in src_pictures:
             if file_allowed(file):
                 btn = ThumbButton(common.settings.src_path, file)
+                btn.column = col
                 common.buttons_list.append(btn)
                 self.grid.attach(btn, col, row, 1, 1)
                 if col < common.cols - 1:
@@ -99,6 +100,7 @@ class Preview(Gtk.ScrolledWindow):
         for file in src_pictures:
             if file_allowed(file):
                 btn = ThumbButton(common.settings.src_path, file)
+                btn.column = col
                 common.buttons_list.append(btn)
                 self.grid.attach(btn, col, row, 1, 1)
                 if col < common.cols - 1:
@@ -129,6 +131,10 @@ class ThumbButton(Gtk.Button):
         self.set_image_position(2)  # TOP
         self.set_tooltip_text(common.lang['select_this_picture'])
 
+        # Workaround: column is a helper value to identify thumbnails placed in column 0. 
+        # They need different context menu gravity in Sway
+        self.column = 0
+
         if len(filename) > 30:
             filename = '…{}'.format(filename[-28::])
         self.set_label(filename)
@@ -157,7 +163,7 @@ class ThumbButton(Gtk.Button):
         if event.type == Gdk.EventType._2BUTTON_PRESS:
             on_thumb_double_click(button)
         if event.button == 3 and common.settings.show_context_menu:
-            on_open_button(button)
+            show_image_menu(button)
 
     def deselect(self, button):
         self.selected = False
@@ -332,7 +338,7 @@ class SortingButton(Gtk.Button):
         menu.append(i3)
         menu.show_all()
         # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-        menu.popup_at_widget(widget, Gdk.Gravity.EAST, Gdk.Gravity.NORTH, None)
+        menu.popup_at_widget(widget, Gdk.Gravity.EAST, Gdk.Gravity.NORTH_WEST, None)
 
     def on_i0(self, widget):
         common.settings.sorting = 'new'
@@ -476,7 +482,7 @@ def on_trash_button(widget):
     menu.popup_at_widget(widget, Gdk.Gravity.WEST, Gdk.Gravity.NORTH, None)
 
 
-def on_open_button(widget):
+def show_image_menu(widget):
     if common.selected_wallpaper:
         if common.associations:  # not None if /usr/share/applications/mimeinfo.cache found and parse
             openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
@@ -499,8 +505,11 @@ def on_open_button(widget):
                 item.set_submenu(submenu)
 
             menu.show_all()
-            # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-            menu.popup_at_widget(widget, Gdk.Gravity.WEST, Gdk.Gravity.NORTH, None)
+            # We don't want the menu to stick out of the window on Sway, as it may be partially not clickable
+            if widget.column and not widget.column == 0:
+                menu.popup_at_widget(widget, Gdk.Gravity.WEST, Gdk.Gravity.NORTH, None)
+            else:
+                menu.popup_at_widget(widget, Gdk.Gravity.EAST, Gdk.Gravity.NORTH, None)
         else:  # fallback in case mimeinfo.cache not found
             print("No registered program found. Does the /usr/share/applications/mimeinfo.cache file exist?")
             command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
@@ -618,12 +627,13 @@ class GUI:
 
         # Button to open in feh
         common.open_button = Gtk.Button()
+        common.open_button.column = None
         img = Gtk.Image()
         img.set_from_file('images/icon_feh.svg')
         common.open_button.set_image(img)
         common.open_button.set_tooltip_text(common.lang['image_menu'])
         common.open_button.set_sensitive(False)
-        common.open_button.connect('clicked', on_open_button)
+        common.open_button.connect('clicked', show_image_menu)
         bottom_box.add(common.open_button)
 
         # Label to display details of currently selected picture
@@ -761,7 +771,7 @@ def on_settings_button(button):
     
     menu.show_all()
     # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-    menu.popup_at_widget(button, Gdk.Gravity.EAST, Gdk.Gravity.NORTH, None)
+    menu.popup_at_widget(button, Gdk.Gravity.EAST, Gdk.Gravity.NORTH_WEST, None)
     
     
 def switch_open_button(item):

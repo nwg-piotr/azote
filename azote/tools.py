@@ -442,14 +442,12 @@ class Settings(object):
         try:
             self.show_open_button = settings.show_open_button
             log('Picture menu button: {}'.format(self.show_open_button), common.INFO)
-            print(self.show_open_button)
         except AttributeError:
             save_needed = True
 
         try:
             self.show_context_menu = settings.show_context_menu
             log('Thumbnail context menu: {}'.format(self.show_context_menu), common.INFO)
-            print(self.show_context_menu)
         except AttributeError:
             save_needed = True
             
