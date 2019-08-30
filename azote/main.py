@@ -764,7 +764,7 @@ def on_settings_button(button):
     item.connect('activate', switch_open_button)
     menu.append(item)
     
-    item = Gtk.CheckMenuItem.new_with_label('Thumbnail context menu')
+    item = Gtk.CheckMenuItem.new_with_label(common.lang['thumbmail_context_menu'])
     item.set_active(common.settings.show_context_menu)
     item.connect('activate', switch_context_menu)
     menu.append(item)

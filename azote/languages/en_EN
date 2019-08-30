@@ -27,4 +27,5 @@ sorting_za = Z -> A
 sorting_new = New on top
 sorting_old = Old on top
 split_selection_between_displays = Split selection between displays
+thumbmail_context_menu = Thumbnail context menu
 thumbnails_in_cache = {} thumbnails in cache ({})

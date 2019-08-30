@@ -27,4 +27,5 @@ sorting_za = Z -> A
 sorting_new = Nouveau en haut
 sorting_old = Ancien en haut
 split_selection_between_displays = Répartition de la sélection entre les écrans
+thumbmail_context_menu = Menu contextuel des miniatures
 thumbnails_in_cache = {} miniatures en cache ({})
