@@ -26,6 +26,7 @@ from PIL import Image
 # send2trash module may or may not be available
 try:
     from send2trash import send2trash
+
     common.env['send2trash'] = True
 except Exception as e:
     common.env['send2trash'] = False
@@ -38,7 +39,6 @@ from tools import set_env, hash_name, create_thumbnails, file_allowed, update_st
 
 
 def get_files():
-
     file_names = [f for f in os.listdir(common.settings.src_path)
                   if os.path.isfile(os.path.join(common.settings.src_path, f))]
 
@@ -129,7 +129,9 @@ class ThumbButton(Gtk.Button):
 
         self.set_image(self.img)
         self.set_image_position(2)  # TOP
-        self.set_tooltip_text(common.lang['select_this_picture'])
+        self.set_tooltip_text(
+            common.lang['thumbnail_tooltip_2']) if common.settings.show_context_menu else self.set_tooltip_text(
+            common.lang['thumbnail_tooltip_1'])
 
         # Workaround: column is a helper value to identify thumbnails placed in column 0. 
         # They need different context menu gravity in Sway
@@ -179,6 +181,7 @@ class DisplayBox(Gtk.Box):
     """
     The box contains elements to preview certain displays and assign wallpapers to them
     """
+
     def __init__(self, name, width, height):
         super().__init__()
 
@@ -681,7 +684,7 @@ class GUI:
         status_box.set_spacing(5)
         status_box.set_border_width(5)
         status_box.set_orientation(Gtk.Orientation.HORIZONTAL)
-        
+
         # Button to call About dialog
         about_button = Gtk.Button()
         img = Gtk.Image()
@@ -745,25 +748,25 @@ def on_apply_to_all_button(button):
             menu.append(item)
         menu.show_all()
         menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_EAST, None)
-        
-        
+
+
 def on_settings_button(button):
     menu = Gtk.Menu()
-    
+
     item = Gtk.CheckMenuItem.new_with_label(common.lang['image_menu'])
     item.set_active(common.settings.show_open_button)
     item.connect('activate', switch_open_button)
     menu.append(item)
-    
+
     item = Gtk.CheckMenuItem.new_with_label(common.lang['thumbmail_context_menu'])
     item.set_active(common.settings.show_context_menu)
     item.connect('activate', switch_context_menu)
     menu.append(item)
-    
+
     menu.show_all()
     menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
-    
-    
+
+
 def switch_open_button(item):
     common.settings.show_open_button = not common.settings.show_open_button
     common.settings.save()
