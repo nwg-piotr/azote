@@ -418,10 +418,14 @@ class Settings(object):
 
         self.src_path = common.sample_dir
         self.sorting = 'new'
+        self.show_open_button = common.sway
+        self.show_trash_button = common.sway and common.env['send2trash']
+        self.show_context_menu = not common.sway
 
         self.load()
 
     def load(self):
+        save_needed = False
         if not os.path.isfile(self.file):
             log('Creating initial settings', common.INFO)
             self.save()
@@ -434,6 +438,30 @@ class Settings(object):
             self.sorting = settings.sorting  # 'new' 'old' 'az' 'za'
             log('Image sorting: {}'.format(self.sorting), common.INFO)
         except AttributeError:
+            save_needed = True
+            
+        try:
+            self.show_open_button = settings.show_open_button
+            log('Show open button: {}'.format(self.show_open_button), common.INFO)
+            print(self.show_open_button)
+        except AttributeError:
+            save_needed = True
+
+        try:
+            self.show_trash_button = settings.show_trash_button
+            log('Show trash button: {}'.format(self.show_trash_button), common.INFO)
+            print(self.show_trash_button)
+        except AttributeError:
+            save_needed = True
+
+        try:
+            self.show_context_menu = settings.show_context_menu
+            log('Show thumbnail context menu: {}'.format(self.show_context_menu), common.INFO)
+            print(self.show_context_menu)
+        except AttributeError:
+            save_needed = True
+            
+        if save_needed:
             self.save()
 
     def save(self):

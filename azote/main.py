@@ -158,7 +158,7 @@ class ThumbButton(Gtk.Button):
             common.selected_picture_label.set_text("{} ({} x {})".format(filename, img.size[0], img.size[1]))
         if event.type == Gdk.EventType._2BUTTON_PRESS:
             on_thumb_double_click(button)
-        if event.button == 3:
+        if event.button == 3 and common.settings.show_context_menu:
             on_open_button(button)
 
     def deselect(self, button):
@@ -333,7 +333,8 @@ class SortingButton(Gtk.Button):
         i3.connect('activate', self.on_i3)
         menu.append(i3)
         menu.show_all()
-        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        menu.popup_at_widget(widget, Gdk.Gravity.EAST, Gdk.Gravity.NORTH, None)
 
     def on_i0(self, widget):
         common.settings.sorting = 'new'
@@ -475,7 +476,8 @@ def on_trash_button(widget):
     i0.connect('activate', move_to_trash)
     menu.append(i0)
     menu.show_all()
-    menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+    # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+    menu.popup_at_widget(widget, Gdk.Gravity.WEST, Gdk.Gravity.NORTH, None)
 
 
 def on_open_button(widget):
@@ -500,9 +502,9 @@ def on_open_button(widget):
                 submenu.append(item1)
                 item.set_submenu(submenu)
 
-
             menu.show_all()
-            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+            # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+            menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.EAST, None)
         else:  # fallback in case mimeinfo.cache not found
             print("No registered program found. Does the /usr/share/applications/mimeinfo.cache file exist?")
             command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
@@ -694,13 +696,7 @@ class GUI:
         status_box.set_spacing(5)
         status_box.set_border_width(5)
         status_box.set_orientation(Gtk.Orientation.HORIZONTAL)
-
-        common.status_bar = Gtk.Statusbar()
-        common.status_bar.set_property("name", "status-bar")
-        common.status_bar.set_halign(Gtk.Align.CENTER)
-        status_box.pack_start(common.status_bar, True, True, 0)
-        update_status_bar()
-
+        
         # Button to call About dialog
         about_button = Gtk.Button()
         img = Gtk.Image()
@@ -710,9 +706,29 @@ class GUI:
         about_button.connect('clicked', on_about_button)
         status_box.add(about_button)
 
+        # Button to display settings menu
+        settings_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_menu.svg')
+        settings_button.set_image(img)
+        settings_button.set_tooltip_text(common.lang['settings'])
+        settings_button.connect('clicked', on_settings_button)
+        status_box.add(settings_button)
+
+        common.status_bar = Gtk.Statusbar()
+        common.status_bar.set_property("name", "status-bar")
+        common.status_bar.set_halign(Gtk.Align.CENTER)
+        status_box.pack_start(common.status_bar, True, True, 0)
+        update_status_bar()
+
         main_box.add(status_box)
 
         window.show_all()
+        if common.trash_button:
+            common.trash_button.show() if common.settings.show_trash_button else common.trash_button.hide()
+        if common.open_button:
+            common.open_button.show() if common.settings.show_open_button else common.open_button.hide()
+
         common.progress_bar.hide()
 
 
@@ -738,14 +754,59 @@ def on_apply_to_all_button(button):
             item.connect('activate', apply_to_all_swaybg, mode)
             menu.append(item)
         menu.show_all()
-        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        menu.popup_at_widget(button, Gdk.Gravity.WEST, Gdk.Gravity.NORTH, None)
     else:
         for mode in common.modes_feh:
             item = Gtk.MenuItem.new_with_label(mode)
             item.connect('activate', apply_to_all_feh, mode)
             menu.append(item)
         menu.show_all()
-        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        menu.popup_at_widget(button, Gdk.Gravity.WEST, Gdk.Gravity.NORTH, None)
+        
+        
+def on_settings_button(button):
+    menu = Gtk.Menu()
+    
+    item = Gtk.CheckMenuItem.new_with_label('Open button')
+    item.set_active(common.settings.show_open_button)
+    item.connect('activate', switch_open_button)
+    menu.append(item)
+    
+    if common.env['send2trash']:
+        item = Gtk.CheckMenuItem.new_with_label('Trash button')
+        item.set_active(common.settings.show_trash_button)
+        item.connect('activate', switch_trash_button)
+        menu.append(item)
+    
+    item = Gtk.CheckMenuItem.new_with_label('Thumbnail context menu')
+    item.set_active(common.settings.show_context_menu)
+    item.connect('activate', switch_context_menu)
+    menu.append(item)
+    
+    menu.show_all()
+    # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+    menu.popup_at_widget(button, Gdk.Gravity.EAST, Gdk.Gravity.NORTH, None)
+    
+    
+def switch_open_button(item):
+    common.settings.show_open_button = not common.settings.show_open_button
+    common.settings.save()
+    if common.open_button:
+        common.open_button.show() if common.settings.show_open_button else common.open_button.hide()
+
+
+def switch_trash_button(item):
+    common.settings.show_trash_button = not common.settings.show_trash_button
+    common.settings.save()
+    if common.trash_button:
+        common.trash_button.show() if common.settings.show_trash_button else common.trash_button.hide()
+
+
+def switch_context_menu(item):
+    common.settings.show_context_menu = not common.settings.show_context_menu
+    common.settings.save()
 
 
 def on_thumb_double_click(button):
