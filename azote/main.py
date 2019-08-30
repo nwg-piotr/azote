@@ -144,8 +144,6 @@ class ThumbButton(Gtk.Button):
         common.open_button.set_sensitive(True)
         common.apply_to_all_button.set_sensitive(True)
 
-        if common.trash_button and self.source_path.startswith(os.getenv("HOME")):
-            common.trash_button.set_sensitive(True)
         self.selected = True
         common.selected_wallpaper = self
         deselect_all()
@@ -429,8 +427,6 @@ def clear_wallpaper_selection():
         common.split_button.set_sensitive(False)
     common.apply_button.set_sensitive(False)
     common.open_button.set_sensitive(False)
-    if common.trash_button:
-        common.trash_button.set_sensitive(False)
 
 
 def on_about_button(button):
@@ -504,7 +500,7 @@ def on_open_button(widget):
 
             menu.show_all()
             # menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-            menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.EAST, None)
+            menu.popup_at_widget(widget, Gdk.Gravity.WEST, Gdk.Gravity.NORTH, None)
         else:  # fallback in case mimeinfo.cache not found
             print("No registered program found. Does the /usr/share/applications/mimeinfo.cache file exist?")
             command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
@@ -620,29 +616,15 @@ class GUI:
         bottom_box.pack_start(folder_button, True, True, 0)
         folder_button.connect_after('clicked', on_folder_clicked)
 
-        v_separator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
-        bottom_box.add(v_separator)
-
         # Button to open in feh
         common.open_button = Gtk.Button()
         img = Gtk.Image()
         img.set_from_file('images/icon_feh.svg')
         common.open_button.set_image(img)
-        common.open_button.set_tooltip_text(common.lang['open_selected_picture'])
+        common.open_button.set_tooltip_text(common.lang['image_menu'])
         common.open_button.set_sensitive(False)
         common.open_button.connect('clicked', on_open_button)
         bottom_box.add(common.open_button)
-
-        if common.env['send2trash']:
-            # Button to move to trash
-            common.trash_button = Gtk.Button()
-            img = Gtk.Image()
-            img.set_from_file('images/icon_trash.svg')
-            common.trash_button.set_image(img)
-            common.trash_button.set_tooltip_text(common.lang['move_to_trash'])
-            common.trash_button.set_sensitive(False)
-            common.trash_button.connect('clicked', on_trash_button)
-            bottom_box.add(common.trash_button)
 
         # Label to display details of currently selected picture
         common.selected_picture_label = Gtk.Label()
@@ -724,8 +706,6 @@ class GUI:
         main_box.add(status_box)
 
         window.show_all()
-        if common.trash_button:
-            common.trash_button.show() if common.settings.show_trash_button else common.trash_button.hide()
         if common.open_button:
             common.open_button.show() if common.settings.show_open_button else common.open_button.hide()
 
@@ -774,12 +754,6 @@ def on_settings_button(button):
     item.connect('activate', switch_open_button)
     menu.append(item)
     
-    if common.env['send2trash']:
-        item = Gtk.CheckMenuItem.new_with_label('Trash button')
-        item.set_active(common.settings.show_trash_button)
-        item.connect('activate', switch_trash_button)
-        menu.append(item)
-    
     item = Gtk.CheckMenuItem.new_with_label('Thumbnail context menu')
     item.set_active(common.settings.show_context_menu)
     item.connect('activate', switch_context_menu)
@@ -795,13 +769,6 @@ def switch_open_button(item):
     common.settings.save()
     if common.open_button:
         common.open_button.show() if common.settings.show_open_button else common.open_button.hide()
-
-
-def switch_trash_button(item):
-    common.settings.show_trash_button = not common.settings.show_trash_button
-    common.settings.save()
-    if common.trash_button:
-        common.trash_button.show() if common.settings.show_trash_button else common.trash_button.hide()
 
 
 def switch_context_menu(item):
