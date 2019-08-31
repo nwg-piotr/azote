@@ -26,6 +26,7 @@ from PIL import Image
 # send2trash module may or may not be available
 try:
     from send2trash import send2trash
+
     common.env['send2trash'] = True
 except Exception as e:
     common.env['send2trash'] = False
@@ -38,7 +39,6 @@ from tools import set_env, hash_name, create_thumbnails, file_allowed, update_st
 
 
 def get_files():
-
     file_names = [f for f in os.listdir(common.settings.src_path)
                   if os.path.isfile(os.path.join(common.settings.src_path, f))]
 
@@ -75,6 +75,7 @@ class Preview(Gtk.ScrolledWindow):
         for file in src_pictures:
             if file_allowed(file):
                 btn = ThumbButton(common.settings.src_path, file)
+                btn.column = col
                 common.buttons_list.append(btn)
                 self.grid.attach(btn, col, row, 1, 1)
                 if col < common.cols - 1:
@@ -99,6 +100,7 @@ class Preview(Gtk.ScrolledWindow):
         for file in src_pictures:
             if file_allowed(file):
                 btn = ThumbButton(common.settings.src_path, file)
+                btn.column = col
                 common.buttons_list.append(btn)
                 self.grid.attach(btn, col, row, 1, 1)
                 if col < common.cols - 1:
@@ -127,7 +129,13 @@ class ThumbButton(Gtk.Button):
 
         self.set_image(self.img)
         self.set_image_position(2)  # TOP
-        self.set_tooltip_text(common.lang['select_this_picture'])
+        self.set_tooltip_text(
+            common.lang['thumbnail_tooltip_2']) if common.settings.show_context_menu else self.set_tooltip_text(
+            common.lang['thumbnail_tooltip_1'])
+
+        # Workaround: column is a helper value to identify thumbnails placed in column 0. 
+        # They need different context menu gravity in Sway
+        self.column = 0
 
         if len(filename) > 30:
             filename = '…{}'.format(filename[-28::])
@@ -144,8 +152,6 @@ class ThumbButton(Gtk.Button):
         common.open_button.set_sensitive(True)
         common.apply_to_all_button.set_sensitive(True)
 
-        if common.trash_button and self.source_path.startswith(os.getenv("HOME")):
-            common.trash_button.set_sensitive(True)
         self.selected = True
         common.selected_wallpaper = self
         deselect_all()
@@ -158,6 +164,8 @@ class ThumbButton(Gtk.Button):
             common.selected_picture_label.set_text("{} ({} x {})".format(filename, img.size[0], img.size[1]))
         if event.type == Gdk.EventType._2BUTTON_PRESS:
             on_thumb_double_click(button)
+        if event.button == 3 and common.settings.show_context_menu:
+            show_image_menu(button)
 
     def deselect(self, button):
         self.selected = False
@@ -173,6 +181,7 @@ class DisplayBox(Gtk.Box):
     """
     The box contains elements to preview certain displays and assign wallpapers to them
     """
+
     def __init__(self, name, width, height):
         super().__init__()
 
@@ -303,7 +312,7 @@ class SortingButton(Gtk.Button):
         self.img = Gtk.Image()
         self.refresh()
         self.set_tooltip_text(common.lang['sorting_order'])
-        self.connect('clicked', self.on_clicked)
+        self.connect('clicked', self.on_sorting_button)
 
     def refresh(self):
         if common.settings.sorting == 'old':
@@ -316,7 +325,7 @@ class SortingButton(Gtk.Button):
             self.img.set_from_file('images/icon_new.svg')
         self.set_image(self.img)
 
-    def on_clicked(self, widget):
+    def on_sorting_button(self, widget):
         menu = Gtk.Menu()
         i0 = Gtk.MenuItem.new_with_label(common.lang['sorting_new'])
         i0.connect('activate', self.on_i0)
@@ -331,7 +340,7 @@ class SortingButton(Gtk.Button):
         i3.connect('activate', self.on_i3)
         menu.append(i3)
         menu.show_all()
-        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
 
     def on_i0(self, widget):
         common.settings.sorting = 'new'
@@ -426,8 +435,6 @@ def clear_wallpaper_selection():
         common.split_button.set_sensitive(False)
     common.apply_button.set_sensitive(False)
     common.open_button.set_sensitive(False)
-    if common.trash_button:
-        common.trash_button.set_sensitive(False)
 
 
 def on_about_button(button):
@@ -467,16 +474,7 @@ def move_to_trash(widget):
     common.preview.refresh()
 
 
-def on_trash_button(widget):
-    menu = Gtk.Menu()
-    i0 = Gtk.MenuItem.new_with_label(common.lang['move'])
-    i0.connect('activate', move_to_trash)
-    menu.append(i0)
-    menu.show_all()
-    menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-
-
-def on_open_button(widget):
+def show_image_menu(widget):
     if common.selected_wallpaper:
         if common.associations:  # not None if /usr/share/applications/mimeinfo.cache found and parse
             openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
@@ -487,8 +485,27 @@ def on_open_button(widget):
                     item = Gtk.MenuItem.new_with_label(common.lang['open_with'].format(opener[0]))
                     item.connect('activate', open_with, opener[1])
                     menu.append(item)
+            if common.env['send2trash']:
+                item = Gtk.SeparatorMenuItem()
+                menu.append(item)
+                item = Gtk.MenuItem.new_with_label(common.lang['remove_image'])
+                menu.append(item)
+                submenu = Gtk.Menu()
+                item1 = Gtk.MenuItem.new_with_label(common.lang['move'])
+                item1.connect('activate', move_to_trash)
+                submenu.append(item1)
+                item.set_submenu(submenu)
+
             menu.show_all()
-            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+            # We don't want the menu to stick out of the window on Sway, as it may be partially not clickable
+
+            if widget.column:
+                if widget.column == 0:
+                    menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
+                else:
+                    menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_EAST, None)
+            else:
+                menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH, None)
         else:  # fallback in case mimeinfo.cache not found
             print("No registered program found. Does the /usr/share/applications/mimeinfo.cache file exist?")
             command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
@@ -604,29 +621,16 @@ class GUI:
         bottom_box.pack_start(folder_button, True, True, 0)
         folder_button.connect_after('clicked', on_folder_clicked)
 
-        v_separator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
-        bottom_box.add(v_separator)
-
         # Button to open in feh
         common.open_button = Gtk.Button()
+        common.open_button.column = None
         img = Gtk.Image()
         img.set_from_file('images/icon_feh.svg')
         common.open_button.set_image(img)
-        common.open_button.set_tooltip_text(common.lang['open_selected_picture'])
+        common.open_button.set_tooltip_text(common.lang['image_menu'])
         common.open_button.set_sensitive(False)
-        common.open_button.connect('clicked', on_open_button)
+        common.open_button.connect('clicked', show_image_menu)
         bottom_box.add(common.open_button)
-
-        if common.env['send2trash']:
-            # Button to move to trash
-            common.trash_button = Gtk.Button()
-            img = Gtk.Image()
-            img.set_from_file('images/icon_trash.svg')
-            common.trash_button.set_image(img)
-            common.trash_button.set_tooltip_text(common.lang['move_to_trash'])
-            common.trash_button.set_sensitive(False)
-            common.trash_button.connect('clicked', on_trash_button)
-            bottom_box.add(common.trash_button)
 
         # Label to display details of currently selected picture
         common.selected_picture_label = Gtk.Label()
@@ -681,12 +685,6 @@ class GUI:
         status_box.set_border_width(5)
         status_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
-        common.status_bar = Gtk.Statusbar()
-        common.status_bar.set_property("name", "status-bar")
-        common.status_bar.set_halign(Gtk.Align.CENTER)
-        status_box.pack_start(common.status_bar, True, True, 0)
-        update_status_bar()
-
         # Button to call About dialog
         about_button = Gtk.Button()
         img = Gtk.Image()
@@ -696,9 +694,27 @@ class GUI:
         about_button.connect('clicked', on_about_button)
         status_box.add(about_button)
 
+        # Button to display settings menu
+        settings_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_menu.svg')
+        settings_button.set_image(img)
+        settings_button.set_tooltip_text(common.lang['settings'])
+        settings_button.connect('clicked', on_settings_button)
+        status_box.add(settings_button)
+
+        common.status_bar = Gtk.Statusbar()
+        common.status_bar.set_property("name", "status-bar")
+        common.status_bar.set_halign(Gtk.Align.CENTER)
+        status_box.pack_start(common.status_bar, True, True, 0)
+        update_status_bar()
+
         main_box.add(status_box)
 
         window.show_all()
+        if common.open_button:
+            common.open_button.show() if common.settings.show_open_button else common.open_button.hide()
+
         common.progress_bar.hide()
 
 
@@ -724,14 +740,43 @@ def on_apply_to_all_button(button):
             item.connect('activate', apply_to_all_swaybg, mode)
             menu.append(item)
         menu.show_all()
-        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_EAST, None)
     else:
         for mode in common.modes_feh:
             item = Gtk.MenuItem.new_with_label(mode)
             item.connect('activate', apply_to_all_feh, mode)
             menu.append(item)
         menu.show_all()
-        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_EAST, None)
+
+
+def on_settings_button(button):
+    menu = Gtk.Menu()
+
+    item = Gtk.CheckMenuItem.new_with_label(common.lang['image_menu'])
+    item.set_active(common.settings.show_open_button)
+    item.connect('activate', switch_open_button)
+    menu.append(item)
+
+    item = Gtk.CheckMenuItem.new_with_label(common.lang['thumbmail_context_menu'])
+    item.set_active(common.settings.show_context_menu)
+    item.connect('activate', switch_context_menu)
+    menu.append(item)
+
+    menu.show_all()
+    menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
+
+
+def switch_open_button(item):
+    common.settings.show_open_button = not common.settings.show_open_button
+    common.settings.save()
+    if common.open_button:
+        common.open_button.show() if common.settings.show_open_button else common.open_button.hide()
+
+
+def switch_context_menu(item):
+    common.settings.show_context_menu = not common.settings.show_context_menu
+    common.settings.save()
 
 
 def on_thumb_double_click(button):
