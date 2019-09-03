@@ -1,3 +1,10 @@
+Development
+- move to trash button feature moved to the image menu, button removed, context (right click) menu added
+- image button now opens the image menu
+- settings button added: turns image button and thumbnail context menu on/off (as right-click menu is not 100% reliable
+  on Sway). Default settings determined on 1st run, depending on the sway environment detection.
+- menus' gravity adjusted
+
 v1.3.1 (2019-08-21)
 - double click on a thumbnail sets the wallpaper on all displays (mode = 'fill')
 - main.py: some methods in classes replaced with static functions

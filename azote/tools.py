@@ -418,10 +418,14 @@ class Settings(object):
 
         self.src_path = common.sample_dir
         self.sorting = 'new'
+        # Gtk.Menu() on sway is unreliable, especially called with right click
+        self.show_open_button = common.sway         # shown by default on Sway
+        self.show_context_menu = not common.sway    # turned off by default on Sway
 
         self.load()
 
     def load(self):
+        save_needed = False
         if not os.path.isfile(self.file):
             log('Creating initial settings', common.INFO)
             self.save()
@@ -434,6 +438,21 @@ class Settings(object):
             self.sorting = settings.sorting  # 'new' 'old' 'az' 'za'
             log('Image sorting: {}'.format(self.sorting), common.INFO)
         except AttributeError:
+            save_needed = True
+            
+        try:
+            self.show_open_button = settings.show_open_button
+            log('Picture menu button: {}'.format(self.show_open_button), common.INFO)
+        except AttributeError:
+            save_needed = True
+
+        try:
+            self.show_context_menu = settings.show_context_menu
+            log('Thumbnail context menu: {}'.format(self.show_context_menu), common.INFO)
+        except AttributeError:
+            save_needed = True
+            
+        if save_needed:
             self.save()
 
     def save(self):
