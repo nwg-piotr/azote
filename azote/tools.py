@@ -53,9 +53,11 @@ def str_to_bool(s):
 
 
 def check_displays():
-    # Sway or not Sway?
+    # Sway or not Sway? If so, the swaymsg command should return exit code 0
+    result = subprocess.run(['swaymsg', '-t', 'get_outputs'], stdout=subprocess.DEVNULL)
+    common.sway = result == 0
+    # ask for the wm name (just for logging: maybe we should give up on it to drop the wmctrl dependency?)
     wm = subprocess.check_output("wmctrl -m | awk '/Name/{print $2}'", shell=True).decode("utf-8").strip()
-    common.sway = 'LG3D' in wm or 'wlroots' in wm
     if common.sway:
         common.env['wm'] = 'sway'
     else:
@@ -64,7 +66,7 @@ def check_displays():
     fnull = open(os.devnull, 'w')
     common.env['xrandr'] = subprocess.call(["which", "xrandr"], stdout=fnull, stderr=subprocess.STDOUT) == 0
 
-    if common.env['wm'] == 'sway':
+    if common.sway:
         # We need swaymsg to check outputs on Sway
         try:
             displays = []

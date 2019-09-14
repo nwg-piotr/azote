@@ -4,6 +4,7 @@ Development
 - settings button added: turns image button and thumbnail context menu on/off (as right-click menu is not 100% reliable
   on Sway). Default settings determined on 1st run, depending on the sway environment detection.
 - menus' gravity adjusted
+- way of checking if we're running sway altered to avoid crash on qtile
 
 v1.3.1 (2019-08-21)
 - double click on a thumbnail sets the wallpaper on all displays (mode = 'fill')
