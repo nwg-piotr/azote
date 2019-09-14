@@ -55,7 +55,7 @@ def str_to_bool(s):
 def check_displays():
     # Sway or not Sway? If so, the swaymsg command should return exit code 0
     result = subprocess.run(['swaymsg', '-t', 'get_outputs'], stdout=subprocess.DEVNULL)
-    common.sway = result == 0
+    common.sway = result.returncode == 0
     # ask for the wm name (just for logging: maybe we should give up on it to drop the wmctrl dependency?)
     wm = subprocess.check_output("wmctrl -m | awk '/Name/{print $2}'", shell=True).decode("utf-8").strip()
     if common.sway:
