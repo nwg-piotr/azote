@@ -1,4 +1,4 @@
-Development
+v1.4.0 (2019-09-15)
 - move to trash button feature moved to the image menu, button removed, context (right click) menu added
 - image button now opens the image menu
 - settings button added: turns image button and thumbnail context menu on/off (as right-click menu is not 100% reliable
