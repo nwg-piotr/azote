@@ -1,7 +1,8 @@
 # Azote
 
 **Azote** is a GTK+ 3-based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
-(Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands.
+(Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. During development I test it on sway, i3, 
+Openbox, qtile and dwm, so I'm not sure if it works on others window managers.
 
 ![screenshot](http://nwg.pl/Lychee/uploads/big/2ef98871aea09679282675e942f153ed.png)
 
@@ -29,9 +30,10 @@ Select the folder your wallpapers are stored in. If it contains a lot of big pic
 Azote to create thumbnails. It's being performed once per folder, unless you clear the `~/.azote/thumbnails` folder.
 
 Most of the buttons seem to be self-explanatory, with a little help from their tooltip text. What may not be clear
-at first is the `Apply selected picture to all screens` button. Introduced on request (issue #29), it applies unchanged
+at first is the `Apply selected picture to all screens` button. It applies unchanged
 selected picture to all displays, regardless of whether they are currently connected/detected. It may be useful if you
-often connect and disconnect displays.
+often connect and disconnect displays. A shortcut to this feature is just to double click a thumbnail. It'll always 
+use the 'fill' mode, however.
 
 Azote, as well as feh, saves a batch file to your home directory. It needs to be executed in order to set the wallpaper 
 on subsequent logins or reboot.
