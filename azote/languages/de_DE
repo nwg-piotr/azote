@@ -18,6 +18,7 @@ open_folder = Ordner öffnen
 open_with = Öffnen mit {}
 refresh_folder_preview = Ordnervorschau aktualisieren
 remove_image = Bild entfernen
+scale_and_crop = Skalieren und Zuschneiden
 set_selected_wallpaper = Ausgewählten Hintergrund setzen
 settings = Einstellungen
 sorting_order = Sortierreihenfolge

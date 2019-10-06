@@ -18,6 +18,7 @@ open_folder = Ouvrir le dossier
 open_with = Ovrir avec {}
 refresh_folder_preview = Rafraîchir l'aperçu du dossier
 remove_image = Enlever l'image
+scale_and_crop = Échelle et recadrer
 set_selected_wallpaper = Définir le fond d'écran sélectionné
 settings = Paramètres
 sorting_order = Ordre de tri

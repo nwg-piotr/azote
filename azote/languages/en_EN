@@ -18,6 +18,7 @@ open_folder = Open folder
 open_with = Open with {}
 refresh_folder_preview = Refresh folder preview
 remove_image = Remove image
+scale_and_crop = Scale and crop
 set_selected_wallpaper = Set selected wallpaper
 settings = Settings
 sorting_order = Sorting order

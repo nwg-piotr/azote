@@ -35,7 +35,7 @@ except Exception as e:
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, rgba_to_hex, split_selected_wallpaper
+    copy_backgrounds, rgba_to_hex, split_selected_wallpaper, scale_and_crop
 
 
 def get_files():
@@ -485,6 +485,19 @@ def show_image_menu(widget):
                     item = Gtk.MenuItem.new_with_label(common.lang['open_with'].format(opener[0]))
                     item.connect('activate', open_with, opener[1])
                     menu.append(item)
+                item = Gtk.SeparatorMenuItem()
+                menu.append(item)
+
+            item = Gtk.MenuItem.new_with_label(common.lang['scale_and_crop'])
+            menu.append(item)
+            submenu = Gtk.Menu()
+            for i in range(len(common.displays)):
+                display = common.displays[i]
+                subitem = Gtk.MenuItem.new_with_label('{} x {} ({})'.format(display['width'], display['height'], display['name']))
+                subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, common.displays[i])
+                submenu.append(subitem)
+            item.set_submenu(submenu)
+
             if common.env['send2trash']:
                 item = Gtk.SeparatorMenuItem()
                 menu.append(item)
