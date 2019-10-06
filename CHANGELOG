@@ -1,3 +1,6 @@
+Development:
+- Image menu: scale and crop the selected image to dimensions of a selected display
+
 v1.4.0 (2019-09-15)
 - move to trash button feature moved to the image menu, button removed, context (right click) menu added
 - image button now opens the image menu

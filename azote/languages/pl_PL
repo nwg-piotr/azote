@@ -18,6 +18,7 @@ open_folder = Otwórz folder
 open_with = Otwórz w {}
 refresh_folder_preview = Odśwież podgląd folderu
 remove_image = Usuń obraz
+scale_and_crop = Skaluj i przytnij
 set_selected_wallpaper = Ustaw wybraną tapetę
 settings = Ustawienia
 sorting_order = Sortowanie

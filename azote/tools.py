@@ -372,6 +372,40 @@ def expand_img(image):
         return ImageOps.expand(image, border=border)
     else:
         return image
+    
+    
+def scale_and_crop(item, image_path, display):
+    img = Image.open(image_path)
+    
+    # We can either scale vertically & crop horizontally or scale horizontally and crop vertically
+    new_height = int(img.size[0] * display['height'] / display['width'])
+
+    if new_height < img.size[1]:  # we need to scale to display width and crop vertical margins
+        new_height = int(display['width'] * img.size[1] / img.size[0])
+        # Choose the filter depending on if we're scaling down or up
+        if new_height >= display['height']:
+            img = img.resize((display['width'], new_height), Image.ANTIALIAS)
+        else:
+            img = img.resize((display['width'], new_height), Image.BILINEAR)
+
+        margin = (img.size[1] - display['height']) // 2
+        img = img.crop((0, margin, display['width'], display['height'] + margin))
+
+    elif new_height > img.size[1]:  # we need to scale to display height and crop horizontal margins
+        new_width = int(img.size[0] * display['height'] / img.size[1])
+        if new_width >= display['width']:
+            img = img.resize((new_width, display['height']), Image.ANTIALIAS)
+        else:
+            img = img.resize((new_width, display['height']), Image.BILINEAR)
+
+        margin = (img.size[0] - display['width']) // 2
+        img = img.crop((margin, 0, display['width'] + margin, display['height']))
+
+    else:
+        img = img.resize((display['width'], display['height']), Image.ANTIALIAS)
+
+    img.save('{}-{}x{}{}'.format(os.path.splitext(image_path)[0], display['width'], display['height'], os.path.splitext(image_path)[1]))
+    common.preview.refresh()
 
 
 def is_newer(in_path, dest_path):
