@@ -406,26 +406,6 @@ def scale_and_crop(item, image_path, display):
 
     img.save('{}-{}x{}{}'.format(os.path.splitext(image_path)[0], display['width'], display['height'], os.path.splitext(image_path)[1]))
     common.preview.refresh()
-    
-
-def scale_down_horizontally(image, display_width, display_height):
-    # scale the image horizontally & crop vertically
-    return image
-
-
-def scale_down_vertically(image, display_width, display_height):
-    # scale the image vertically and crop horizontally
-    return image
-
-
-def scale_up_horizontally(image, display_width, display_height):
-    # scale the image up horizontally and crop vertically
-    return image
-
-
-def scale_up_vertically(image, display_width, display_height):
-    # scale the image up vertically and crop horizontally
-    return image
 
 
 def is_newer(in_path, dest_path):
