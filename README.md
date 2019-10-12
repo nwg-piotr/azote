@@ -73,6 +73,11 @@ done &
 exec dwm
 ```
 
+## Versioning
+
+Azote uses the [Semantic Versioning 2.0.0](https://semver.org). 
+For changes see [CHANGELOG](https://github.com/nwg-piotr/azote/blob/master/CHANGELOG).
+
 ## Installation
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
@@ -103,7 +108,7 @@ Binary package `azote` available in the Void repository.
 
 ### Other Linux distributions:
 
-Packagers wanted!
+Packagers wanted. Personally I only maintain Arch (AUR) and Void Linux packages.
 
 **Dependencies:**
 
