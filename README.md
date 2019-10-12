@@ -75,7 +75,7 @@ exec dwm
 
 ## Versioning
 
-Azote uses the [Semantic Versioning 2.0.0](https://semver.org). 
+Azote uses [Semantic Versioning 2.0.0](https://semver.org). 
 For changes see [CHANGELOG](https://github.com/nwg-piotr/azote/blob/master/CHANGELOG).
 
 ## Installation
