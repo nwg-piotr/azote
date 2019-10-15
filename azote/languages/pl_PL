@@ -9,6 +9,7 @@ background_color = Kolor tła
 display_mode = Tryb wyświetlania
 flip_image = Odwróć obraz
 flip_wallpaper_horizontally = Odwróć tapetę w poziomie
+image_button = Przycisk obrazu
 image_menu = Menu obrazu
 move = Do kosza
 move_to_trash = Przenieś wybrany do kosza

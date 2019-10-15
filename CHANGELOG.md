@@ -1,8 +1,9 @@
 # CHANGELOG
 
-## Development:
-- Scale & crop feature not working on X11 bug 
-[fixed](https://github.com/nwg-piotr/azote/commit/077806e6f72a84fdf768ac6c64d4f081a78fb579).
+## v1.5.1
+- scale & crop feature not working on X11 bug 
+[fixed](https://github.com/nwg-piotr/azote/commit/077806e6f72a84fdf768ac6c64d4f081a78fb579)
+- small fixes to translations
 
 ## v1.5.0 (2019-10-12)
 - Image menu: scale and crop the selected image to dimensions of a selected display

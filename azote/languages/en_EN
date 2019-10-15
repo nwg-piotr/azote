@@ -9,6 +9,7 @@ background_color = Background color
 display_mode = Display mode
 flip_image = Flip image
 flip_wallpaper_horizontally = Flip wallpaper horizontally
+image_button = Image button
 image_menu = Image menu
 move = To trash
 move_to_trash = Move selected to trash
