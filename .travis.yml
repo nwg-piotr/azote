@@ -6,7 +6,7 @@ python:
    - "3.7"
 
 before_install:
-   - apt install libgirepository1.0-dev python3 python3-gi python3-pil
+   - sudo apt install libgirepository1.0-dev python3 python3-gi python3-pil
 
 install: skip
 
