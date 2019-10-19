@@ -5,9 +5,10 @@ python:
    - "3.6"
    - "3.7"
 
-install:
-   - pip install -r requirements.txt
-   - apt install libgirepository1.0-dev
+before_install:
+   - apt install libgirepository1.0-dev python3 python3-gi python3-pil
+
+install: skip
 
 script:
    - python3 setup.py || python setup.py
