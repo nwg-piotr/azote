@@ -9,4 +9,4 @@ before_install: sudo apt update && sudo apt install python3-all python3-setuptoo
 
 install: skip
 
-script: python3 setup.py || python setup.py
+script: python3 setup.py install --optimize=1
