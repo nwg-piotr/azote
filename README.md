@@ -1,5 +1,7 @@
 # Azote
 
+[![Build Status](https://travis-ci.com/Head-on-a-Stick/azote.svg?branch=travis_CI)](https://travis-ci.com/Head-on-a-Stick/azote)
+
 **Azote** is a GTK+ 3-based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
 (Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. During development I test it on sway, i3, 
 Openbox, qtile and dwm, so I'm not sure if it works on others window managers.
