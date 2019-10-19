@@ -1,6 +1,6 @@
 # Azote
 
-[![Build Status](https://travis-ci.com/Head-on-a-Stick/azote.svg?branch=travis_CI)](https://travis-ci.com/Head-on-a-Stick/azote)
+[![Build Status](https://travis-ci.com/nwg-piotr/azote.svg?branch=travis_CI)](https://travis-ci.com/nwg-piotr/azote)
 
 **Azote** is a GTK+ 3-based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
 (Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. During development I test it on sway, i3, 
@@ -78,7 +78,7 @@ exec dwm
 ## Versioning
 
 Azote uses [Semantic Versioning 2.0.0](https://semver.org). 
-For changes see [CHANGELOG](https://github.com/nwg-piotr/azote/blob/master/CHANGELOG).
+For changes see [CHANGELOG](https://github.com/nwg-piotr/azote/blob/master/CHANGELOG.md).
 
 ## Installation
 
