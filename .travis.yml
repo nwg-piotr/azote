@@ -5,10 +5,8 @@ python:
    - "3.6"
    - "3.7"
 
-before_install:
-   - sudo apt install libgirepository1.0-dev python3 python3-gi python3-pil
+before_install: sudo apt install python3-all python3-setuptools
 
 install: skip
 
-script:
-   - python3 setup.py || python setup.py
+script: python3 setup.py || python setup.py
