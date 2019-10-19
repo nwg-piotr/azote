@@ -7,6 +7,7 @@ python:
 
 install:
    - pip install -r requirements.txt
+   - apt install libgirepository1.0-dev
 
 script:
-   - python3 setup.py
+   - python3 setup.py || python setup.py
