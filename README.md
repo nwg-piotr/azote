@@ -1,5 +1,7 @@
 # Azote
 
+[![Build Status](https://travis-ci.com/nwg-piotr/azote.svg?branch=master)](https://travis-ci.com/nwg-piotr/azote)
+
 **Azote** is a GTK+ 3-based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
 (Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. During development I test it on sway, i3, 
 Openbox, qtile and dwm, so I'm not sure if it works on others window managers.
@@ -73,6 +75,11 @@ done &
 exec dwm
 ```
 
+## Versioning
+
+Azote uses [Semantic Versioning 2.0.0](https://semver.org). 
+For changes see [CHANGELOG](https://github.com/nwg-piotr/azote/blob/master/CHANGELOG.md).
+
 ## Installation
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
@@ -103,7 +110,7 @@ Binary package `azote` available in the Void repository.
 
 ### Other Linux distributions:
 
-Packagers wanted!
+Packagers wanted. Personally I only maintain Arch (AUR) and Void Linux packages.
 
 **Dependencies:**
 

@@ -9,6 +9,7 @@ background_color = Hintergrundfarbe
 display_mode = Anzeigemodus
 flip_image = Bild spiegeln
 flip_wallpaper_horizontally = Bild horizontal spiegeln
+image_button = Bildschaltfläche
 image_menu = Bild Menü
 move = Zum Papierkorb
 move_to_trash = Ausgewählte in den Papierkorb verschieben

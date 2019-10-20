@@ -1,0 +1,12 @@
+language: python
+python:
+   - "3.4"
+   - "3.5"
+   - "3.6"
+   - "3.7"
+
+before_install: sudo apt update && sudo apt install python3-all python3-setuptools
+
+install: skip
+
+script: python3 setup.py install --optimize=1
