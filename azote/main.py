@@ -493,9 +493,19 @@ def show_image_menu(widget):
             submenu = Gtk.Menu()
             for i in range(len(common.displays)):
                 display = common.displays[i]
-                subitem = Gtk.MenuItem.new_with_label('{} x {} ({})'.format(display['width'], display['height'], display['name']))
-                subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, common.displays[i])
+                width, height = display['width'], display['height']
+                subitem = Gtk.MenuItem.new_with_label(
+                    '{} x {} ({})'.format(width, height, display['name']))
+                subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
                 submenu.append(subitem)
+
+            if common.settings.custom_display:
+                subitem = Gtk.MenuItem.new_with_label(
+                    '{} x {} ({})'.format(common.settings.custom_display[1], common.settings.custom_display[2],
+                                          common.settings.custom_display[0]))
+                subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, int(common.settings.custom_display[1]), int(common.settings.custom_display[2]))
+                submenu.append(subitem)
+
             item.set_submenu(submenu)
 
             if common.env['send2trash']:
@@ -566,6 +576,7 @@ class GUI:
 
         window = Gtk.Window()
         window.set_default_size(240 * 3 + 160, h * 0.95)
+        common.main_window = window
 
         window.set_title("Azote")
         logo = GdkPixbuf.Pixbuf.new_from_file('images/icon.svg')
@@ -771,9 +782,13 @@ def on_settings_button(button):
     item.connect('activate', switch_open_button)
     menu.append(item)
 
-    item = Gtk.CheckMenuItem.new_with_label(common.lang['thumbmail_context_menu'])
+    item = Gtk.CheckMenuItem.new_with_label(common.lang['thumbnail_context_menu'])
     item.set_active(common.settings.show_context_menu)
     item.connect('activate', switch_context_menu)
+    menu.append(item)
+
+    item = Gtk.MenuItem.new_with_label(common.lang['custom_display'])
+    item.connect('activate', show_custom_display_dialog)
     menu.append(item)
 
     menu.show_all()
@@ -790,6 +805,132 @@ def switch_open_button(item):
 def switch_context_menu(item):
     common.settings.show_context_menu = not common.settings.show_context_menu
     common.settings.save()
+
+
+def show_custom_display_dialog(item):
+    cdd = CustomDisplayDialog()
+
+
+class CustomDisplayDialog(Gtk.Window):
+    def __init__(self):
+        super().__init__()
+
+        self.properties = common.settings.custom_display
+
+        self.set_title("Azote custom display")
+        self.set_role("pop-up")
+        self.set_type_hint(Gtk.WindowType.TOPLEVEL)
+        self.set_modal(True)
+        self.set_transient_for(common.main_window)
+        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+        self.set_keep_above(True)
+
+        self.name_label = Gtk.Label()
+        self.name_label.set_width_chars(12)
+        self.name_label.set_text(common.lang['name'])
+
+        self.name_entry = Gtk.Entry()
+        if self.properties and self.properties[0]:
+            self.name_entry.set_text(self.properties[0])
+        self.name_entry.connect('changed', self.validate_entries)
+
+        self.width_label = Gtk.Label()
+        self.width_label.set_width_chars(12)
+        self.width_label.set_text(common.lang['width'])
+
+        self.button_ok = Gtk.Button.new_with_label(common.lang['ok'])
+        self.button_ok.set_sensitive(False)
+
+        self.width_entry = NumberEntry()
+        if self.properties:
+            self.width_entry.set_text(self.properties[1])
+        self.width_entry.connect('changed', self.validate_entries)
+
+        self.height_label = Gtk.Label()
+        self.height_label.set_width_chars(12)
+        self.height_label.set_text(common.lang['height'])
+
+        self.height_entry = NumberEntry()
+        if self.properties:
+            self.height_entry.set_text(self.properties[2])
+        self.height_entry.connect('changed', self.validate_entries)
+
+        self.button_cancel = Gtk.Button.new_with_label(common.lang['cancel'])
+        self.button_cancel.connect("clicked", self.dialog_cancel, self)
+
+        self.button_clear = Gtk.Button.new_with_label(common.lang['delete'])
+        self.button_clear.connect("clicked", self.dialog_clear, self)
+
+        self.vbox = Gtk.VBox()
+        self.vbox.set_spacing(5)
+        self.vbox.set_border_width(5)
+
+        self.hbox0 = Gtk.HBox()
+        self.hbox0.pack_start(self.name_label, True, True, 0)
+        self.hbox0.add(self.name_entry)
+        self.vbox.add(self.hbox0)
+
+        self.hbox1 = Gtk.HBox()
+        self.hbox1.pack_start(self.width_label, True, True, 0)
+        self.hbox1.add(self.width_entry)
+        self.vbox.add(self.hbox1)
+
+        self.hbox2 = Gtk.HBox()
+        self.hbox2.pack_start(self.height_label, True, True, 0)
+        self.hbox2.add(self.height_entry)
+        self.vbox.add(self.hbox2)
+
+        self.hbox3 = Gtk.HBox()
+        self.hbox3.pack_start(self.button_ok, True, True, 0)
+        self.hbox3.pack_start(self.button_cancel, True, True, 5)
+        self.hbox3.pack_start(self.button_clear, True, True, 0)
+        self.vbox.pack_start(self.hbox3, True, True, 0)
+
+        self.add(self.vbox)
+        self.button_ok.connect("clicked", self.dialog_ok)
+        self.show_all()
+
+    def validate_entries(self, widget):
+        self.button_ok.set_sensitive(self.width_entry.get_text() and self.height_entry.get_text())
+
+    def dialog_ok(self, widget, callback_data=None):
+        self.properties = [self.name_entry.get_text(), self.width_entry.get_text(), self.height_entry.get_text()]
+        if not self.properties[0]:
+            self.properties[0] = 'Custom'
+        common.settings.custom_display = self.properties
+        common.settings.save()
+        self.close()
+
+    def dialog_cancel(self, widget, callback_data=None):
+        self.close()
+
+    def dialog_clear(self, widget, callback_data=None):
+        common.settings.custom_display = None
+        common.settings.save()
+        self.close()
+
+
+class NumberEntry(Gtk.Entry):
+    """
+    https://stackoverflow.com/a/2727085/4040598
+    """
+
+    def __init__(self):
+        Gtk.Entry.__init__(self)
+        self.connect('changed', self.on_changed)
+
+    def on_changed(self, *args):
+        text = self.get_text().strip()
+        self.set_text(''.join([i for i in text if i in '0123456789']))
+
+
+def dialog_ok(widget, window, name, width, height, callback_data=None):
+    print(window, name, width, height)
+    window.close()
+
+
+def dialog_cancel(widget, window, callback_data=None):
+    window.close()
 
 
 def on_thumb_double_click(button):
