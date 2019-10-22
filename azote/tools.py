@@ -427,6 +427,25 @@ def update_status_bar():
             file_info = os.stat(os.path.join(common.thumb_dir, file))
             total_size += file_info.st_size
     common.status_bar.push(0, common.lang['thumbnails_in_cache'].format(num_files, convert_bytes(total_size)))
+    
+    
+def clear_thumbnails():
+    files_in_use = os.listdir(common.settings.src_path)
+    for i in range(len(files_in_use)):
+        full_path = os.path.join(common.settings.src_path, files_in_use[i])
+        files_in_use[i] = '{}.png'.format(hashlib.md5(full_path.encode()).hexdigest())
+    
+    deleted = 0
+    for file in os.listdir(common.thumb_dir):
+        if file not in files_in_use:
+            file_path = os.path.join(common.thumb_dir, file)
+            try:
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                    deleted += 1
+            except Exception as e:
+                print(e)
+    print('{} unused thumbnails deleted'.format(deleted))
 
 
 def convert_bytes(num):

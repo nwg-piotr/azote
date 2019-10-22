@@ -35,7 +35,7 @@ except Exception as e:
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, rgba_to_hex, split_selected_wallpaper, scale_and_crop
+    copy_backgrounds, rgba_to_hex, split_selected_wallpaper, scale_and_crop, clear_thumbnails
 
 
 def get_files():
@@ -981,7 +981,34 @@ def apply_to_all_feh(item, mode):
     subprocess.call(command, shell=True)
 
 
+def print_help():
+    try:
+        version = pkg_resources.require(common.app_name)[0].version
+    except Exception as e:
+        version = 'unknown ({})'.format(e)
+    print('\nAzote wallpaper manager version {}\n'.format(version))
+    print('[-h] | [--help]\t\t\t Print help')
+    print('[-l] | [--lang] <ln_LN> \t Force a locale (de_DE, en_EN, fr_FR, pl_PL)')
+    print('[-c] | [--clear]\t\t Clear thumbnails\n')
+
+
 def main():
+    lang = None
+    clear_thumbs = False
+    for i in range(1, len(sys.argv)):
+        if sys.argv[i].upper() == '-H' or sys.argv[i].upper() == '--HELP':
+            print_help()
+            exit(0)
+
+        if sys.argv[i].upper() == '-L' or sys.argv[i].upper() == '--LANG':
+            try:
+                lang = sys.argv[i + 1]
+            except:
+                pass
+            
+        if sys.argv[i].upper() == '-C' or sys.argv[i].upper() == '--CLEAR':
+            clear_thumbs = True
+
     screen = Gdk.Screen.get_default()
     provider = Gtk.CssProvider()
     style_context = Gtk.StyleContext()
@@ -1020,15 +1047,10 @@ def main():
             """
     provider.load_from_data(css)
 
-    lang = None
-    for i in range(1, len(sys.argv)):
-        if sys.argv[i] == 'lang':
-            try:
-                lang = sys.argv[i + 1]
-            except:
-                pass
-
     set_env(lang)  # detect displays, check installed modules, set paths and stuff
+    if clear_thumbs:
+        clear_thumbnails()
+        
     common.cols = len(common.displays) if len(common.displays) > 3 else 3
     app = GUI()
     Gtk.main()
