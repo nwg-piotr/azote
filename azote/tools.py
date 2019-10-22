@@ -369,8 +369,12 @@ def expand_img(image):
     border_h = (240 - width) // 2
     border_v = (135 - height) // 2
     if border_v > 0 or border_h > 0:
-        border = (border_h, border_v, border_h, border_v)
-        return ImageOps.expand(image, border=border)
+        # border = (border_h, border_v, border_h, border_v)
+        # return ImageOps.expand(image, border=border)
+        # Let's add checkered background instead of the black one
+        background = Image.open('images/squares.jpg')
+        background.paste(image, (border_h, border_v))
+        return background
     else:
         return image
 
