@@ -1,7 +1,9 @@
 # CHANGELOG
 
 ## In development:
-- Scale & crop backgrounds to virtual, custom display dimensions
+- scale & crop backgrounds to virtual, custom display dimensions
+- `-h | --help` argument added
+- `-c | --clear` argument to clear unused thumbnails on startup
 
 ## v1.5.1 (2019-10-16)
 - scale & crop feature not working on X11 bug 
