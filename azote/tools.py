@@ -25,6 +25,7 @@ from shutil import copyfile
 import json
 
 import gi
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -110,8 +111,8 @@ def check_displays():
             display = {'name': names[i],
                        'x': 0,
                        'y': 0,
-                       'width': int(w_h[0]),
-                       'height': int(w_h[1])}
+                       'width': w_h[0],
+                       'height': w_h[1]}
             displays.append(display)
             log("Output found: {}".format(display), common.INFO)
 
@@ -372,39 +373,39 @@ def expand_img(image):
         return ImageOps.expand(image, border=border)
     else:
         return image
-    
-    
-def scale_and_crop(item, image_path, display):
+
+
+def scale_and_crop(item, image_path, width, height):
     img = Image.open(image_path)
-    
+
     # We can either scale vertically & crop horizontally or scale horizontally and crop vertically
-    new_height = int(img.size[0] * display['height'] / display['width'])
+    new_height = int(img.size[0] * height / width)
 
     if new_height < img.size[1]:  # we need to scale to display width and crop vertical margins
-        new_height = int(display['width'] * img.size[1] / img.size[0])
+        new_height = int(width * img.size[1] / img.size[0])
         # Choose the filter depending on if we're scaling down or up
-        if new_height >= display['height']:
-            img = img.resize((display['width'], new_height), Image.ANTIALIAS)
+        if new_height >= height:
+            img = img.resize((width, new_height), Image.ANTIALIAS)
         else:
-            img = img.resize((display['width'], new_height), Image.BILINEAR)
+            img = img.resize((width, new_height), Image.BILINEAR)
 
-        margin = (img.size[1] - display['height']) // 2
-        img = img.crop((0, margin, display['width'], display['height'] + margin))
+        margin = (img.size[1] - height) // 2
+        img = img.crop((0, margin, width, height + margin))
 
     elif new_height > img.size[1]:  # we need to scale to display height and crop horizontal margins
-        new_width = int(img.size[0] * display['height'] / img.size[1])
-        if new_width >= display['width']:
-            img = img.resize((new_width, display['height']), Image.ANTIALIAS)
+        new_width = int(img.size[0] * height / img.size[1])
+        if new_width >= width:
+            img = img.resize((new_width, height), Image.ANTIALIAS)
         else:
-            img = img.resize((new_width, display['height']), Image.BILINEAR)
+            img = img.resize((new_width, height), Image.BILINEAR)
 
-        margin = (img.size[0] - display['width']) // 2
-        img = img.crop((margin, 0, display['width'] + margin, display['height']))
+        margin = (img.size[0] - width) // 2
+        img = img.crop((margin, 0, width + margin, height))
 
     else:
-        img = img.resize((display['width'], display['height']), Image.ANTIALIAS)
+        img = img.resize((width, height), Image.ANTIALIAS)
 
-    img.save('{}-{}x{}{}'.format(os.path.splitext(image_path)[0], display['width'], display['height'], os.path.splitext(image_path)[1]))
+    img.save('{}-{}x{}{}'.format(os.path.splitext(image_path)[0], width, height, os.path.splitext(image_path)[1]))
     common.preview.refresh()
 
 
@@ -426,6 +427,25 @@ def update_status_bar():
             file_info = os.stat(os.path.join(common.thumb_dir, file))
             total_size += file_info.st_size
     common.status_bar.push(0, common.lang['thumbnails_in_cache'].format(num_files, convert_bytes(total_size)))
+    
+    
+def clear_thumbnails():
+    files_in_use = os.listdir(common.settings.src_path)
+    for i in range(len(files_in_use)):
+        full_path = os.path.join(common.settings.src_path, files_in_use[i])
+        files_in_use[i] = '{}.png'.format(hashlib.md5(full_path.encode()).hexdigest())
+    
+    deleted = 0
+    for file in os.listdir(common.thumb_dir):
+        if file not in files_in_use:
+            file_path = os.path.join(common.thumb_dir, file)
+            try:
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                    deleted += 1
+            except Exception as e:
+                print(e)
+    print('{} unused thumbnails deleted'.format(deleted))
 
 
 def convert_bytes(num):
@@ -455,8 +475,9 @@ class Settings(object):
         self.src_path = common.sample_dir
         self.sorting = 'new'
         # Gtk.Menu() on sway is unreliable, especially called with right click
-        self.show_open_button = common.sway         # shown by default on Sway
-        self.show_context_menu = not common.sway    # turned off by default on Sway
+        self.show_open_button = common.sway  # shown by default on Sway
+        self.show_context_menu = not common.sway  # turned off by default on Sway
+        self.custom_display = None
 
         self.load()
 
@@ -475,7 +496,7 @@ class Settings(object):
             log('Image sorting: {}'.format(self.sorting), common.INFO)
         except AttributeError:
             save_needed = True
-            
+
         try:
             self.show_open_button = settings.show_open_button
             log('Picture menu button: {}'.format(self.show_open_button), common.INFO)
@@ -487,7 +508,13 @@ class Settings(object):
             log('Thumbnail context menu: {}'.format(self.show_context_menu), common.INFO)
         except AttributeError:
             save_needed = True
-            
+
+        try:
+            self.custom_display = settings.custom_display
+            log('Custom display: {}'.format(self.custom_display), common.INFO)
+        except AttributeError:
+            save_needed = True
+
         if save_needed:
             self.save()
 

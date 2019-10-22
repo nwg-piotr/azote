@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## In development:
+- scale & crop backgrounds to virtual, custom display dimensions
+- `-h | --help` argument added
+- `-c | --clear` argument to clear unused thumbnails on startup
+
 ## v1.5.1 (2019-10-16)
 - scale & crop feature not working on X11 bug 
 [fixed](https://github.com/nwg-piotr/azote/commit/077806e6f72a84fdf768ac6c64d4f081a78fb579)
