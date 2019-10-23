@@ -369,8 +369,12 @@ def expand_img(image):
     border_h = (240 - width) // 2
     border_v = (135 - height) // 2
     if border_v > 0 or border_h > 0:
-        border = (border_h, border_v, border_h, border_v)
-        return ImageOps.expand(image, border=border)
+        # border = (border_h, border_v, border_h, border_v)
+        # return ImageOps.expand(image, border=border)
+        # Let's add checkered background instead of the black one
+        background = Image.open('images/squares.jpg')
+        background.paste(image, (border_h, border_v))
+        return background
     else:
         return image
 
@@ -429,23 +433,24 @@ def update_status_bar():
     common.status_bar.push(0, common.lang['thumbnails_in_cache'].format(num_files, convert_bytes(total_size)))
     
     
-def clear_thumbnails():
+def clear_thumbnails(clear_all=False):
     files_in_use = os.listdir(common.settings.src_path)
     for i in range(len(files_in_use)):
         full_path = os.path.join(common.settings.src_path, files_in_use[i])
         files_in_use[i] = '{}.png'.format(hashlib.md5(full_path.encode()).hexdigest())
     
-    deleted = 0
+    number = 0
     for file in os.listdir(common.thumb_dir):
-        if file not in files_in_use:
+        if file not in files_in_use or clear_all:
             file_path = os.path.join(common.thumb_dir, file)
             try:
                 if os.path.isfile(file_path):
                     os.remove(file_path)
-                    deleted += 1
+                    number += 1
             except Exception as e:
                 print(e)
-    print('{} unused thumbnails deleted'.format(deleted))
+    msg = 'thumbnails' if clear_all else 'unused thumbnails'
+    print('\nAzote: {} {} deleted\n'.format(number, msg))
 
 
 def convert_bytes(num):
