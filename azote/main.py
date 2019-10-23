@@ -571,10 +571,11 @@ def destroy(self):
 
 class GUI:
     def __init__(self):
-        screen = Gdk.Screen.get_default()
-        h = screen.get_height()
 
         window = Gtk.Window()
+        screen = window.get_screen()
+        h = screen.height()
+
         window.set_default_size(240 * 3 + 160, h * 0.95)
         common.main_window = window
 
