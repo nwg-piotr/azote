@@ -989,12 +989,13 @@ def print_help():
     print('\nAzote wallpaper manager version {}\n'.format(version))
     print('[-h] | [--help]\t\t\t Print help')
     print('[-l] | [--lang] <ln_LN> \t Force a locale (de_DE, en_EN, fr_FR, pl_PL)')
-    print('[-c] | [--clear]\t\t Clear thumbnails\n')
+    print('[-c] | [--clear]\t\t Clear unused thumbnails')
+    print('[-a] | [--clear-all]\t\t Clear all thumbnails\n')
 
 
 def main():
     lang = None
-    clear_thumbs = False
+    clear_thumbs, clear_all = False, False
     for i in range(1, len(sys.argv)):
         if sys.argv[i].upper() == '-H' or sys.argv[i].upper() == '--HELP':
             print_help()
@@ -1008,6 +1009,9 @@ def main():
             
         if sys.argv[i].upper() == '-C' or sys.argv[i].upper() == '--CLEAR':
             clear_thumbs = True
+            
+        if sys.argv[i].upper() == '-A' or sys.argv[i].upper() == '--CLEAR-ALL':
+            clear_thumbs, clear_all = True, True
 
     screen = Gdk.Screen.get_default()
     provider = Gtk.CssProvider()
@@ -1049,7 +1053,8 @@ def main():
 
     set_env(lang)  # detect displays, check installed modules, set paths and stuff
     if clear_thumbs:
-        clear_thumbnails()
+        clear_thumbnails(clear_all)
+        exit()
         
     common.cols = len(common.displays) if len(common.displays) > 3 else 3
     app = GUI()
