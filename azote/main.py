@@ -872,13 +872,32 @@ class ColorPaletteDialog(Gtk.Window):
         self.hbox = Gtk.VBox()
         self.hbox.set_spacing(5)
         self.hbox.set_border_width(5)
+
+        self.screen = Gdk.Screen.get_default()
+        self.provider = Gtk.CssProvider()
+        self.style_context = Gtk.StyleContext()
+        self.style_context.add_provider_for_screen(
+            self.screen, self.provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+
+        self.css = '\n '
+        for i in range(len(palette)):
+            color = palette[i]
+            hex_color = '#%02x%02x%02x' % (color[0], color[1], color[2])
+            
+            self.css += 'button#col%s { background-color: %s; }\n ' % (i, hex_color)
+
+        print(bytes(self.css, 'utf-8'))
         
-        for color in palette:
-            button = Gtk.Button.new_with_label('#%02x%02x%02x' % color)
-            c = Gdk.Color.from_floats(color[0] / 256, color[1] / 256, color[2] / 256)
-            rgba = Gdk.RGBA.from_color(c)
-            button.override_background_color(0, rgba)
+        self.provider.load_from_data(bytes(self.css, 'utf-8'))
+
+        for i in range(len(palette)):
+            color = palette[i]
+            hex_color = '#%02x%02x%02x' % (color[0], color[1], color[2])
+            button = Gtk.Button.new_with_label(hex_color)
+            button.set_property("name", "col{}".format(i))
             self.hbox.add(button)
+
         self.vbox.add(self.hbox)
 
         self.add(self.vbox)
@@ -1124,6 +1143,7 @@ def main():
                 font-size: 12px;
             }
             """
+    print(css)
     provider.load_from_data(css)
 
     set_env(lang)  # detect displays, check installed modules, set paths and stuff
