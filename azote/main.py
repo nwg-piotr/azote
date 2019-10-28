@@ -32,6 +32,14 @@ except Exception as e:
     common.env['send2trash'] = False
     print('send2trash module not found', e)
 
+# same applies to the colorthief module https://github.com/fengsp/color-thief-py
+try:
+    from colorthief import ColorThief
+    common.env['colorthief'] = True
+except Exception as e:
+    common.env['colorthief'] = False
+    print('colorthief module not found', e)
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
@@ -488,9 +496,31 @@ def show_image_menu(widget):
                 item = Gtk.SeparatorMenuItem()
                 menu.append(item)
 
+            if common.env['colorthief']:
+                item = Gtk.MenuItem.new_with_label('Generate palette')
+                menu.append(item)
+                submenu = Gtk.Menu()
+
+                # Hell knows why the library does not return the tuple of expected length for some num_colors values
+                # Let's cheat here
+                subitem = Gtk.MenuItem.new_with_label('4 colors')
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.source_path, 4)
+                submenu.append(subitem)
+
+                subitem = Gtk.MenuItem.new_with_label('8 colors')
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.source_path, 9)
+                submenu.append(subitem)
+
+                subitem = Gtk.MenuItem.new_with_label('16 colors')
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.source_path, 17)
+                submenu.append(subitem)
+
+                item.set_submenu(submenu)
+
             item = Gtk.MenuItem.new_with_label(common.lang['scale_and_crop'])
             menu.append(item)
             submenu = Gtk.Menu()
+
             for i in range(len(common.displays)):
                 display = common.displays[i]
                 width, height = display['width'], display['height']
@@ -539,6 +569,17 @@ def show_image_menu(widget):
 def on_refresh_clicked(button):
     clear_wallpaper_selection()
     common.preview.refresh()
+
+
+def generate_palette(item, image_path, num_colors):
+    color_thief = ColorThief(image_path)
+    dominant_color = color_thief.get_color(quality=100)
+    dominant_color = '#%02x%02x%02x' % dominant_color
+    palette = color_thief.get_palette(color_count=num_colors)
+    for i in range(len(palette)):
+        palette[i] = '#%02x%02x%02x' % palette[i]
+    print('Dominant:', dominant_color)
+    print('Palette:', palette)
 
 
 def on_folder_clicked(button):
