@@ -35,6 +35,7 @@ except Exception as e:
 # same applies to the colorthief module https://github.com/fengsp/color-thief-py
 try:
     from colorthief import ColorThief
+
     common.env['colorthief'] = True
 except Exception as e:
     common.env['colorthief'] = False
@@ -463,7 +464,14 @@ def on_about_button(button):
     dialog.set_website('https://github.com/nwg-piotr/azote')
     dialog.set_comments(common.lang['app_desc'])
     dialog.set_license_type(Gtk.License.GPL_3_0)
-    dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick'])
+    dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick', 'Libraries and dependencies:',
+                        '- send2trash python module (c) 2017 Virgil Dupras',
+                        '- colorthief python module (c) 2015 Shipeng Feng',
+                        '- python-pillow (c) 1995-2011, Fredrik Lundh, 2010-2019 Alex Clark and Contributors',
+                        '- pygobject (c) 2005-2019 The GNOME Project',
+                        '- GTK+ (c) 2007-2019 The GTK Team',
+                        '- feh (c) 1999,2000 Tom Gilbert, 2010-2018 Daniel Friesel',
+                        '- swaybg (c) 2016-2019 Drew DeVault'])
     dialog.set_translator_credits('xsme (de_DE), HumanG33k (fr_FR)')
     dialog.set_artists(['edskeye'])
 
@@ -504,15 +512,23 @@ def show_image_menu(widget):
                 # Hell knows why the library does not return the tuple of expected length for some num_colors values
                 # Let's cheat here
                 subitem = Gtk.MenuItem.new_with_label('4 colors')
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename, common.selected_wallpaper.source_path, 4)
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename,
+                                common.selected_wallpaper.source_path, 4)
                 submenu.append(subitem)
 
                 subitem = Gtk.MenuItem.new_with_label('8 colors')
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename, common.selected_wallpaper.source_path, 9)
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename,
+                                common.selected_wallpaper.source_path, 9)
+                submenu.append(subitem)
+
+                subitem = Gtk.MenuItem.new_with_label('12 colors')
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename,
+                                common.selected_wallpaper.source_path, 13)
                 submenu.append(subitem)
 
                 subitem = Gtk.MenuItem.new_with_label('16 colors')
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename, common.selected_wallpaper.source_path, 17)
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename,
+                                common.selected_wallpaper.source_path, 17)
                 submenu.append(subitem)
 
                 item.set_submenu(submenu)
@@ -533,7 +549,8 @@ def show_image_menu(widget):
                 subitem = Gtk.MenuItem.new_with_label(
                     '{} x {} ({})'.format(common.settings.custom_display[1], common.settings.custom_display[2],
                                           common.settings.custom_display[0]))
-                subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, int(common.settings.custom_display[1]), int(common.settings.custom_display[2]))
+                subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path,
+                                int(common.settings.custom_display[1]), int(common.settings.custom_display[2]))
                 submenu.append(subitem)
 
             item.set_submenu(submenu)
@@ -573,12 +590,12 @@ def on_refresh_clicked(button):
 
 def generate_palette(item, filename, image_path, num_colors):
     color_thief = ColorThief(image_path)
-    #dominant_color = color_thief.get_color(quality=100)
-    #dominant_color = '#%02x%02x%02x' % dominant_color
+    # dominant_color = color_thief.get_color(quality=100)
+    # dominant_color = '#%02x%02x%02x' % dominant_color
     palette = color_thief.get_palette(color_count=num_colors, quality=10)
-    #for i in range(len(palette)):
-    #    palette[i] = '#%02x%02x%02x' % palette[i]
-    #print('Dominant:', dominant_color)
+    # We need hexadecimal colours
+    for i in range(len(palette)):
+        palette[i] = '#%02x%02x%02x' % palette[i]
     cpd = ColorPaletteDialog(filename, palette)
 
 
@@ -865,14 +882,6 @@ class ColorPaletteDialog(Gtk.Window):
         self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
         self.set_keep_above(True)
 
-        self.vbox = Gtk.VBox()
-        self.vbox.set_spacing(5)
-        self.vbox.set_border_width(5)
-
-        self.hbox = Gtk.VBox()
-        self.hbox.set_spacing(5)
-        self.hbox.set_border_width(5)
-
         self.screen = Gdk.Screen.get_default()
         self.provider = Gtk.CssProvider()
         self.style_context = Gtk.StyleContext()
@@ -880,28 +889,31 @@ class ColorPaletteDialog(Gtk.Window):
             self.screen, self.provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
+        self.vbox = Gtk.VBox()
+        self.vbox.set_spacing(5)
+        self.vbox.set_border_width(5)
+
+        self.hbox = Gtk.HBox()
+        self.hbox.set_spacing(5)
+        self.hbox.set_border_width(5)
+
         self.css = '\n '
         for i in range(len(palette)):
             color = palette[i]
-            hex_color = '#%02x%02x%02x' % (color[0], color[1], color[2])
-            
-            self.css += 'button#col%s { background-color: %s; }\n ' % (i, hex_color)
+            self.css += 'button#col%s { background-color: %s; }\n ' % (i, color)
 
-        print(bytes(self.css, 'utf-8'))
-        
         self.provider.load_from_data(bytes(self.css, 'utf-8'))
 
         for i in range(len(palette)):
             color = palette[i]
-            hex_color = '#%02x%02x%02x' % (color[0], color[1], color[2])
-            button = Gtk.Button.new_with_label(hex_color)
+            button = Gtk.Button.new_with_label(color)
             button.set_property("name", "col{}".format(i))
-            self.hbox.add(button)
+            #self.hbox.add(button)
+            self.hbox.pack_start(button, True, True, 0)
 
         self.vbox.add(self.hbox)
 
         self.add(self.vbox)
-
         self.show_all()
 
 
@@ -1100,10 +1112,10 @@ def main():
                 lang = sys.argv[i + 1]
             except:
                 pass
-            
+
         if sys.argv[i].upper() == '-C' or sys.argv[i].upper() == '--CLEAR':
             clear_thumbs = True
-            
+
         if sys.argv[i].upper() == '-A' or sys.argv[i].upper() == '--CLEAR-ALL':
             clear_thumbs, clear_all = True, True
 
@@ -1143,14 +1155,13 @@ def main():
                 font-size: 12px;
             }
             """
-    print(css)
     provider.load_from_data(css)
 
     set_env(lang)  # detect displays, check installed modules, set paths and stuff
     if clear_thumbs:
         clear_thumbnails(clear_all)
         exit()
-        
+
     common.cols = len(common.displays) if len(common.displays) > 3 else 3
     app = GUI()
     Gtk.main()
