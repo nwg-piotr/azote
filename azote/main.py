@@ -504,15 +504,15 @@ def show_image_menu(widget):
                 # Hell knows why the library does not return the tuple of expected length for some num_colors values
                 # Let's cheat here
                 subitem = Gtk.MenuItem.new_with_label('4 colors')
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.source_path, 4)
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename, common.selected_wallpaper.source_path, 4)
                 submenu.append(subitem)
 
                 subitem = Gtk.MenuItem.new_with_label('8 colors')
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.source_path, 9)
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename, common.selected_wallpaper.source_path, 9)
                 submenu.append(subitem)
 
                 subitem = Gtk.MenuItem.new_with_label('16 colors')
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.source_path, 17)
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename, common.selected_wallpaper.source_path, 17)
                 submenu.append(subitem)
 
                 item.set_submenu(submenu)
@@ -571,15 +571,15 @@ def on_refresh_clicked(button):
     common.preview.refresh()
 
 
-def generate_palette(item, image_path, num_colors):
+def generate_palette(item, filename, image_path, num_colors):
     color_thief = ColorThief(image_path)
-    dominant_color = color_thief.get_color(quality=100)
-    dominant_color = '#%02x%02x%02x' % dominant_color
-    palette = color_thief.get_palette(color_count=num_colors)
-    for i in range(len(palette)):
-        palette[i] = '#%02x%02x%02x' % palette[i]
-    print('Dominant:', dominant_color)
-    print('Palette:', palette)
+    #dominant_color = color_thief.get_color(quality=100)
+    #dominant_color = '#%02x%02x%02x' % dominant_color
+    palette = color_thief.get_palette(color_count=num_colors, quality=10)
+    #for i in range(len(palette)):
+    #    palette[i] = '#%02x%02x%02x' % palette[i]
+    #print('Dominant:', dominant_color)
+    cpd = ColorPaletteDialog(filename, palette)
 
 
 def on_folder_clicked(button):
@@ -851,6 +851,39 @@ def switch_context_menu(item):
 
 def show_custom_display_dialog(item):
     cdd = CustomDisplayDialog()
+
+
+class ColorPaletteDialog(Gtk.Window):
+    def __init__(self, filename, palette):
+        super().__init__()
+
+        self.set_title(filename)
+        self.set_role("pop-up")
+        self.set_type_hint(Gtk.WindowType.TOPLEVEL)
+        self.set_modal(True)
+        self.set_transient_for(common.main_window)
+        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+        self.set_keep_above(True)
+
+        self.vbox = Gtk.VBox()
+        self.vbox.set_spacing(5)
+        self.vbox.set_border_width(5)
+
+        self.hbox = Gtk.VBox()
+        self.hbox.set_spacing(5)
+        self.hbox.set_border_width(5)
+        
+        for color in palette:
+            button = Gtk.Button.new_with_label('#%02x%02x%02x' % color)
+            c = Gdk.Color.from_floats(color[0] / 256, color[1] / 256, color[2] / 256)
+            rgba = Gdk.RGBA.from_color(c)
+            button.override_background_color(0, rgba)
+            self.hbox.add(button)
+        self.vbox.add(self.hbox)
+
+        self.add(self.vbox)
+
+        self.show_all()
 
 
 class CustomDisplayDialog(Gtk.Window):
