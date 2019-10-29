@@ -6,6 +6,7 @@
 - `-c | --clear` argument to clear unused thumbnails and exit
 - `-a | --clear-all` argument to clear all thumbnails and exit
 - thumbnails: checkered background instead of black
+- 'Create palette' entry added to the context menu
 
 ## v1.5.1 (2019-10-16)
 - scale & crop feature not working on X11 bug 
