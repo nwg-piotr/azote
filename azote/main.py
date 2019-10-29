@@ -505,29 +505,29 @@ def show_image_menu(widget):
                 menu.append(item)
 
             if common.env['colorthief']:
-                item = Gtk.MenuItem.new_with_label('Generate palette')
+                item = Gtk.MenuItem.new_with_label(common.lang['create_palette'])
                 menu.append(item)
                 submenu = Gtk.Menu()
 
                 # Hell knows why the library does not return the tuple of expected length for some num_colors values
                 # Let's cheat here
-                subitem = Gtk.MenuItem.new_with_label('4 colors')
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename,
+                subitem = Gtk.MenuItem.new_with_label('4 {}'.format(common.lang['colors']))
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file, common.selected_wallpaper.filename,
                                 common.selected_wallpaper.source_path, 4)
                 submenu.append(subitem)
 
-                subitem = Gtk.MenuItem.new_with_label('8 colors')
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename,
+                subitem = Gtk.MenuItem.new_with_label('8 {}'.format(common.lang['colors']))
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file, common.selected_wallpaper.filename,
                                 common.selected_wallpaper.source_path, 9)
                 submenu.append(subitem)
 
-                subitem = Gtk.MenuItem.new_with_label('12 colors')
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename,
+                subitem = Gtk.MenuItem.new_with_label('12 {}'.format(common.lang['colors']))
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file, common.selected_wallpaper.filename,
                                 common.selected_wallpaper.source_path, 13)
                 submenu.append(subitem)
 
-                subitem = Gtk.MenuItem.new_with_label('16 colors')
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.filename,
+                subitem = Gtk.MenuItem.new_with_label('16 {}'.format(common.lang['colors']))
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file, common.selected_wallpaper.filename,
                                 common.selected_wallpaper.source_path, 17)
                 submenu.append(subitem)
 
@@ -588,7 +588,7 @@ def on_refresh_clicked(button):
     common.preview.refresh()
 
 
-def generate_palette(item, filename, image_path, num_colors):
+def generate_palette(item, thumb_file, filename, image_path, num_colors):
     color_thief = ColorThief(image_path)
     # dominant_color = color_thief.get_color(quality=100)
     # dominant_color = '#%02x%02x%02x' % dominant_color
@@ -596,7 +596,7 @@ def generate_palette(item, filename, image_path, num_colors):
     # We need hexadecimal colours
     for i in range(len(palette)):
         palette[i] = '#%02x%02x%02x' % palette[i]
-    cpd = ColorPaletteDialog(filename, palette)
+    cpd = ColorPaletteDialog(thumb_file, filename, palette)
 
 
 def on_folder_clicked(button):
@@ -871,8 +871,13 @@ def show_custom_display_dialog(item):
 
 
 class ColorPaletteDialog(Gtk.Window):
-    def __init__(self, filename, palette):
+    def __init__(self, thumb_file, filename, palette):
         super().__init__()
+
+        self.image = Gtk.Image.new_from_file(thumb_file)
+        self.label = Gtk.Label()
+        self.label.set_text(filename)
+        self.label.set_property('name', 'image-label')
 
         self.set_title(filename)
         self.set_role("pop-up")
@@ -891,30 +896,56 @@ class ColorPaletteDialog(Gtk.Window):
 
         self.vbox = Gtk.VBox()
         self.vbox.set_spacing(5)
-        self.vbox.set_border_width(5)
+        self.vbox.set_border_width(15)
+
+        self.vbox.pack_start(self.image, True, True, 15)
+        self.vbox.add(self.label)
 
         self.hbox = Gtk.HBox()
         self.hbox.set_spacing(5)
         self.hbox.set_border_width(5)
 
+        # We need to generate a stylesheet first
         self.css = '\n '
         for i in range(len(palette)):
             color = palette[i]
-            self.css += 'button#col%s { background-color: %s; }\n ' % (i, color)
-
+            self.css += 'button#col%s { background-color: %s; color: #ffffff; }\n ' % (i, color)
         self.provider.load_from_data(bytes(self.css, 'utf-8'))
 
         for i in range(len(palette)):
             color = palette[i]
             button = Gtk.Button.new_with_label(color)
+            button.set_tooltip_text(common.lang['copy'])
             button.set_property("name", "col{}".format(i))
-            #self.hbox.add(button)
-            self.hbox.pack_start(button, True, True, 0)
+            button.set_property("width-request", 85)
+            button.connect_after('clicked', self.to_clipboard)
+            self.hbox.pack_start(button, True, False, 0)
+            if (i + 1) % 4 == 0:
 
-        self.vbox.add(self.hbox)
+                self.vbox.add(self.hbox)
+                self.hbox = Gtk.HBox()
+                self.hbox.set_spacing(5)
+                self.hbox.set_border_width(5)
+
+        hbox = Gtk.HBox()
+        hbox.set_spacing(5)
+        hbox.set_border_width(5)
+
+        button = Gtk.Button.new_with_label(common.lang['close'])
+        button.connect_after('clicked', self.close_window)
+        hbox.pack_start(button, True, False, 0)
+        
+        self.vbox.add(hbox)
 
         self.add(self.vbox)
         self.show_all()
+
+    def close_window(self, widget):
+        self.close()
+        
+    def to_clipboard(self, widget):
+        common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        common.clipboard.set_text(widget.get_label(), -1)
 
 
 class CustomDisplayDialog(Gtk.Window):
@@ -1145,6 +1176,9 @@ def main():
             }
             button#display-btn-selected {
                 font-weight: bold;
+                font-size: 12px;
+            }
+            label#image-label {
                 font-size: 12px;
             }
             statusbar#status-bar {

@@ -19,6 +19,7 @@ class cached_property(object):
     """Decorator that creates converts a method with a single
     self argument into a property cached on the instance.
     """
+
     def __init__(self, func):
         self.func = func
 
@@ -29,6 +30,7 @@ class cached_property(object):
 
 class ColorThief(object):
     """Color thief main class."""
+
     def __init__(self, file):
         """Create one color thief for one image.
 
@@ -146,30 +148,30 @@ class MMCQ(object):
         do_cut_color = None
         if maxw == rw:
             do_cut_color = 'r'
-            for i in range(vbox.r1, vbox.r2+1):
+            for i in range(vbox.r1, vbox.r2 + 1):
                 sum_ = 0
-                for j in range(vbox.g1, vbox.g2+1):
-                    for k in range(vbox.b1, vbox.b2+1):
+                for j in range(vbox.g1, vbox.g2 + 1):
+                    for k in range(vbox.b1, vbox.b2 + 1):
                         index = MMCQ.get_color_index(i, j, k)
                         sum_ += histo.get(index, 0)
                 total += sum_
                 partialsum[i] = total
         elif maxw == gw:
             do_cut_color = 'g'
-            for i in range(vbox.g1, vbox.g2+1):
+            for i in range(vbox.g1, vbox.g2 + 1):
                 sum_ = 0
-                for j in range(vbox.r1, vbox.r2+1):
-                    for k in range(vbox.b1, vbox.b2+1):
+                for j in range(vbox.r1, vbox.r2 + 1):
+                    for k in range(vbox.b1, vbox.b2 + 1):
                         index = MMCQ.get_color_index(j, i, k)
                         sum_ += histo.get(index, 0)
                 total += sum_
                 partialsum[i] = total
         else:  # maxw == bw
             do_cut_color = 'b'
-            for i in range(vbox.b1, vbox.b2+1):
+            for i in range(vbox.b1, vbox.b2 + 1):
                 sum_ = 0
-                for j in range(vbox.r1, vbox.r2+1):
-                    for k in range(vbox.g1, vbox.g2+1):
+                for j in range(vbox.r1, vbox.r2 + 1):
+                    for k in range(vbox.g1, vbox.g2 + 1):
                         index = MMCQ.get_color_index(j, k, i)
                         sum_ += histo.get(index, 0)
                 total += sum_
@@ -182,7 +184,7 @@ class MMCQ(object):
         dim2 = do_cut_color + '2'
         dim1_val = getattr(vbox, dim1)
         dim2_val = getattr(vbox, dim2)
-        for i in range(dim1_val, dim2_val+1):
+        for i in range(dim1_val, dim2_val + 1):
             if partialsum[i] > (total / 2):
                 vbox1 = vbox.copy
                 vbox2 = vbox.copy
@@ -196,7 +198,7 @@ class MMCQ(object):
                 while not partialsum.get(d2, False):
                     d2 += 1
                 count2 = lookaheadsum.get(d2)
-                while not count2 and partialsum.get(d2-1, False):
+                while not count2 and partialsum.get(d2 - 1, False):
                     d2 -= 1
                     count2 = lookaheadsum.get(d2)
                 # set dimensions
@@ -274,6 +276,7 @@ class MMCQ(object):
 
 class VBox(object):
     """3d color space box"""
+
     def __init__(self, r1, r2, g1, g2, b1, b2, histo):
         self.r1 = r1
         self.r2 = r2
@@ -349,6 +352,7 @@ class VBox(object):
 
 class CMap(object):
     """Color map"""
+
     def __init__(self):
         self.vboxes = PQueue(lambda x: x['vbox'].count * x['vbox'].volume)
 
@@ -390,6 +394,7 @@ class CMap(object):
 
 class PQueue(object):
     """Simple priority queue."""
+
     def __init__(self, sort_key):
         self.sort_key = sort_key
         self.contents = []

@@ -56,3 +56,4 @@ modes_swaybg = ["stretch", "fit", "fill", "center", "tile"]
 modes_feh = ["scale", "max", "fill", "center", "tile"]
 
 main_window = None
+clipboard = None
