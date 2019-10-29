@@ -473,6 +473,11 @@ def rgba_to_hex(color):
                                            int(color.blue * 255))
 
 
+def hex_to_rgb(string):
+    string = string.lstrip('#')
+    return tuple(int(string[i:i+2], 16) for i in (0, 2, 4))
+
+
 class Settings(object):
     def __init__(self):
         self.file = os.path.join(common.app_dir, "settings.pkl")

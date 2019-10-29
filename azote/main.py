@@ -44,7 +44,7 @@ except Exception as e:
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, rgba_to_hex, split_selected_wallpaper, scale_and_crop, clear_thumbnails
+    copy_backgrounds, rgba_to_hex, hex_to_rgb, split_selected_wallpaper, scale_and_crop, clear_thumbnails
 
 
 def get_files():
@@ -595,7 +595,7 @@ def generate_palette(item, thumb_file, filename, image_path, num_colors):
     palette = color_thief.get_palette(color_count=num_colors, quality=10)
     # We need hexadecimal colours
     for i in range(len(palette)):
-        palette[i] = '#%02x%02x%02x' % palette[i]
+        palette[i] = '#%02x%02x%02x' % (palette[i][0], palette[i][1], palette[i][2])
     cpd = ColorPaletteDialog(thumb_file, filename, palette)
 
 
@@ -931,9 +931,12 @@ class ColorPaletteDialog(Gtk.Window):
         hbox.set_spacing(5)
         hbox.set_border_width(5)
 
+        self.clipboard_preview = ClipboardPreview()
+        hbox.pack_start(self.clipboard_preview, True, True, 0)
+
         button = Gtk.Button.new_with_label(common.lang['close'])
         button.connect_after('clicked', self.close_window)
-        hbox.pack_start(button, True, False, 0)
+        hbox.pack_start(button, True, True, 0)
         
         self.vbox.add(hbox)
 
@@ -945,7 +948,21 @@ class ColorPaletteDialog(Gtk.Window):
         
     def to_clipboard(self, widget):
         common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        common.clipboard.set_text(widget.get_label(), -1)
+        common.clipboard.set_text(widget.get_label() + ' ' + str(hex_to_rgb(widget.get_label())), -1)
+        hex = widget.get_label()
+        rgb = hex_to_rgb(widget.get_label())
+        label = '{} {} {}'.format(common.lang['copied'], hex, rgb)
+        self.clipboard_preview.update(label, widget.get_property('name'))
+
+
+class ClipboardPreview(Gtk.Button):
+    def __init__(self):
+        super().__init__()
+        self.set_label(common.lang['clipboard_empty'])
+
+    def update(self, name, class_name):
+        self.set_label(name)
+        self.set_property("name", class_name)
 
 
 class CustomDisplayDialog(Gtk.Window):
