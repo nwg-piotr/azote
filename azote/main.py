@@ -42,9 +42,9 @@ except Exception as e:
     print('colorthief module not found', e)
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, Gdk
+from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, rgba_to_hex, hex_to_rgb, split_selected_wallpaper, scale_and_crop, clear_thumbnails
+    copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, create_pixbuf, split_selected_wallpaper, scale_and_crop, clear_thumbnails
 
 
 def get_files():
@@ -594,8 +594,8 @@ def generate_palette(item, thumb_file, filename, image_path, num_colors):
     # dominant_color = '#%02x%02x%02x' % dominant_color
     palette = color_thief.get_palette(color_count=num_colors, quality=10)
     # We need hexadecimal colours
-    for i in range(len(palette)):
-        palette[i] = '#%02x%02x%02x' % (palette[i][0], palette[i][1], palette[i][2])
+    # for i in range(len(palette)):
+    #    palette[i] = '#%02x%02x%02x' % (palette[i][0], palette[i][1], palette[i][2])
     cpd = ColorPaletteDialog(thumb_file, filename, palette)
 
 
@@ -905,18 +905,27 @@ class ColorPaletteDialog(Gtk.Window):
         self.hbox.set_spacing(5)
         self.hbox.set_border_width(5)
 
-        # We need to generate a stylesheet first
+        """# We need to generate a stylesheet first
         self.css = '\n '
         for i in range(len(palette)):
             color = palette[i]
-            self.css += 'button#col%s { background-color: %s; color: #ffffff; }\n ' % (i, color)
-        self.provider.load_from_data(bytes(self.css, 'utf-8'))
+            hex_color = rgb_to_hex(color)
+            self.css += 'button#col%s { background-color: %s; color: #ffffff; }\n ' % (i, hex_color)
+        self.provider.load_from_data(bytes(self.css, 'utf-8'))"""
 
         for i in range(len(palette)):
             color = palette[i]
-            button = Gtk.Button.new_with_label(color)
+            hex_color = rgb_to_hex(color)
+
+            pixbuf = create_pixbuf((100, 50), color)
+            gdk_image = Gtk.Image.new_from_pixbuf(pixbuf)
+
+            button = Gtk.Button.new_with_label(hex_color)
+            button.set_image(gdk_image)
+            button.set_image_position(2)  # TOP
+
             button.set_tooltip_text(common.lang['copy'])
-            button.set_property("name", "col{}".format(i))
+            # button.set_property("name", "col{}".format(i))
             button.set_property("width-request", 85)
             button.connect_after('clicked', self.to_clipboard)
             self.hbox.pack_start(button, True, False, 0)
@@ -932,11 +941,15 @@ class ColorPaletteDialog(Gtk.Window):
         hbox.set_border_width(5)
 
         self.clipboard_preview = ClipboardPreview()
-        hbox.pack_start(self.clipboard_preview, True, True, 0)
+        hbox.pack_start(self.clipboard_preview, False, False, 0)
+
+        self.clipboard_label = Gtk.Label()
+        self.clipboard_label.set_text(common.lang['clipboard_empty'])
+        hbox.pack_start(self.clipboard_label, True, True, 0)
 
         button = Gtk.Button.new_with_label(common.lang['close'])
         button.connect_after('clicked', self.close_window)
-        hbox.pack_start(button, True, True, 0)
+        hbox.pack_start(button, False, False, 0)
         
         self.vbox.add(hbox)
 
@@ -951,18 +964,23 @@ class ColorPaletteDialog(Gtk.Window):
         common.clipboard.set_text(widget.get_label() + ' ' + str(hex_to_rgb(widget.get_label())), -1)
         hex = widget.get_label()
         rgb = hex_to_rgb(widget.get_label())
-        label = '{} {} {}'.format(common.lang['copied'], hex, rgb)
+        label = '{} {}'.format(hex, rgb)
         self.clipboard_preview.update(label, widget.get_property('name'))
+        self.clipboard_label.set_text(label)
 
 
 class ClipboardPreview(Gtk.Button):
     def __init__(self):
         super().__init__()
-        self.set_label(common.lang['clipboard_empty'])
+        self.set_property("width-request", 30)
+        self.set_sensitive(False)
 
-    def update(self, name, class_name):
-        self.set_label(name)
-        self.set_property("name", class_name)
+    def update(self, name, color):
+        #self.set_label(name)
+        pixbuf = create_pixbuf((30, 30), (100, 100, 100))
+        gdk_image = Gtk.Image.new_from_pixbuf(pixbuf)
+        self.set_image(gdk_image)
+        #self.set_property("name", class_name)
 
 
 class CustomDisplayDialog(Gtk.Window):

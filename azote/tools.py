@@ -27,7 +27,7 @@ import json
 import gi
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
 
 
 def log(message, level=None):
@@ -473,9 +473,21 @@ def rgba_to_hex(color):
                                            int(color.blue * 255))
 
 
+def rgb_to_hex(rgb_color):
+    return '#%02x%02x%02x' % (rgb_color[0], rgb_color[1], rgb_color[2])
+
+
 def hex_to_rgb(string):
     string = string.lstrip('#')
     return tuple(int(string[i:i+2], 16) for i in (0, 2, 4))
+
+
+def create_pixbuf(size, color):
+    image = Image.new("RGB", size, color)
+    data = image.tobytes()
+    w, h = image.size
+    data = GLib.Bytes.new(data)
+    return GdkPixbuf.Pixbuf.new_from_bytes(data, GdkPixbuf.Colorspace.RGB, False, 8, w, h, w * 3)
 
 
 class Settings(object):
