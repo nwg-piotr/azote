@@ -634,7 +634,7 @@ class GUI:
         screen = window.get_screen()
         h = screen.height()
 
-        window.set_default_size(240 * 3 + 160, h * 0.95)
+        window.set_default_size(common.settings.thumb_width * 3 + 160, h * 0.95)
         common.main_window = window
 
         window.set_title("Azote")
@@ -917,7 +917,7 @@ class ColorPaletteDialog(Gtk.Window):
             color = palette[i]
             hex_color = rgb_to_hex(color)
 
-            pixbuf = create_pixbuf((100, 50), color)
+            pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), color)
             gdk_image = Gtk.Image.new_from_pixbuf(pixbuf)
 
             button = Gtk.Button.new_with_label(hex_color)
@@ -947,7 +947,8 @@ class ColorPaletteDialog(Gtk.Window):
         self.clipboard_label.set_text(common.lang['clipboard_empty'])
         hbox.pack_start(self.clipboard_label, True, True, 0)
 
-        button = Gtk.Button.new_with_label(common.lang['close'])
+        button = Gtk.Button.new_from_icon_name("window-close", Gtk.IconSize.SMALL_TOOLBAR)
+        button.set_label(common.lang['close'])
         button.connect_after('clicked', self.close_window)
         hbox.pack_start(button, False, False, 0)
         
@@ -965,22 +966,20 @@ class ColorPaletteDialog(Gtk.Window):
         hex = widget.get_label()
         rgb = hex_to_rgb(widget.get_label())
         label = '{} {}'.format(hex, rgb)
-        self.clipboard_preview.update(label, widget.get_property('name'))
+        self.clipboard_preview.update(widget.get_label())
         self.clipboard_label.set_text(label)
 
 
-class ClipboardPreview(Gtk.Button):
+class ClipboardPreview(Gtk.Image):
     def __init__(self):
         super().__init__()
-        self.set_property("width-request", 30)
-        self.set_sensitive(False)
+        pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size), (255, 255, 255))
+        #self.set_property("width-request", 110)
+        self.set_from_pixbuf(pixbuf)
 
-    def update(self, name, color):
-        #self.set_label(name)
-        pixbuf = create_pixbuf((30, 30), (100, 100, 100))
-        gdk_image = Gtk.Image.new_from_pixbuf(pixbuf)
-        self.set_image(gdk_image)
-        #self.set_property("name", class_name)
+    def update(self, color):
+        pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size), hex_to_rgb(color))
+        self.set_from_pixbuf(pixbuf)
 
 
 class CustomDisplayDialog(Gtk.Window):

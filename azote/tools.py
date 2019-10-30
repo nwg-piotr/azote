@@ -17,6 +17,7 @@ import logging
 from PIL import Image, ImageOps
 import common
 import pickle
+import json
 import subprocess
 import locale
 import pkg_resources
@@ -492,6 +493,7 @@ def create_pixbuf(size, color):
 
 class Settings(object):
     def __init__(self):
+        # Settings available in GUI we'll store in a pickle file
         self.file = os.path.join(common.app_dir, "settings.pkl")
 
         self.src_path = common.sample_dir
@@ -501,7 +503,12 @@ class Settings(object):
         self.show_context_menu = not common.sway  # turned off by default on Sway
         self.custom_display = None
 
+        # Runtime config (json)
+        self.rc_file = os.path.join(common.app_dir, "azoterc")
+        
         self.load()
+        
+        self.thumb_height = int(self.thumb_width * 135 / self.thumb_width)
 
     def load(self):
         save_needed = False
@@ -539,10 +546,70 @@ class Settings(object):
 
         if save_needed:
             self.save()
+            
+        self.load_rc()
 
     def save(self):
         with open(self.file, 'wb') as output:
             pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+            
+    def load_rc(self):
+        save_needed = False
+        try:
+            with open(self.rc_file, 'r') as f:
+                rc = json.load(f)
+        except FileNotFoundError:
+            log('rc file not found, creating...', common.INFO)
+            self.save_rc(set_defaults=True)
+
+        try:
+            with open(self.rc_file, 'r') as f:
+                rc = json.load(f)
+            log('rc file loaded', common.INFO)
+        except Exception as e:
+            log('rc file error: {}'.format(e), common.ERROR)
+
+        try:
+            self.thumb_width = int(rc['thumb_width'])
+        except KeyError:
+            self.thumb_width = 240
+            save_needed = True
+            
+        try:
+            self.color_icon_w = int(rc['color_icon_w'])
+        except KeyError:
+            self.color_icon_w = 100
+            save_needed = True
+
+        try:
+            self.color_icon_h = int(rc['color_icon_h'])
+        except KeyError:
+            self.color_icon_h = 50
+            save_needed = True
+
+        try:
+            self.clip_prev_size = int(rc['clip_prev_size'])
+        except KeyError:
+            self.clip_prev_size = 30
+            save_needed = True
+
+        if save_needed:
+            self.save_rc()
+
+    def save_rc(self, set_defaults=False):
+        if set_defaults:
+            self.thumb_width = 240
+            self.color_icon_w = 100
+            self.color_icon_h = 50
+            self.clip_prev_size = 30
+
+        rc = {'thumb_width': str(self.thumb_width),
+              'color_icon_w': str(self.color_icon_w),
+              'color_icon_h': str(self.color_icon_h),
+              'clip_prev_size': str(self.clip_prev_size)}
+        
+        with open(self.rc_file, 'w') as f:
+            json.dump(rc, f)
 
 
 class Language(dict):
