@@ -17,6 +17,7 @@ Optional: python-send2trash
 import os
 import sys
 import subprocess
+import array
 import stat
 import common
 import gi
@@ -202,8 +203,14 @@ class DisplayBox(Gtk.Box):
         self.mode = 'fill' if common.sway else 'scale'
         self.color = None
 
-        self.img = Gtk.Image()
-        self.img.set_from_file("images/empty.png")
+        #self.img = Gtk.Image()
+        #self.img.set_from_file("images/empty.png")
+        
+        image = Image.open('images/empty.png')
+        image.thumbnail(common.settings.thumb_size, Image.ANTIALIAS)
+
+        pixbuf = create_pixbuf(common.settings.thumb_size, (0, 0, 0))
+        self.img = Gtk.Image.new_from_pixbuf(pixbuf)
 
         self.select_button = Gtk.Button()
         self.select_button.set_label("{} ({} x {})".format(name, width, height))  # label on top: name (with x height)
@@ -918,10 +925,10 @@ class ColorPaletteDialog(Gtk.Window):
             hex_color = rgb_to_hex(color)
 
             pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), color)
-            gdk_image = Gtk.Image.new_from_pixbuf(pixbuf)
+            gtk_image = Gtk.Image.new_from_pixbuf(pixbuf)
 
             button = Gtk.Button.new_with_label(hex_color)
-            button.set_image(gdk_image)
+            button.set_image(gtk_image)
             button.set_image_position(2)  # TOP
 
             button.set_tooltip_text(common.lang['copy'])

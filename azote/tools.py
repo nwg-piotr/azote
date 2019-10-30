@@ -17,7 +17,6 @@ import logging
 from PIL import Image, ImageOps
 import common
 import pickle
-import json
 import subprocess
 import locale
 import pkg_resources
@@ -304,7 +303,7 @@ def create_thumbnail(in_path, dest_path, thumb_name, refresh=False):
     try:
         img = Image.open(in_path)
         # convert to thumbnail image
-        img.thumbnail((240, 135), Image.ANTIALIAS)
+        img.thumbnail(common.settings.thumb_size, Image.ANTIALIAS)
 
         img = expand_img(img)
 
@@ -326,7 +325,7 @@ def flip_selected_wallpaper():
             img_path = os.path.join(common.bcg_dir, "flipped-{}".format(common.selected_wallpaper.filename))
             flipped.save(os.path.join(common.tmp_dir, "flipped-{}".format(common.selected_wallpaper.filename)), "PNG")
 
-            flipped.thumbnail((240, 135), Image.ANTIALIAS)
+            flipped.thumbnail(common.settings.thumb_size, Image.ANTIALIAS)
             flipped = expand_img(flipped)
 
             thumb_path = os.path.join(common.tmp_dir, "thumbnail-{}".format(common.selected_wallpaper.filename))
@@ -349,7 +348,7 @@ def split_selected_wallpaper(num_parts):
             img_path = os.path.join(common.bcg_dir, "part{}-{}".format(i, common.selected_wallpaper.filename))
             part.save(os.path.join(common.tmp_dir, "part{}-{}".format(i, common.selected_wallpaper.filename)), "PNG")
 
-            part.thumbnail((240, 135), Image.ANTIALIAS)
+            part.thumbnail(common.settings.thumb_size, Image.ANTIALIAS)
 
             thumb_path = os.path.join(common.tmp_dir, "thumb-part{}-{}".format(i, common.selected_wallpaper.filename))
 
@@ -365,15 +364,16 @@ def split_selected_wallpaper(num_parts):
 
 
 def expand_img(image):
-    # We want the thumbnail to be always 240 x 135. Let's expand if necessary.
+    # We want the thumbnail to be always in the same proportion. Let's expand if necessary.
     width, height = image.size
-    border_h = (240 - width) // 2
-    border_v = (135 - height) // 2
+    border_h = (common.settings.thumb_width - width) // 2
+    border_v = (common.settings.thumb_height - height) // 2
     if border_v > 0 or border_h > 0:
         # border = (border_h, border_v, border_h, border_v)
         # return ImageOps.expand(image, border=border)
         # Let's add checkered background instead of the black one
         background = Image.open('images/squares.jpg')
+        background = background.resize(common.settings.thumb_size, Image.ANTIALIAS)
         background.paste(image, (border_h, border_v))
         return background
     else:
@@ -507,8 +507,6 @@ class Settings(object):
         self.rc_file = os.path.join(common.app_dir, "azoterc")
         
         self.load()
-        
-        self.thumb_height = int(self.thumb_width * 135 / self.thumb_width)
 
     def load(self):
         save_needed = False
@@ -571,9 +569,14 @@ class Settings(object):
 
         try:
             self.thumb_width = int(rc['thumb_width'])
+            # todo Check if the value has been changed, clear existing thumbnails if so
         except KeyError:
             self.thumb_width = 240
             save_needed = True
+
+        self.thumb_height = int(self.thumb_width * 135 / 240)
+        self.thumb_size = (self.thumb_width, self.thumb_height)
+        log('Thumbnail size: {}'.format(self.thumb_size), common.INFO)
             
         try:
             self.color_icon_w = int(rc['color_icon_w'])
