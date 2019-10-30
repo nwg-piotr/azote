@@ -192,6 +192,9 @@ def set_env(language=None):
         common.sample_dir = '/usr/share/backgrounds/sway'
 
     common.settings = Settings()
+    if common.settings.clear_thumbnails:
+        clear_thumbnails(clear_all=True)
+        common.settings.clear_thumbnails = False
 
     log("Environment: {}".format(common.env), common.INFO)
 
@@ -502,6 +505,8 @@ class Settings(object):
         self.show_open_button = common.sway  # shown by default on Sway
         self.show_context_menu = not common.sway  # turned off by default on Sway
         self.custom_display = None
+        self.old_thumb_width = None
+        self.clear_thumbnails = False
 
         # Runtime config (json)
         self.rc_file = os.path.join(common.app_dir, "azoterc")
@@ -542,10 +547,22 @@ class Settings(object):
         except AttributeError:
             save_needed = True
 
+        try:
+            self.old_thumb_width = settings.old_thumb_width
+            log('Old thumbnail width: {}'.format(self.old_thumb_width), common.INFO)
+        except AttributeError:
+            save_needed = True
+
+        self.load_rc()
+        # overwrite self.old_thumb_width with self.thumb_width if changed in azoterc
+        if self.old_thumb_width != self.thumb_width:
+            self.old_thumb_width = self.thumb_width
+            save_needed = True
+            log('New thumbnail width: {}, clearing existing thumbnails!'.format(self.thumb_width), common.WARNING)
+            self.clear_thumbnails = True
+
         if save_needed:
             self.save()
-            
-        self.load_rc()
 
     def save(self):
         with open(self.file, 'wb') as output:
@@ -569,7 +586,9 @@ class Settings(object):
 
         try:
             self.thumb_width = int(rc['thumb_width'])
-            # todo Check if the value has been changed, clear existing thumbnails if so
+            # ignore too small values
+            if self.thumb_width < 128:
+                self.thumb_width = 128
         except KeyError:
             self.thumb_width = 240
             save_needed = True
@@ -578,6 +597,13 @@ class Settings(object):
         self.thumb_size = (self.thumb_width, self.thumb_height)
         log('Thumbnail size: {}'.format(self.thumb_size), common.INFO)
             
+        try:
+            self.columns = int(rc['columns'])
+        except KeyError:
+            self.columns = 3
+            save_needed = True
+        log('Number of columns: {}'.format(self.columns), common.INFO)
+
         try:
             self.color_icon_w = int(rc['color_icon_w'])
         except KeyError:
@@ -602,17 +628,19 @@ class Settings(object):
     def save_rc(self, set_defaults=False):
         if set_defaults:
             self.thumb_width = 240
+            self.columns = 3
             self.color_icon_w = 100
             self.color_icon_h = 50
             self.clip_prev_size = 30
 
         rc = {'thumb_width': str(self.thumb_width),
+              'columns': str(self.columns),
               'color_icon_w': str(self.color_icon_w),
               'color_icon_h': str(self.color_icon_h),
               'clip_prev_size': str(self.clip_prev_size)}
         
         with open(self.rc_file, 'w') as f:
-            json.dump(rc, f)
+            json.dump(rc, f, indent=2)
 
 
 class Language(dict):

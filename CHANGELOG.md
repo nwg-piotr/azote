@@ -7,6 +7,8 @@
 - `-a | --clear-all` argument to clear all thumbnails and exit
 - thumbnails: checkered background instead of black
 - 'Create palette' entry added to the context menu
+- `~/.azote.azoterc` runtime configuration file (json) added, to allow changing some graphics dimensions, 
+and initial number of columns 
 
 ## v1.5.1 (2019-10-16)
 - scale & crop feature not working on X11 bug 

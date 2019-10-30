@@ -641,7 +641,7 @@ class GUI:
         screen = window.get_screen()
         h = screen.height()
 
-        window.set_default_size(common.settings.thumb_width * 3 + 160, h * 0.95)
+        window.set_default_size(common.settings.thumb_width * common.settings.columns + 160, h * 0.95)
         common.main_window = window
 
         window.set_title("Azote")
@@ -809,7 +809,7 @@ class GUI:
 
 
 def on_configure_event(window, e):
-    cols = e.width // 280
+    cols = e.width // (common.settings.thumb_width + 40)
     if cols != common.cols:
         common.preview.hide()
         if cols != common.cols:
@@ -1237,7 +1237,7 @@ def main():
         clear_thumbnails(clear_all)
         exit()
 
-    common.cols = len(common.displays) if len(common.displays) > 3 else 3
+    common.cols = len(common.displays) if len(common.displays) > common.settings.columns else common.settings.columns
     app = GUI()
     Gtk.main()
 
