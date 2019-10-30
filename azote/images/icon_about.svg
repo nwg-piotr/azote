@@ -37,16 +37,16 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1900"
-     inkscape:window-height="1036"
+     inkscape:window-width="1890"
+     inkscape:window-height="1002"
      id="namedview8"
      showgrid="false"
-     inkscape:zoom="7.1744663"
-     inkscape:cx="16.077131"
-     inkscape:cy="47.000001"
-     inkscape:window-x="1930"
-     inkscape:window-y="34"
-     inkscape:window-maximized="1"
+     inkscape:zoom="26.416583"
+     inkscape:cx="11.011272"
+     inkscape:cy="11.77788"
+     inkscape:window-x="14"
+     inkscape:window-y="38"
+     inkscape:window-maximized="0"
      inkscape:current-layer="svg6"
      inkscape:snap-global="false"
      showguides="true"
@@ -66,15 +66,24 @@
        inkscape:label=""
        inkscape:color="rgb(0,0,255)" />
   </sodipodi:namedview>
+  <path
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:23.3879776px;line-height:1.25;font-family:Ionicons;-inkscape-font-specification:Ionicons;letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:#cccccc;stroke-width:0.80000001;stroke-miterlimit:4;stroke-dasharray:none"
+     d="M 6.5937404,6.498751 Q 8.822587,4.2699051 11.964894,4.2699051 q 3.142308,0 5.371154,2.2288459 2.228846,2.2288458 2.228846,5.371154 0,3.142307 -2.228846,5.371153 -2.228846,2.228847 -5.371154,2.228847 -3.142307,0 -5.3711536,-2.228847 -2.228846,-2.228846 -2.228846,-5.371153 0,-3.1423082 2.228846,-5.371154 z"
+     id="path8824"
+     inkscape:connector-curvature="0" />
   <g
-     aria-label=""
-     style="font-style:normal;font-weight:normal;font-size:23.3879776px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;stroke-width:0.58469945"
-     id="text823-8"
-     transform="matrix(0.84198419,0,0,0.84198419,55.066664,20.897273)">
+     id="g8828"
+     transform="matrix(1.0410345,0,0,1.0410345,-0.59289886,-0.17988355)"
+     style="stroke-width:0.96058297;fill:#cccccc">
     <path
-       d="m -57.863925,-17.281939 q 2.786459,-2.786458 6.714908,-2.786458 3.928449,0 6.714908,2.786458 2.786458,2.786458 2.786458,6.714908 0,3.928449 -2.786458,6.7149072 -2.786459,2.7864583 -6.714908,2.7864583 -3.928449,0 -6.714908,-2.7864583 -2.786458,-2.7864582 -2.786458,-6.7149072 0,-3.92845 2.786458,-6.714908 z m 7.582821,11.1001534 v -6.5778684 h -1.735826 v 6.5778684 z m -1.553108,-7.5828204 q 0.319758,0.274077 0.685195,0.274077 0.365437,0 0.639515,-0.274077 0.319757,-0.274078 0.319757,-0.639515 0,-0.365438 -0.319757,-0.639515 -0.274078,-0.274078 -0.639515,-0.274078 -0.365437,0 -0.685195,0.274078 -0.274078,0.274077 -0.274078,0.639515 0,0.365437 0.274078,0.639515 z"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Ionicons;-inkscape-font-specification:Ionicons;stroke-width:0.58469945;fill:#333333;fill-opacity:1"
+       inkscape:connector-curvature="0"
+       id="path8822"
+       d="M 12.849542,15.160354 V 10.10621 h -1.57348 v 5.054144 z"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:23.3879776px;line-height:1.25;font-family:Ionicons;-inkscape-font-specification:Ionicons;letter-spacing:0px;word-spacing:0px;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.47290236" />
+    <path
+       inkscape:connector-curvature="0"
        id="path1167"
-       inkscape:connector-curvature="0" />
+       d="m 11.441691,9.3113357 q 0.289852,0.2333016 0.621111,0.2333016 0.33126,0 0.579704,-0.2333016 0.289851,-0.2333024 0.289851,-0.5443721 0,-0.3110705 -0.289851,-0.5443721 -0.248444,-0.2333025 -0.579704,-0.2333025 -0.331259,0 -0.621111,0.2333025 -0.248444,0.2333016 -0.248444,0.5443721 0,0.3110697 0.248444,0.5443721 z"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:23.3879776px;line-height:1.25;font-family:Ionicons;-inkscape-font-specification:Ionicons;letter-spacing:0px;word-spacing:0px;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.47290233" />
   </g>
 </svg>
