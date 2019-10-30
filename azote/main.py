@@ -209,7 +209,7 @@ class DisplayBox(Gtk.Box):
         image = Image.open('images/empty.png')
         image.thumbnail(common.settings.thumb_size, Image.ANTIALIAS)
 
-        pixbuf = create_pixbuf(common.settings.thumb_size, (0, 0, 0))
+        pixbuf = create_pixbuf(common.settings.thumb_size, (16, 16, 16))
         self.img = Gtk.Image.new_from_pixbuf(pixbuf)
 
         self.select_button = Gtk.Button()
