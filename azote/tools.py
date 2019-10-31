@@ -507,7 +507,7 @@ class Settings(object):
         self.old_thumb_width = None
         self.clear_thumbnails = False
 
-        # Runtime config (json)
+        # Runtime config (json) location
         self.rc_file = os.path.join(common.app_dir, "azoterc")
         
         self.load()
@@ -615,6 +615,13 @@ class Settings(object):
             self.clip_prev_size = 30
             save_needed = True
 
+        try:
+            self.palette_quality = int(rc['palette_quality'])
+        except KeyError:
+            self.palette_quality = 10
+            save_needed = True
+        log('Palette quality: {} (10 by default, the less, the better & slower)'.format(self.palette_quality), common.INFO)
+
         if save_needed:
             self.save_rc()
 
@@ -625,12 +632,14 @@ class Settings(object):
             self.color_icon_w = 100
             self.color_icon_h = 50
             self.clip_prev_size = 30
+            self.palette_quality = 10
 
         rc = {'thumb_width': str(self.thumb_width),
               'columns': str(self.columns),
               'color_icon_w': str(self.color_icon_w),
               'color_icon_h': str(self.color_icon_h),
-              'clip_prev_size': str(self.clip_prev_size)}
+              'clip_prev_size': str(self.clip_prev_size),
+              'palette_quality': str(self.palette_quality)}
         
         with open(self.rc_file, 'w') as f:
             json.dump(rc, f, indent=2)

@@ -2,13 +2,14 @@
 
 ## In development:
 - scale & crop backgrounds to virtual, custom display dimensions
-- `-h | --help` argument added
-- `-c | --clear` argument to clear unused thumbnails and exit
-- `-a | --clear-all` argument to clear all thumbnails and exit
+- CLI arguments added: `-h | --help`, `-c | --clear` (clear unused thumbnails), 
+`-a | --clear-all` (clear all thumbnails) and exit
 - thumbnails: checkered background instead of black
-- 'Create palette' entry added to the context menu
-- `~/.azote.azoterc` runtime configuration file (json) added, to allow changing some graphics dimensions, 
-and initial number of columns 
+- 'Create palette':  feature added: to the context menu
+- `~/.azote.azoterc` added, defines thumbnail width, number of columns dimensions of palette color images, 
+color palette quality  
+- image button removed, context menu always active
+- button icons redesigned
 
 ## v1.5.1 (2019-10-16)
 - scale & crop feature not working on X11 bug 

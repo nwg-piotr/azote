@@ -592,12 +592,8 @@ def on_refresh_clicked(button):
 
 def generate_palette(item, thumb_file, filename, image_path, num_colors):
     color_thief = ColorThief(image_path)
-    # dominant_color = color_thief.get_color(quality=100)
-    # dominant_color = '#%02x%02x%02x' % dominant_color
-    palette = color_thief.get_palette(color_count=num_colors, quality=10)
-    # We need hexadecimal colours
-    # for i in range(len(palette)):
-    #    palette[i] = '#%02x%02x%02x' % (palette[i][0], palette[i][1], palette[i][2])
+    # dominant = color_thief.get_color(quality=10)
+    palette = color_thief.get_palette(color_count=num_colors, quality=common.settings.palette_quality)
     cpd = ColorPaletteDialog(thumb_file, filename, palette)
 
 
@@ -864,13 +860,6 @@ class ColorPaletteDialog(Gtk.Window):
         self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
         self.set_keep_above(True)
 
-        self.screen = Gdk.Screen.get_default()
-        self.provider = Gtk.CssProvider()
-        self.style_context = Gtk.StyleContext()
-        self.style_context.add_provider_for_screen(
-            self.screen, self.provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
-
         self.vbox = Gtk.VBox()
         self.vbox.set_spacing(5)
         self.vbox.set_border_width(15)
@@ -892,12 +881,11 @@ class ColorPaletteDialog(Gtk.Window):
             button = Gtk.Button.new_with_label(hex_color)
             button.set_image(gtk_image)
             button.set_image_position(2)  # TOP
-
             button.set_tooltip_text(common.lang['copy'])
-            # button.set_property("name", "col{}".format(i))
-            button.set_property("width-request", 85)
             button.connect_after('clicked', self.to_clipboard)
-            self.hbox.pack_start(button, True, False, 0)
+
+            self.hbox.pack_start(button, False, False, 0)
+
             if (i + 1) % 4 == 0:
 
                 self.vbox.add(self.hbox)
