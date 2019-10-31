@@ -17,7 +17,6 @@ Optional: python-send2trash
 import os
 import sys
 import subprocess
-import colorsys
 import stat
 import common
 import gi
