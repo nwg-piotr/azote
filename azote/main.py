@@ -141,8 +141,7 @@ class ThumbButton(Gtk.Button):
         self.set_image(self.img)
         self.set_image_position(2)  # TOP
         self.set_tooltip_text(
-            common.lang['thumbnail_tooltip_2']) if common.settings.show_context_menu else self.set_tooltip_text(
-            common.lang['thumbnail_tooltip_1'])
+            common.lang['thumbnail_tooltip'])
 
         # Workaround: column is a helper value to identify thumbnails placed in column 0. 
         # They need different context menu gravity in Sway
@@ -160,7 +159,6 @@ class ThumbButton(Gtk.Button):
         if common.split_button:
             common.split_button.set_sensitive(True)
 
-        common.open_button.set_sensitive(True)
         common.apply_to_all_button.set_sensitive(True)
 
         self.selected = True
@@ -175,7 +173,7 @@ class ThumbButton(Gtk.Button):
             common.selected_picture_label.set_text("{} ({} x {})".format(filename, img.size[0], img.size[1]))
         if event.type == Gdk.EventType._2BUTTON_PRESS:
             on_thumb_double_click(button)
-        if event.button == 3 and common.settings.show_context_menu:
+        if event.button == 3:
             show_image_menu(button)
 
     def deselect(self, button):
@@ -447,7 +445,6 @@ def clear_wallpaper_selection():
     if common.split_button:
         common.split_button.set_sensitive(False)
     common.apply_button.set_sensitive(False)
-    common.open_button.set_sensitive(False)
 
 
 def on_about_button(button):
@@ -708,17 +705,6 @@ class GUI:
         bottom_box.pack_start(folder_button, True, True, 0)
         folder_button.connect_after('clicked', on_folder_clicked)
 
-        # Button to open in feh
-        common.open_button = Gtk.Button()
-        common.open_button.column = None
-        img = Gtk.Image()
-        img.set_from_file('images/icon_feh.svg')
-        common.open_button.set_image(img)
-        common.open_button.set_tooltip_text(common.lang['image_menu'])
-        common.open_button.set_sensitive(False)
-        common.open_button.connect('clicked', show_image_menu)
-        bottom_box.add(common.open_button)
-
         # Label to display details of currently selected picture
         common.selected_picture_label = Gtk.Label()
         common.selected_picture_label.set_property("name", "selected-label")
@@ -786,7 +772,7 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_menu.svg')
         settings_button.set_image(img)
-        settings_button.set_tooltip_text(common.lang['settings'])
+        settings_button.set_tooltip_text(common.lang['preferences'])
         settings_button.connect('clicked', on_settings_button)
         status_box.add(settings_button)
 
@@ -799,8 +785,6 @@ class GUI:
         main_box.add(status_box)
 
         window.show_all()
-        if common.open_button:
-            common.open_button.show() if common.settings.show_open_button else common.open_button.hide()
 
         common.progress_bar.hide()
 
@@ -840,14 +824,9 @@ def on_apply_to_all_button(button):
 def on_settings_button(button):
     menu = Gtk.Menu()
 
-    item = Gtk.CheckMenuItem.new_with_label(common.lang['image_button'])
-    item.set_active(common.settings.show_open_button)
-    item.connect('activate', switch_open_button)
-    menu.append(item)
-
-    item = Gtk.CheckMenuItem.new_with_label(common.lang['thumbnail_context_menu'])
-    item.set_active(common.settings.show_context_menu)
-    item.connect('activate', switch_context_menu)
+    item = Gtk.CheckMenuItem.new_with_label(common.lang['copy_as_rgb'])
+    item.set_active(common.settings.copy_as_rgb)
+    item.connect('activate', switch_copy_as_rgb)
     menu.append(item)
 
     item = Gtk.MenuItem.new_with_label(common.lang['custom_display'])
@@ -858,15 +837,8 @@ def on_settings_button(button):
     menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
 
 
-def switch_open_button(item):
-    common.settings.show_open_button = not common.settings.show_open_button
-    common.settings.save()
-    if common.open_button:
-        common.open_button.show() if common.settings.show_open_button else common.open_button.hide()
-
-
-def switch_context_menu(item):
-    common.settings.show_context_menu = not common.settings.show_context_menu
+def switch_copy_as_rgb(item):
+    common.settings.copy_as_rgb = not common.settings.copy_as_rgb
     common.settings.save()
 
 
@@ -966,10 +938,11 @@ class ColorPaletteDialog(Gtk.Window):
         
     def to_clipboard(self, widget):
         common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        common.clipboard.set_text(widget.get_label() + ' ' + str(hex_to_rgb(widget.get_label())), -1)
+        content = str(hex_to_rgb(widget.get_label()) if common.settings.copy_as_rgb else widget.get_label())
+        common.clipboard.set_text(content, -1)
         hex = widget.get_label()
         rgb = hex_to_rgb(widget.get_label())
-        label = '{} {}'.format(hex, rgb)
+        label = '{}'.format(content)
         self.clipboard_preview.update(widget.get_label())
         self.clipboard_label.set_text(label)
 

@@ -502,8 +502,7 @@ class Settings(object):
         self.src_path = common.sample_dir
         self.sorting = 'new'
         # Gtk.Menu() on sway is unreliable, especially called with right click
-        self.show_open_button = common.sway  # shown by default on Sway
-        self.show_context_menu = not common.sway  # turned off by default on Sway
+        self.copy_as_rgb = False
         self.custom_display = None
         self.old_thumb_width = None
         self.clear_thumbnails = False
@@ -530,14 +529,8 @@ class Settings(object):
             save_needed = True
 
         try:
-            self.show_open_button = settings.show_open_button
-            log('Picture menu button: {}'.format(self.show_open_button), common.INFO)
-        except AttributeError:
-            save_needed = True
-
-        try:
-            self.show_context_menu = settings.show_context_menu
-            log('Thumbnail context menu: {}'.format(self.show_context_menu), common.INFO)
+            self.copy_as_rgb = settings.copy_as_rgb
+            log('Thumbnail context menu: {}'.format(self.copy_as_rgb), common.INFO)
         except AttributeError:
             save_needed = True
 
