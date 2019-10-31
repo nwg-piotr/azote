@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## In development:
-- Scale & crop backgrounds to virtual, custom display dimensions
+- Scale & crop backgrounds to virtual, custom display dimensions;
 - CLI arguments added: `-h | --help`, `-c | --clear` (clear unused thumbnails), 
 `-a | --clear-all` (clear all thumbnails);
 - thumbnails: checkered background instead of black (clear thumbnails for this to take effect);
