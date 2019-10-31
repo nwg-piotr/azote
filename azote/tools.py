@@ -502,10 +502,10 @@ class Settings(object):
         self.src_path = common.sample_dir
         self.sorting = 'new'
         # Gtk.Menu() on sway is unreliable, especially called with right click
-        self.copy_as_rgb = False
         self.custom_display = None
         self.old_thumb_width = None
         self.clear_thumbnails = False
+        self.copy_as = '#rgb'
 
         # Runtime config (json) location
         self.rc_file = os.path.join(common.app_dir, "azoterc")
@@ -529,12 +529,6 @@ class Settings(object):
             save_needed = True
 
         try:
-            self.copy_as_rgb = settings.copy_as_rgb
-            log('Thumbnail context menu: {}'.format(self.copy_as_rgb), common.INFO)
-        except AttributeError:
-            save_needed = True
-
-        try:
             self.custom_display = settings.custom_display
             log('Custom display: {}'.format(self.custom_display), common.INFO)
         except AttributeError:
@@ -543,6 +537,11 @@ class Settings(object):
         try:
             self.old_thumb_width = settings.old_thumb_width
             log('Old thumbnail width: {}'.format(self.old_thumb_width), common.INFO)
+        except AttributeError:
+            save_needed = True
+            
+        try:
+            self.copy_as = settings.copy_as
         except AttributeError:
             save_needed = True
 
