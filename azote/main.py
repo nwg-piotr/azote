@@ -17,7 +17,7 @@ Optional: python-send2trash
 import os
 import sys
 import subprocess
-import array
+import colorsys
 import stat
 import common
 import gi
@@ -821,22 +821,12 @@ def on_apply_to_all_button(button):
 def on_settings_button(button):
     menu = Gtk.Menu()
 
-    item = Gtk.CheckMenuItem.new_with_label(common.lang['copy_as_rgb'])
-    item.set_active(common.settings.copy_as_rgb)
-    item.connect('activate', switch_copy_as_rgb)
-    menu.append(item)
-
     item = Gtk.MenuItem.new_with_label(common.lang['custom_display'])
     item.connect('activate', show_custom_display_dialog)
     menu.append(item)
 
     menu.show_all()
     menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
-
-
-def switch_copy_as_rgb(item):
-    common.settings.copy_as_rgb = not common.settings.copy_as_rgb
-    common.settings.save()
 
 
 def show_custom_display_dialog(item):
@@ -860,6 +850,10 @@ class ColorPaletteDialog(Gtk.Window):
         self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
         self.set_keep_above(True)
+        try:
+            self.copy_as = common.settings.copy_as
+        except AttributeError:
+            self.copy_as = '#rgb'
 
         self.vbox = Gtk.VBox()
         self.vbox.set_spacing(5)
@@ -894,6 +888,31 @@ class ColorPaletteDialog(Gtk.Window):
                 self.hbox.set_spacing(5)
                 self.hbox.set_border_width(5)
 
+        button1 = Gtk.RadioButton(label='#rgb')
+        button1.connect('toggled', self.rgb_toggled)
+
+        button2 = Gtk.RadioButton.new_with_label_from_widget(button1, 'r, g, b')
+        button2.set_label('r, g, b')
+        button2.connect('toggled', self.rgb_toggled)
+        
+        for button in [button1, button2]:
+            if button.get_label() == self.copy_as:
+                button.set_active(True)
+
+        label = Gtk.Label()
+        label.set_text('Copy as:')
+        
+        hbox = Gtk.HBox()
+        hbox.set_spacing(5)
+        hbox.set_border_width(5)
+
+        hbox.pack_start(label, True, False, 0)
+        
+        hbox.pack_start(button1, True, False, 0)
+        hbox.pack_start(button2, True, False, 0)
+
+        self.vbox.pack_start(hbox, True, True, 0)
+
         hbox = Gtk.HBox()
         hbox.set_spacing(5)
         hbox.set_border_width(5)
@@ -914,15 +933,25 @@ class ColorPaletteDialog(Gtk.Window):
         self.add(self.vbox)
         self.show_all()
 
+    def rgb_toggled(self, button):
+        state = 'on' if button.get_active() else 'off'
+        if state == 'on':
+            common.settings.copy_as = button.get_label()
+            common.settings.save()
+    
     def close_window(self, widget):
         self.close()
         
     def to_clipboard(self, widget):
         common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        content = str(hex_to_rgb(widget.get_label()) if common.settings.copy_as_rgb else widget.get_label())
+
+        if common.settings.copy_as == 'r, g, b':
+            t = hex_to_rgb(widget.get_label())
+            content = '{}, {}, {}'.format(t[0], t[1], t[2])
+        else:
+            content = widget.get_label()
+                          
         common.clipboard.set_text(content, -1)
-        hex = widget.get_label()
-        rgb = hex_to_rgb(widget.get_label())
         label = '{}'.format(content)
         self.clipboard_preview.update(widget.get_label())
         self.clipboard_label.set_text(label)
