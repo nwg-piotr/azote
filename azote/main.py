@@ -17,6 +17,7 @@ Optional: python-send2trash
 import os
 import sys
 import subprocess
+import array
 import stat
 import common
 import gi
@@ -32,10 +33,20 @@ except Exception as e:
     common.env['send2trash'] = False
     print('send2trash module not found', e)
 
+# same applies to the colorthief module https://github.com/fengsp/color-thief-py
+try:
+    from colorthief import ColorThief
+
+    common.env['colorthief'] = True
+except Exception as e:
+    common.env['colorthief'] = False
+    print('colorthief module not found', e)
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
+from gi.repository.GdkPixbuf import InterpType
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, rgba_to_hex, split_selected_wallpaper, scale_and_crop, clear_thumbnails
+    copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, create_pixbuf, split_selected_wallpaper, scale_and_crop, clear_thumbnails
 
 
 def get_files():
@@ -130,8 +141,7 @@ class ThumbButton(Gtk.Button):
         self.set_image(self.img)
         self.set_image_position(2)  # TOP
         self.set_tooltip_text(
-            common.lang['thumbnail_tooltip_2']) if common.settings.show_context_menu else self.set_tooltip_text(
-            common.lang['thumbnail_tooltip_1'])
+            common.lang['thumbnail_tooltip'])
 
         # Workaround: column is a helper value to identify thumbnails placed in column 0. 
         # They need different context menu gravity in Sway
@@ -149,7 +159,6 @@ class ThumbButton(Gtk.Button):
         if common.split_button:
             common.split_button.set_sensitive(True)
 
-        common.open_button.set_sensitive(True)
         common.apply_to_all_button.set_sensitive(True)
 
         self.selected = True
@@ -164,7 +173,7 @@ class ThumbButton(Gtk.Button):
             common.selected_picture_label.set_text("{} ({} x {})".format(filename, img.size[0], img.size[1]))
         if event.type == Gdk.EventType._2BUTTON_PRESS:
             on_thumb_double_click(button)
-        if event.button == 3 and common.settings.show_context_menu:
+        if event.button == 3:
             show_image_menu(button)
 
     def deselect(self, button):
@@ -193,8 +202,10 @@ class DisplayBox(Gtk.Box):
         self.mode = 'fill' if common.sway else 'scale'
         self.color = None
 
-        self.img = Gtk.Image()
-        self.img.set_from_file("images/empty.png")
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file('images/empty.png')
+        pixbuf = pixbuf.scale_simple(common.settings.thumb_size[0], common.settings.thumb_size[1], InterpType.BILINEAR)
+
+        self.img = Gtk.Image.new_from_pixbuf(pixbuf)
 
         self.select_button = Gtk.Button()
         self.select_button.set_label("{} ({} x {})".format(name, width, height))  # label on top: name (with x height)
@@ -246,14 +257,15 @@ class DisplayBox(Gtk.Box):
             self.color_button.set_tooltip_text(common.lang['background_color'])
             options_box.add(self.color_button)
 
-        self.flip_button = Gtk.Button.new_with_label(common.lang['flip_image'])
+        self.flip_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_flip.svg')
+        self.flip_button.set_image(img)
+        self.flip_button.set_tooltip_text(common.lang['flip_image'])
         self.flip_button.set_sensitive(False)
         self.flip_button.connect('clicked', self.on_flip_button)
         self.flip_button.set_tooltip_text(common.lang['flip_wallpaper_horizontally'])
-        if common.sway:
-            options_box.add(self.flip_button)
-        else:
-            options_box.pack_start(self.flip_button, True, True, 0)
+        options_box.pack_start(self.flip_button, True, True, 0)
 
     def clear_color_selection(self):
         # If not on sway / swaybg, we have no color_button in UI
@@ -434,7 +446,6 @@ def clear_wallpaper_selection():
     if common.split_button:
         common.split_button.set_sensitive(False)
     common.apply_button.set_sensitive(False)
-    common.open_button.set_sensitive(False)
 
 
 def on_about_button(button):
@@ -455,7 +466,14 @@ def on_about_button(button):
     dialog.set_website('https://github.com/nwg-piotr/azote')
     dialog.set_comments(common.lang['app_desc'])
     dialog.set_license_type(Gtk.License.GPL_3_0)
-    dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick'])
+    dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick', 'Libraries and dependencies:',
+                        '- send2trash python module (c) 2017 Virgil Dupras',
+                        '- colorthief python module (c) 2015 Shipeng Feng',
+                        '- python-pillow (c) 1995-2011, Fredrik Lundh, 2010-2019 Alex Clark and Contributors',
+                        '- pygobject (c) 2005-2019 The GNOME Project',
+                        '- GTK+ (c) 2007-2019 The GTK Team',
+                        '- feh (c) 1999,2000 Tom Gilbert, 2010-2018 Daniel Friesel',
+                        '- swaybg (c) 2016-2019 Drew DeVault'])
     dialog.set_translator_credits('xsme (de_DE), HumanG33k (fr_FR)')
     dialog.set_artists(['edskeye'])
 
@@ -488,9 +506,39 @@ def show_image_menu(widget):
                 item = Gtk.SeparatorMenuItem()
                 menu.append(item)
 
+            if common.env['colorthief']:
+                item = Gtk.MenuItem.new_with_label(common.lang['create_palette'])
+                menu.append(item)
+                submenu = Gtk.Menu()
+
+                # Hell knows why the library does not return the tuple of expected length for some num_colors values
+                # Let's cheat here
+                subitem = Gtk.MenuItem.new_with_label('4 {}'.format(common.lang['colors']))
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file, common.selected_wallpaper.filename,
+                                common.selected_wallpaper.source_path, 4)
+                submenu.append(subitem)
+
+                subitem = Gtk.MenuItem.new_with_label('8 {}'.format(common.lang['colors']))
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file, common.selected_wallpaper.filename,
+                                common.selected_wallpaper.source_path, 9)
+                submenu.append(subitem)
+
+                subitem = Gtk.MenuItem.new_with_label('12 {}'.format(common.lang['colors']))
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file, common.selected_wallpaper.filename,
+                                common.selected_wallpaper.source_path, 13)
+                submenu.append(subitem)
+
+                subitem = Gtk.MenuItem.new_with_label('16 {}'.format(common.lang['colors']))
+                subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file, common.selected_wallpaper.filename,
+                                common.selected_wallpaper.source_path, 17)
+                submenu.append(subitem)
+
+                item.set_submenu(submenu)
+
             item = Gtk.MenuItem.new_with_label(common.lang['scale_and_crop'])
             menu.append(item)
             submenu = Gtk.Menu()
+
             for i in range(len(common.displays)):
                 display = common.displays[i]
                 width, height = display['width'], display['height']
@@ -503,7 +551,8 @@ def show_image_menu(widget):
                 subitem = Gtk.MenuItem.new_with_label(
                     '{} x {} ({})'.format(common.settings.custom_display[1], common.settings.custom_display[2],
                                           common.settings.custom_display[0]))
-                subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, int(common.settings.custom_display[1]), int(common.settings.custom_display[2]))
+                subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path,
+                                int(common.settings.custom_display[1]), int(common.settings.custom_display[2]))
                 submenu.append(subitem)
 
             item.set_submenu(submenu)
@@ -541,6 +590,13 @@ def on_refresh_clicked(button):
     common.preview.refresh()
 
 
+def generate_palette(item, thumb_file, filename, image_path, num_colors):
+    color_thief = ColorThief(image_path)
+    # dominant = color_thief.get_color(quality=10)
+    palette = color_thief.get_palette(color_count=num_colors, quality=common.settings.palette_quality)
+    cpd = ColorPaletteDialog(thumb_file, filename, palette)
+
+
 def on_folder_clicked(button):
     dialog = Gtk.FileChooserDialog(title=common.lang['open_folder'], parent=button.get_toplevel(),
                                    action=Gtk.FileChooserAction.SELECT_FOLDER)
@@ -576,7 +632,7 @@ class GUI:
         screen = window.get_screen()
         h = screen.height()
 
-        window.set_default_size(240 * 3 + 160, h * 0.95)
+        window.set_default_size(common.settings.thumb_width * common.settings.columns + 160, h * 0.95)
         common.main_window = window
 
         window.set_title("Azote")
@@ -646,17 +702,6 @@ class GUI:
         bottom_box.pack_start(folder_button, True, True, 0)
         folder_button.connect_after('clicked', on_folder_clicked)
 
-        # Button to open in feh
-        common.open_button = Gtk.Button()
-        common.open_button.column = None
-        img = Gtk.Image()
-        img.set_from_file('images/icon_feh.svg')
-        common.open_button.set_image(img)
-        common.open_button.set_tooltip_text(common.lang['image_menu'])
-        common.open_button.set_sensitive(False)
-        common.open_button.connect('clicked', show_image_menu)
-        bottom_box.add(common.open_button)
-
         # Label to display details of currently selected picture
         common.selected_picture_label = Gtk.Label()
         common.selected_picture_label.set_property("name", "selected-label")
@@ -724,7 +769,7 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_menu.svg')
         settings_button.set_image(img)
-        settings_button.set_tooltip_text(common.lang['settings'])
+        settings_button.set_tooltip_text(common.lang['preferences'])
         settings_button.connect('clicked', on_settings_button)
         status_box.add(settings_button)
 
@@ -737,14 +782,12 @@ class GUI:
         main_box.add(status_box)
 
         window.show_all()
-        if common.open_button:
-            common.open_button.show() if common.settings.show_open_button else common.open_button.hide()
 
         common.progress_bar.hide()
 
 
 def on_configure_event(window, e):
-    cols = e.width // 280
+    cols = e.width // (common.settings.thumb_width + 40)
     if cols != common.cols:
         common.preview.hide()
         if cols != common.cols:
@@ -778,14 +821,9 @@ def on_apply_to_all_button(button):
 def on_settings_button(button):
     menu = Gtk.Menu()
 
-    item = Gtk.CheckMenuItem.new_with_label(common.lang['image_button'])
-    item.set_active(common.settings.show_open_button)
-    item.connect('activate', switch_open_button)
-    menu.append(item)
-
-    item = Gtk.CheckMenuItem.new_with_label(common.lang['thumbnail_context_menu'])
-    item.set_active(common.settings.show_context_menu)
-    item.connect('activate', switch_context_menu)
+    item = Gtk.CheckMenuItem.new_with_label(common.lang['copy_as_rgb'])
+    item.set_active(common.settings.copy_as_rgb)
+    item.connect('activate', switch_copy_as_rgb)
     menu.append(item)
 
     item = Gtk.MenuItem.new_with_label(common.lang['custom_display'])
@@ -796,20 +834,109 @@ def on_settings_button(button):
     menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
 
 
-def switch_open_button(item):
-    common.settings.show_open_button = not common.settings.show_open_button
-    common.settings.save()
-    if common.open_button:
-        common.open_button.show() if common.settings.show_open_button else common.open_button.hide()
-
-
-def switch_context_menu(item):
-    common.settings.show_context_menu = not common.settings.show_context_menu
+def switch_copy_as_rgb(item):
+    common.settings.copy_as_rgb = not common.settings.copy_as_rgb
     common.settings.save()
 
 
 def show_custom_display_dialog(item):
     cdd = CustomDisplayDialog()
+
+
+class ColorPaletteDialog(Gtk.Window):
+    def __init__(self, thumb_file, filename, palette):
+        super().__init__()
+
+        self.image = Gtk.Image.new_from_file(thumb_file)
+        self.label = Gtk.Label()
+        self.label.set_text(filename)
+        self.label.set_property('name', 'image-label')
+
+        self.set_title(filename)
+        self.set_role("pop-up")
+        self.set_type_hint(Gtk.WindowType.TOPLEVEL)
+        self.set_decorated(False)
+        self.set_modal(True)
+        self.set_transient_for(common.main_window)
+        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+        self.set_keep_above(True)
+
+        self.vbox = Gtk.VBox()
+        self.vbox.set_spacing(5)
+        self.vbox.set_border_width(15)
+
+        self.vbox.pack_start(self.image, True, True, 15)
+        self.vbox.add(self.label)
+
+        self.hbox = Gtk.HBox()
+        self.hbox.set_spacing(5)
+        self.hbox.set_border_width(5)
+
+        for i in range(len(palette)):
+            color = palette[i]
+            hex_color = rgb_to_hex(color)
+
+            pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), color)
+            gtk_image = Gtk.Image.new_from_pixbuf(pixbuf)
+
+            button = Gtk.Button.new_with_label(hex_color)
+            button.set_image(gtk_image)
+            button.set_image_position(2)  # TOP
+            button.set_tooltip_text(common.lang['copy'])
+            button.connect_after('clicked', self.to_clipboard)
+
+            self.hbox.pack_start(button, False, False, 0)
+
+            if (i + 1) % 4 == 0:
+
+                self.vbox.add(self.hbox)
+                self.hbox = Gtk.HBox()
+                self.hbox.set_spacing(5)
+                self.hbox.set_border_width(5)
+
+        hbox = Gtk.HBox()
+        hbox.set_spacing(5)
+        hbox.set_border_width(5)
+
+        self.clipboard_preview = ClipboardPreview()
+        hbox.pack_start(self.clipboard_preview, False, False, 0)
+
+        self.clipboard_label = Gtk.Label()
+        self.clipboard_label.set_text(common.lang['clipboard_empty'])
+        hbox.pack_start(self.clipboard_label, True, True, 0)
+
+        button = Gtk.Button.new_with_label(common.lang['close'])
+        button.connect_after('clicked', self.close_window)
+        hbox.pack_start(button, False, False, 0)
+        
+        self.vbox.add(hbox)
+
+        self.add(self.vbox)
+        self.show_all()
+
+    def close_window(self, widget):
+        self.close()
+        
+    def to_clipboard(self, widget):
+        common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        content = str(hex_to_rgb(widget.get_label()) if common.settings.copy_as_rgb else widget.get_label())
+        common.clipboard.set_text(content, -1)
+        hex = widget.get_label()
+        rgb = hex_to_rgb(widget.get_label())
+        label = '{}'.format(content)
+        self.clipboard_preview.update(widget.get_label())
+        self.clipboard_label.set_text(label)
+
+
+class ClipboardPreview(Gtk.Image):
+    def __init__(self):
+        super().__init__()
+        pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size), (255, 255, 255))
+        self.set_from_pixbuf(pixbuf)
+
+    def update(self, color):
+        pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size), hex_to_rgb(color))
+        self.set_from_pixbuf(pixbuf)
 
 
 class CustomDisplayDialog(Gtk.Window):
@@ -822,6 +949,7 @@ class CustomDisplayDialog(Gtk.Window):
         self.set_role("pop-up")
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
         self.set_modal(True)
+        self.set_decorated(False)
         self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
         self.set_keep_above(True)
@@ -1007,10 +1135,10 @@ def main():
                 lang = sys.argv[i + 1]
             except:
                 pass
-            
+
         if sys.argv[i].upper() == '-C' or sys.argv[i].upper() == '--CLEAR':
             clear_thumbs = True
-            
+
         if sys.argv[i].upper() == '-A' or sys.argv[i].upper() == '--CLEAR-ALL':
             clear_thumbs, clear_all = True, True
 
@@ -1042,6 +1170,9 @@ def main():
                 font-weight: bold;
                 font-size: 12px;
             }
+            label#image-label {
+                font-size: 12px;
+            }
             statusbar#status-bar {
                 font-size: 12px;
             }
@@ -1056,8 +1187,8 @@ def main():
     if clear_thumbs:
         clear_thumbnails(clear_all)
         exit()
-        
-    common.cols = len(common.displays) if len(common.displays) > 3 else 3
+
+    common.cols = len(common.displays) if len(common.displays) > common.settings.columns else common.settings.columns
     app = GUI()
     Gtk.main()
 

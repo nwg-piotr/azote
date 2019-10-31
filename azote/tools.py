@@ -27,7 +27,7 @@ import json
 import gi
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
 
 
 def log(message, level=None):
@@ -192,6 +192,9 @@ def set_env(language=None):
         common.sample_dir = '/usr/share/backgrounds/sway'
 
     common.settings = Settings()
+    if common.settings.clear_thumbnails:
+        clear_thumbnails(clear_all=True)
+        common.settings.clear_thumbnails = False
 
     log("Environment: {}".format(common.env), common.INFO)
 
@@ -303,7 +306,7 @@ def create_thumbnail(in_path, dest_path, thumb_name, refresh=False):
     try:
         img = Image.open(in_path)
         # convert to thumbnail image
-        img.thumbnail((240, 135), Image.ANTIALIAS)
+        img.thumbnail(common.settings.thumb_size, Image.ANTIALIAS)
 
         img = expand_img(img)
 
@@ -325,7 +328,7 @@ def flip_selected_wallpaper():
             img_path = os.path.join(common.bcg_dir, "flipped-{}".format(common.selected_wallpaper.filename))
             flipped.save(os.path.join(common.tmp_dir, "flipped-{}".format(common.selected_wallpaper.filename)), "PNG")
 
-            flipped.thumbnail((240, 135), Image.ANTIALIAS)
+            flipped.thumbnail(common.settings.thumb_size, Image.ANTIALIAS)
             flipped = expand_img(flipped)
 
             thumb_path = os.path.join(common.tmp_dir, "thumbnail-{}".format(common.selected_wallpaper.filename))
@@ -348,7 +351,7 @@ def split_selected_wallpaper(num_parts):
             img_path = os.path.join(common.bcg_dir, "part{}-{}".format(i, common.selected_wallpaper.filename))
             part.save(os.path.join(common.tmp_dir, "part{}-{}".format(i, common.selected_wallpaper.filename)), "PNG")
 
-            part.thumbnail((240, 135), Image.ANTIALIAS)
+            part.thumbnail(common.settings.thumb_size, Image.ANTIALIAS)
 
             thumb_path = os.path.join(common.tmp_dir, "thumb-part{}-{}".format(i, common.selected_wallpaper.filename))
 
@@ -364,15 +367,16 @@ def split_selected_wallpaper(num_parts):
 
 
 def expand_img(image):
-    # We want the thumbnail to be always 240 x 135. Let's expand if necessary.
+    # We want the thumbnail to be always in the same proportion. Let's expand if necessary.
     width, height = image.size
-    border_h = (240 - width) // 2
-    border_v = (135 - height) // 2
+    border_h = (common.settings.thumb_width - width) // 2
+    border_v = (common.settings.thumb_height - height) // 2
     if border_v > 0 or border_h > 0:
         # border = (border_h, border_v, border_h, border_v)
         # return ImageOps.expand(image, border=border)
         # Let's add checkered background instead of the black one
         background = Image.open('images/squares.jpg')
+        background = background.resize(common.settings.thumb_size, Image.ANTIALIAS)
         background.paste(image, (border_h, border_v))
         return background
     else:
@@ -473,17 +477,39 @@ def rgba_to_hex(color):
                                            int(color.blue * 255))
 
 
+def rgb_to_hex(rgb_color):
+    return '#%02x%02x%02x' % (rgb_color[0], rgb_color[1], rgb_color[2])
+
+
+def hex_to_rgb(string):
+    string = string.lstrip('#')
+    return tuple(int(string[i:i+2], 16) for i in (0, 2, 4))
+
+
+def create_pixbuf(size, color):
+    image = Image.new("RGB", size, color)
+    data = image.tobytes()
+    w, h = image.size
+    data = GLib.Bytes.new(data)
+    return GdkPixbuf.Pixbuf.new_from_bytes(data, GdkPixbuf.Colorspace.RGB, False, 8, w, h, w * 3)
+
+
 class Settings(object):
     def __init__(self):
+        # Settings available in GUI we'll store in a pickle file
         self.file = os.path.join(common.app_dir, "settings.pkl")
 
         self.src_path = common.sample_dir
         self.sorting = 'new'
         # Gtk.Menu() on sway is unreliable, especially called with right click
-        self.show_open_button = common.sway  # shown by default on Sway
-        self.show_context_menu = not common.sway  # turned off by default on Sway
+        self.copy_as_rgb = False
         self.custom_display = None
+        self.old_thumb_width = None
+        self.clear_thumbnails = False
 
+        # Runtime config (json) location
+        self.rc_file = os.path.join(common.app_dir, "azoterc")
+        
         self.load()
 
     def load(self):
@@ -503,14 +529,8 @@ class Settings(object):
             save_needed = True
 
         try:
-            self.show_open_button = settings.show_open_button
-            log('Picture menu button: {}'.format(self.show_open_button), common.INFO)
-        except AttributeError:
-            save_needed = True
-
-        try:
-            self.show_context_menu = settings.show_context_menu
-            log('Thumbnail context menu: {}'.format(self.show_context_menu), common.INFO)
+            self.copy_as_rgb = settings.copy_as_rgb
+            log('Thumbnail context menu: {}'.format(self.copy_as_rgb), common.INFO)
         except AttributeError:
             save_needed = True
 
@@ -520,12 +540,109 @@ class Settings(object):
         except AttributeError:
             save_needed = True
 
+        try:
+            self.old_thumb_width = settings.old_thumb_width
+            log('Old thumbnail width: {}'.format(self.old_thumb_width), common.INFO)
+        except AttributeError:
+            save_needed = True
+
+        self.load_rc()
+        # overwrite self.old_thumb_width with self.thumb_width if changed in azoterc
+        if self.old_thumb_width != self.thumb_width:
+            self.old_thumb_width = self.thumb_width
+            save_needed = True
+            log('New thumbnail width: {}, clearing existing thumbnails!'.format(self.thumb_width), common.WARNING)
+            self.clear_thumbnails = True
+
         if save_needed:
             self.save()
 
     def save(self):
         with open(self.file, 'wb') as output:
             pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+            
+    def load_rc(self):
+        save_needed = False
+        try:
+            with open(self.rc_file, 'r') as f:
+                rc = json.load(f)
+        except FileNotFoundError:
+            log('rc file not found, creating...', common.INFO)
+            self.save_rc(set_defaults=True)
+
+        try:
+            with open(self.rc_file, 'r') as f:
+                rc = json.load(f)
+            log('rc file loaded', common.INFO)
+        except Exception as e:
+            log('rc file error: {}'.format(e), common.ERROR)
+
+        try:
+            self.thumb_width = int(rc['thumb_width'])
+            # ignore too small values
+            if self.thumb_width < 128:
+                self.thumb_width = 128
+        except KeyError:
+            self.thumb_width = 240
+            save_needed = True
+
+        self.thumb_height = int(self.thumb_width * 135 / 240)
+        self.thumb_size = (self.thumb_width, self.thumb_height)
+        log('Thumbnail size: {}'.format(self.thumb_size), common.INFO)
+            
+        try:
+            self.columns = int(rc['columns'])
+        except KeyError:
+            self.columns = 3
+            save_needed = True
+        log('Number of columns: {}'.format(self.columns), common.INFO)
+
+        try:
+            self.color_icon_w = int(rc['color_icon_w'])
+        except KeyError:
+            self.color_icon_w = 100
+            save_needed = True
+
+        try:
+            self.color_icon_h = int(rc['color_icon_h'])
+        except KeyError:
+            self.color_icon_h = 50
+            save_needed = True
+
+        try:
+            self.clip_prev_size = int(rc['clip_prev_size'])
+        except KeyError:
+            self.clip_prev_size = 30
+            save_needed = True
+
+        try:
+            self.palette_quality = int(rc['palette_quality'])
+        except KeyError:
+            self.palette_quality = 10
+            save_needed = True
+        log('Palette quality: {} (10 by default, the less, the better & slower)'.format(self.palette_quality), common.INFO)
+
+        if save_needed:
+            self.save_rc()
+
+    def save_rc(self, set_defaults=False):
+        if set_defaults:
+            self.thumb_width = 240
+            self.columns = 3
+            self.color_icon_w = 100
+            self.color_icon_h = 50
+            self.clip_prev_size = 30
+            self.palette_quality = 10
+
+        rc = {'thumb_width': str(self.thumb_width),
+              'columns': str(self.columns),
+              'color_icon_w': str(self.color_icon_w),
+              'color_icon_h': str(self.color_icon_h),
+              'clip_prev_size': str(self.clip_prev_size),
+              'palette_quality': str(self.palette_quality)}
+        
+        with open(self.rc_file, 'w') as f:
+            json.dump(rc, f, indent=2)
 
 
 class Language(dict):
