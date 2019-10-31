@@ -1,13 +1,14 @@
 # CHANGELOG
 
 ## In development:
-- Scale & crop backgrounds to virtual, custom display dimensions;
-- CLI arguments added: `-h | --help`, `-c | --clear` (clear unused thumbnails), 
+- **Scale & crop** backgrounds to virtual, custom display dimensions; define a custom display dimensions in preferences;
+- **CLI arguments** added: `-h | --help`, `-c | --clear` (clear unused thumbnails), 
 `-a | --clear-all` (clear all thumbnails);
-- thumbnails: checkered background instead of black (clear thumbnails for this to take effect);
-- 'Create palette':  feature added: to the context menu;
-- `~/.azote.azoterc` added, defines thumbnail width, number of columns dimensions of palette color images, 
-color palette quality;
+- **thumbnails**: checkered background instead of black (clear thumbnails for this to take effect);
+- **Create palette**: generates a colour palette on the basis of the selected image and displays a pop-up window;
+click a colour button to copy `#rrggbb` or `(r, g, b)` to the clipboard; switch hex / decimal format in preferences;
+- `~/.azote.azoterc` runtime configuration added - defines thumbnail width, number of thumbnail columns, dimensions 
+of palette color images, color palette quality;
 - image button removed, context menu always active;
 - button icons redesigned.
 
