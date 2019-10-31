@@ -43,7 +43,8 @@ except Exception as e:
     print('colorthief module not found', e)
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
+from gi.repository import Gtk, GdkPixbuf, Gdk
+from gi.repository.GdkPixbuf import InterpType
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
     copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, create_pixbuf, split_selected_wallpaper, scale_and_crop, clear_thumbnails
 
@@ -203,13 +204,9 @@ class DisplayBox(Gtk.Box):
         self.mode = 'fill' if common.sway else 'scale'
         self.color = None
 
-        #self.img = Gtk.Image()
-        #self.img.set_from_file("images/empty.png")
-        
-        image = Image.open('images/empty.png')
-        image.thumbnail(common.settings.thumb_size, Image.ANTIALIAS)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file('images/empty.png')
+        pixbuf = pixbuf.scale_simple(common.settings.thumb_size[0], common.settings.thumb_size[1], InterpType.BILINEAR)
 
-        pixbuf = create_pixbuf(common.settings.thumb_size, (16, 16, 16))
         self.img = Gtk.Image.new_from_pixbuf(pixbuf)
 
         self.select_button = Gtk.Button()
@@ -981,7 +978,6 @@ class ClipboardPreview(Gtk.Image):
     def __init__(self):
         super().__init__()
         pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size), (255, 255, 255))
-        #self.set_property("width-request", 110)
         self.set_from_pixbuf(pixbuf)
 
     def update(self, color):
