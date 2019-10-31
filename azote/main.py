@@ -257,14 +257,15 @@ class DisplayBox(Gtk.Box):
             self.color_button.set_tooltip_text(common.lang['background_color'])
             options_box.add(self.color_button)
 
-        self.flip_button = Gtk.Button.new_with_label(common.lang['flip_image'])
+        self.flip_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_flip.svg')
+        self.flip_button.set_image(img)
+        self.flip_button.set_tooltip_text(common.lang['flip_image'])
         self.flip_button.set_sensitive(False)
         self.flip_button.connect('clicked', self.on_flip_button)
         self.flip_button.set_tooltip_text(common.lang['flip_wallpaper_horizontally'])
-        if common.sway:
-            options_box.add(self.flip_button)
-        else:
-            options_box.pack_start(self.flip_button, True, True, 0)
+        options_box.pack_start(self.flip_button, True, True, 0)
 
     def clear_color_selection(self):
         # If not on sway / swaybg, we have no color_button in UI
@@ -880,14 +881,6 @@ class ColorPaletteDialog(Gtk.Window):
         self.hbox = Gtk.HBox()
         self.hbox.set_spacing(5)
         self.hbox.set_border_width(5)
-
-        """# We need to generate a stylesheet first
-        self.css = '\n '
-        for i in range(len(palette)):
-            color = palette[i]
-            hex_color = rgb_to_hex(color)
-            self.css += 'button#col%s { background-color: %s; color: #ffffff; }\n ' % (i, hex_color)
-        self.provider.load_from_data(bytes(self.css, 'utf-8'))"""
 
         for i in range(len(palette)):
             color = palette[i]

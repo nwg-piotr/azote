@@ -12,7 +12,7 @@
    viewBox="0 0 24 24"
    version="1.1"
    id="svg6"
-   sodipodi:docname="icon_za.svg"
+   sodipodi:docname="icon_flip.svg"
    inkscape:version="0.92.4 5da689c313, 2019-01-14">
   <metadata
      id="metadata12">
@@ -22,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -41,9 +41,9 @@
      inkscape:window-height="1045"
      id="namedview8"
      showgrid="false"
-     inkscape:zoom="35.666667"
-     inkscape:cx="12"
-     inkscape:cy="12"
+     inkscape:zoom="27.59167"
+     inkscape:cx="0.99971095"
+     inkscape:cy="11.220347"
      inkscape:window-x="1925"
      inkscape:window-y="30"
      inkscape:window-maximized="1"
@@ -65,38 +65,17 @@
        inkscape:locked="false"
        inkscape:label=""
        inkscape:color="rgb(0,0,255)" />
-    <sodipodi:guide
-       position="20,-7.5503033"
-       orientation="1,0"
-       id="guide934"
-       inkscape:locked="false"
-       inkscape:label=""
-       inkscape:color="rgb(0,0,255)" />
-    <sodipodi:guide
-       position="-47.153781,4"
-       orientation="0,1"
-       id="guide936"
-       inkscape:locked="false"
-       inkscape:label=""
-       inkscape:color="rgb(0,0,255)" />
-    <sodipodi:guide
-       position="4,31.625799"
-       orientation="1,0"
-       id="guide938"
-       inkscape:locked="false"
-       inkscape:label=""
-       inkscape:color="rgb(0,0,255)" />
-    <sodipodi:guide
-       position="11.790204,20"
-       orientation="0,1"
-       id="guide1005"
-       inkscape:locked="false"
-       inkscape:label=""
-       inkscape:color="rgb(0,0,255)" />
   </sodipodi:namedview>
-  <path
-     id="path1002"
-     style="font-style:normal;font-weight:normal;font-size:16.51647186px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#65ccff;fill-opacity:1;stroke:#808080;stroke-width:0.80000001;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
-     d="m 8.009292,14.684602 0.9219986,2.696161 H 7.0836127 Z M 6.9713532,13.097213 4.4722033,19.871803 H 6.2205041 L 6.6492977,18.63737 h 2.7199878 l 0.4251138,1.234433 H 11.542699 L 9.0453901,13.097213 Z M 15.362,6.6686426 v 8.0903314 l -1.906567,-1.914476 -0.979048,0.98126 3.211353,3.224677 h 0.732445 l 3.19479,-3.224677 -0.977209,-0.98126 -1.891845,1.914476 V 6.6686426 Z M 5.1715237,4.1445981 V 5.4658835 H 8.6883686 L 5.068466,9.8621608 v 1.0570272 h 5.87797 V 9.597903 H 7.2234765 L 10.843378,5.2016265 V 4.1445981 Z"
-     inkscape:connector-curvature="0" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:22.84598732px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#65ccff;fill-opacity:1;stroke:#808080;stroke-width:0.76190478;stroke-miterlimit:4;stroke-dasharray:none"
+     x="0.69623435"
+     y="-2.3038328"
+     id="text2669"
+     transform="scale(1,-1)"><tspan
+       sodipodi:role="line"
+       id="tspan2667"
+       x="0.69623435"
+       y="-2.3038328"
+       style="fill:#65ccff;fill-opacity:1;stroke:#808080;stroke-width:0.76190478;stroke-miterlimit:4;stroke-dasharray:none"></tspan></text>
 </svg>
