@@ -856,6 +856,7 @@ class ColorPaletteDialog(Gtk.Window):
         self.set_role("pop-up")
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
         self.set_modal(True)
+        self.set_decorated(False)
         self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
         self.set_keep_above(True)
@@ -904,8 +905,7 @@ class ColorPaletteDialog(Gtk.Window):
         self.clipboard_label.set_text(common.lang['clipboard_empty'])
         hbox.pack_start(self.clipboard_label, True, True, 0)
 
-        button = Gtk.Button.new_from_icon_name("window-close", Gtk.IconSize.SMALL_TOOLBAR)
-        button.set_label(common.lang['close'])
+        button = Gtk.Button.new_with_label(common.lang['close'])
         button.connect_after('clicked', self.close_window)
         hbox.pack_start(button, False, False, 0)
         
@@ -949,6 +949,7 @@ class CustomDisplayDialog(Gtk.Window):
         self.set_role("pop-up")
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
         self.set_modal(True)
+        self.set_decorated(False)
         self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
         self.set_keep_above(True)
