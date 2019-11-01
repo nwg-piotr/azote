@@ -163,6 +163,13 @@ This may be useful to adjust settings to your machine performance:
 - `palette_quality` affects quality and time of generation of the colour palette on the basis of an image; the less - the
 better, but slower; default value is 10.
 
+## Command line arguments
+
+- `-h | help` - displays help;
+- `-l | --lang <ln_LN>` - forces a locale if available (de_DE, en_EN, fr_FR, pl_PL at the moment);
+- `[-c] | [--clear]` - clears unused thumbnails;
+- `[-a] | [--clear-all]` - clears all thumbnails.
+
 ## Troubleshooting
 
 ### No pictures in thumbnails / display preview
