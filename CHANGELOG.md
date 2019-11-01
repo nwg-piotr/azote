@@ -1,11 +1,19 @@
 # CHANGELOG
 
 ## In development:
-- scale & crop backgrounds to virtual, custom display dimensions
-- `-h | --help` argument added
-- `-c | --clear` argument to clear unused thumbnails and exit
-- `-a | --clear-all` argument to clear all thumbnails and exit
-- thumbnails: checkered background instead of black
+- **Scale & crop** backgrounds to virtual, custom display dimensions; define a custom display dimensions in preferences;
+- **CLI arguments** added: `-h | --help`, `-c | --clear` (clear unused thumbnails), 
+`-a | --clear-all` (clear all thumbnails);
+- **thumbnails**: checkered background instead of black (clear thumbnails for this to take effect);
+- **Create palette**: generates a colour palette on the basis of the selected image and displays a pop-up window;
+click a colour button to copy `#rrggbb` or `(r, g, b)` to the clipboard; switch hex / decimal format in preferences;
+This feature uses the awesome [colorthief library](https://github.com/fengsp/color-thief-py) (c) 2015 by Shipeng Feng;
+- `~/.azote.azoterc` runtime configuration added - defines thumbnail width, number of thumbnail columns, dimensions 
+of palette color images, color palette quality;
+- image button removed, context menu always active;
+- button icons redesigned.
+
+**Changes already merged into the master branch may be tested as the `azote-git` AUR package.**
 
 ## v1.5.1 (2019-10-16)
 - scale & crop feature not working on X11 bug 

@@ -22,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -37,16 +37,16 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1890"
-     inkscape:window-height="1005"
+     inkscape:window-width="1910"
+     inkscape:window-height="1045"
      id="namedview8"
      showgrid="false"
-     inkscape:zoom="17.132868"
-     inkscape:cx="11.023019"
-     inkscape:cy="6.6982471"
-     inkscape:window-x="14"
-     inkscape:window-y="35"
-     inkscape:window-maximized="0"
+     inkscape:zoom="35.666667"
+     inkscape:cx="12"
+     inkscape:cy="12"
+     inkscape:window-x="1925"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
      inkscape:current-layer="svg6"
      inkscape:snap-global="false"
      showguides="true"
@@ -95,19 +95,8 @@
        inkscape:color="rgb(0,0,255)" />
   </sodipodi:namedview>
   <path
-     sodipodi:nodetypes="ccccccccccc"
-     inkscape:connector-curvature="0"
      id="path1002"
-     style="font-style:normal;font-weight:normal;font-size:16.51647186px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;stroke-width:1"
-     d="M 16.559232,17.491779 H 15.78088 l -3.407453,-3.407454 1.037803,-1.037802 2.023715,2.023715 V 6.5192428 h 1.470221 v 8.5509952 l 2.006419,-2.023715 1.037803,1.037802 z" />
-  <path
-     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:40px;line-height:1.25;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans Bold';letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;stroke-width:1"
-     d="M 4.9184637,4 H 10.937286 V 5.117439 L 7.0957907,9.764642 h 3.9518003 v 1.3956 H 4.8081577 V 10.042803 L 8.6496548,5.395599 h -3.731191 z"
-     id="path1104"
-     inkscape:connector-curvature="0" />
-  <path
-     id="path923-3"
-     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:40px;line-height:1.25;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans Bold';letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;stroke-width:1"
-     d="m 6.9471177,17.367064 h 1.961513 l -0.978359,-2.84875 z m 2.426713,1.328458 H 6.4867137 L 6.0311047,20 h -1.856003 l 2.652119,-7.160242 h 2.201307 L 11.680647,20 H 9.8246427 Z"
+     style="font-style:normal;font-weight:normal;font-size:16.51647186px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#65ccff;fill-opacity:1;stroke:#808080;stroke-width:0.80000001;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
+     d="m 8.009292,14.684602 0.9219986,2.696161 H 7.0836127 Z M 6.9713532,13.097213 4.4722033,19.871803 H 6.2205041 L 6.6492977,18.63737 h 2.7199878 l 0.4251138,1.234433 H 11.542699 L 9.0453901,13.097213 Z M 15.362,6.6686426 v 8.0903314 l -1.906567,-1.914476 -0.979048,0.98126 3.211353,3.224677 h 0.732445 l 3.19479,-3.224677 -0.977209,-0.98126 -1.891845,1.914476 V 6.6686426 Z M 5.1715237,4.1445981 V 5.4658835 H 8.6883686 L 5.068466,9.8621608 v 1.0570272 h 5.87797 V 9.597903 H 7.2234765 L 10.843378,5.2016265 V 4.1445981 Z"
      inkscape:connector-curvature="0" />
 </svg>
