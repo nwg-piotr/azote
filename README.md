@@ -199,11 +199,6 @@ $ sudo update-desktop-database
 
 See https://specifications.freedesktop.org/desktop-entry-spec/0.9.5/ar01s07.html
 
-### No colors preview in the 'Create palette' window (buttons stay gray)
-
-Spotted on i3 with the `exec --no-startup-id xfsettingsd` command in config.
-This prevent i3 from loading some gtk3 settings. Comment out or remove the line.
-
 ### X11 / feh notice
 
 The background color picker won't be available. You'll also be unable to select different modes 
