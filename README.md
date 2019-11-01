@@ -6,7 +6,7 @@
 (Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. During development I test it on sway, i3, 
 Openbox, qtile and dwm, so I'm not sure if it works on others window managers.
 
-![screenshot](http://nwg.pl/Lychee/uploads/big/2ef98871aea09679282675e942f153ed.png)
+![screenshot](http://nwg.pl/Lychee/uploads/big/a66c84b60a605b78e5fc4dd5ffbf8dbf.png)
 
 *Pictures above come from https://wallhaven.cc*
 
