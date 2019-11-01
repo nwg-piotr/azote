@@ -19,6 +19,9 @@ The most commonly used *desktop background browser and setter* is aimed at X win
 In order not to limit the program usage to the single environment, Azote is also capable of using feh 
 when running on i3, Openbox or other X11 window managers.
 
+*The description below takes into account the latest release. All the features may or may not be available in the
+package already prepared for a certain Linux distribution.*
+
 ### Main features:
 
 - works on Sway
