@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## In development:
+## v1.7.0 (2019-11-01)
 - **Scale & crop** backgrounds to virtual, custom display dimensions; define a custom display dimensions in preferences;
 - **CLI arguments** added: `-h | --help`, `-c | --clear` (clear unused thumbnails), 
 `-a | --clear-all` (clear all thumbnails);
@@ -12,8 +12,6 @@ This feature uses the awesome [colorthief library](https://github.com/fengsp/col
 of palette color images, color palette quality;
 - image button removed, context menu always active;
 - button icons redesigned.
-
-**Changes already merged into the master branch may be tested as the `azote-git` AUR package.**
 
 ## v1.5.1 (2019-10-16)
 - scale & crop feature not working on X11 bug 
