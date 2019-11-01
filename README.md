@@ -24,12 +24,12 @@ package already prepared for a certain Linux distribution.*
 
 ### Main features:
 
-- works on Sway
-- uses own thumbnails, 240x135px by default
-- flips wallpapers horizontally
-- splits wallpapers between 2 or more displays
-- scales and crops images to detected or user-defined display dimensions
-- generates a colour palette on the basis of an image
+- works on Sway;
+- uses own thumbnails, 240x135px by default;
+- flips wallpapers horizontally;
+- splits wallpapers between 2 or more displays;
+- scales and crops images to detected or user-defined display dimensions;
+- generates a colour palette on the basis of an image.
 
 ## Usage
 

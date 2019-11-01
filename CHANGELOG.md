@@ -13,6 +13,8 @@ of palette color images, color palette quality;
 - image button removed, context menu always active;
 - button icons redesigned.
 
+Installing the 1.7.0 version will trigger regeneration of thumbnails on the first run.
+
 ## v1.5.1 (2019-10-16)
 - scale & crop feature not working on X11 bug 
 [fixed](https://github.com/nwg-piotr/azote/commit/077806e6f72a84fdf768ac6c64d4f081a78fb579)
