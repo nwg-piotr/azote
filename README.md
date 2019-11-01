@@ -165,7 +165,7 @@ better, but slower; default value is 10.
 
 ## Command line arguments
 
-- `-h | help` - displays help;
+- `-h | --help` - displays help;
 - `-l | --lang <ln_LN>` - forces a locale if available (de_DE, en_EN, fr_FR, pl_PL at the moment);
 - `[-c] | [--clear]` - clears unused thumbnails;
 - `[-a] | [--clear-all]` - clears all thumbnails.
