@@ -1,8 +1,8 @@
 # Credits
 
-## color-thief-py
+## colorthief
 
-To generate color palettes, Azote uses the awesome [color-thief-py](https://github.com/fengsp/color-thief-py) python 
+To generate color palettes, Azote uses the awesome [colorthief](https://github.com/fengsp/color-thief-py) python 
 module (c) 2015 by Shipeng Feng. The module in version 2.0.1 has been included directly into the Azote package, as the 
 `python-colorthief` package it's still absent in repositories of most Linux distributions. 
 
