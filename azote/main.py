@@ -538,6 +538,7 @@ def show_image_menu(widget):
             menu.append(item)
             submenu = Gtk.Menu()
 
+            # Scale and crop to detected displays dimension
             for i in range(len(common.displays)):
                 display = common.displays[i]
                 width, height = display['width'], display['height']
@@ -546,6 +547,23 @@ def show_image_menu(widget):
                 subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
                 submenu.append(subitem)
 
+            # Scale and crop to double width of the primary display
+            display = common.displays[0]
+            width, height = display['width'] * 2, display['height']
+            subitem = Gtk.MenuItem.new_with_label(
+                '{} x {} ({} {})'.format(width, height, display['name'], common.lang['dual_width']))
+            subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
+            submenu.append(subitem)
+
+            # Scale and crop to double height of the primary display
+            display = common.displays[0]
+            width, height = display['width'], display['height'] * 2
+            subitem = Gtk.MenuItem.new_with_label(
+                '{} x {} ({} {})'.format(width, height, display['name'], common.lang['dual_height']))
+            subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
+            submenu.append(subitem)
+
+            # Scale and crop to user-defined dimensions
             if common.settings.custom_display:
                 subitem = Gtk.MenuItem.new_with_label(
                     '{} x {} ({})'.format(common.settings.custom_display[1], common.settings.custom_display[2],
