@@ -2,11 +2,11 @@
 
 [![Build Status](https://travis-ci.com/nwg-piotr/azote.svg?branch=master)](https://travis-ci.com/nwg-piotr/azote)
 
-**Azote** is a GTK+ 3-based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
+**Azote** is a GTK+ 3 - based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
 (Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. During development I test it on sway, i3, 
 Openbox, qtile and dwm, so I'm not sure if it works on others window managers.
 
-![screenshot](http://nwg.pl/Lychee/uploads/big/2ef98871aea09679282675e942f153ed.png)
+![screenshot](http://nwg.pl/Lychee/uploads/big/a66c84b60a605b78e5fc4dd5ffbf8dbf.png)
 
 *Pictures above come from https://wallhaven.cc*
 
@@ -19,12 +19,17 @@ The most commonly used *desktop background browser and setter* is aimed at X win
 In order not to limit the program usage to the single environment, Azote is also capable of using feh 
 when running on i3, Openbox or other X11 window managers.
 
+*The description below takes into account the latest release. All the features may or may not be available in the
+package already prepared for a certain Linux distribution.*
+
 ### Main features:
 
-- works on Sway
-- uses own, bigger thumbnails (240x135px)
-- flips wallpapers horizontally
-- splits wallpapers between 2 or more displays
+- works on Sway;
+- uses own thumbnails, 240x135px by default;
+- flips wallpapers horizontally;
+- splits wallpapers between 2 or more displays;
+- scales and crops images to detected or user-defined display dimensions;
+- generates a colour palette on the basis of an image.
 
 ## Usage
 
@@ -110,7 +115,8 @@ Binary package `azote` available in the Void repository.
 
 ### Other Linux distributions:
 
-Packagers wanted. Personally I only maintain Arch (AUR) and Void Linux packages.
+Packagers wanted! Personally I only maintain Arch (AUR) and Void Linux packages. Please do remember to copy all LICENSE*
+ files to `/usr/share/licenses/azote/`.
 
 **Dependencies:**
 
@@ -130,6 +136,39 @@ Packagers wanted. Personally I only maintain Arch (AUR) and Void Linux packages.
 Please use assets from the [latest release](https://github.com/nwg-piotr/azote/releases/latest).
 
 Seeing Arch [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
+
+## ~/.azote/azoterc
+
+```json
+{
+  "thumb_width": "240",
+  "columns": "3",
+  "color_icon_w": "100",
+  "color_icon_h": "50",
+  "clip_prev_size": "30",
+  "palette_quality": "10"
+}
+```
+
+Azote is being developed on the 1920 x 1080 box, and some graphics dimensions may not go well with other screens.
+The runtime configuration file allows to redefine them:
+
+- `thumb_width` - thumbnail width; changing the value triggers thumbnails regeneration on startup;
+- `columns` - initial number of columns in thumbnails preview;
+- `color_icon_w`, `color_icon_h`, `clip_prev_size` - define dimensions of pictures which represent colors in the color 
+palette view;
+
+This may be useful to adjust settings to your machine performance:
+
+- `palette_quality` affects quality and time of generation of the colour palette on the basis of an image; the less - the
+better, but slower; default value is 10.
+
+## Command line arguments
+
+- `-h | --help` - displays help;
+- `-l | --lang <ln_LN>` - forces a locale if available (de_DE, en_EN, fr_FR, pl_PL at the moment);
+- `[-c] | [--clear]` - clears unused thumbnails;
+- `[-a] | [--clear-all]` - clears all thumbnails.
 
 ## Troubleshooting
 
@@ -159,11 +198,6 @@ $ sudo update-desktop-database
 ```
 
 See https://specifications.freedesktop.org/desktop-entry-spec/0.9.5/ar01s07.html
-
-### No colors preview in the 'Create palette' window (buttons stay gray)
-
-Spotted on i3 with the `exec --no-startup-id xfsettingsd` command in config.
-This prevent i3 from loading some gtk3 settings. Comment out or remove the line.
 
 ### X11 / feh notice
 
