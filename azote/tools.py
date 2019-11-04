@@ -111,8 +111,8 @@ def check_displays():
             display = {'name': names[i],
                        'x': 0,
                        'y': 0,
-                       'width': w_h[0],
-                       'height': w_h[1]}
+                       'width': int(w_h[0]),
+                       'height': int(w_h[1])}
             displays.append(display)
             log("Output found: {}".format(display), common.INFO)
 

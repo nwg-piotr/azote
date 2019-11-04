@@ -1,8 +1,10 @@
 # CHANGELOG
 
-## Development
+## v1.7.1 (2019-11-04)
 - Scale and crop an image to dual width or height of the primary display
 - Data migrated to XGD-compliant locations
+- Scale & crop feature not working on X11 bug, previously fixed in 1.5.1, has been reintroduced accidentally. 
+Fixed one more time.
 
 ## v1.7.0 (2019-11-01)
 - **Scale & crop** backgrounds to virtual, custom display dimensions; define a custom display dimensions in preferences;
