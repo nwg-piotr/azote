@@ -2,6 +2,11 @@
 
 [![Build Status](https://travis-ci.com/nwg-piotr/azote.svg?branch=master)](https://travis-ci.com/nwg-piotr/azote)
 
+**1.7.2 version note**: _running Azote for the first time will move all the program data to XDG-compliant folders. From now 
+on you'll find the `azoterc` file $XDG_CONFIG_HOME/azote/ (usually `~/.config/azote/azoterc`). Application data will be 
+placed in $XDG_DATA_HOME/azote (`~/.local/share/azote/`). 
+Thumbnails may regenerate. You may need to re-apply wallpaper settings._
+
 **Azote** is a GTK+ 3 - based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
 (Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. During development I test it on sway, i3, 
 Openbox, qtile and dwm, so I'm not sure if it works on others window managers.
@@ -34,7 +39,7 @@ package already prepared for a certain Linux distribution.*
 ## Usage
 
 Select the folder your wallpapers are stored in. If it contains a lot of big pictures, it may take some time for
-Azote to create thumbnails. It's being performed once per folder, unless you clear the `~/.azote/thumbnails` folder.
+Azote to create thumbnails. It's being performed once per folder, unless you clear the thumbnails folder.
 
 Most of the buttons seem to be self-explanatory, with a little help from their tooltip text. What may not be clear
 at first is the `Apply selected picture to all screens` button. It applies unchanged
@@ -137,7 +142,7 @@ Please use assets from the [latest release](https://github.com/nwg-piotr/azote/r
 
 Seeing Arch [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=azote) may be informative.
 
-## ~/.azote/azoterc
+## ~/.config/azote/azoterc
 
 ```json
 {
