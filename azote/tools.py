@@ -129,7 +129,7 @@ def set_env(language=None):
     if not os.path.isdir(common.config_home):
         os.mkdir(common.config_home)
 
-    xdg_data_home = os.getenv('XDG_CONFIG_HOME')
+    xdg_data_home = os.getenv('XDG_DATA_HOME')
     common.data_home = xdg_data_home if xdg_data_home else os.path.join(os.getenv("HOME"), ".local/share/azote")
     if not os.path.isdir(common.data_home):
         os.mkdir(common.data_home)
