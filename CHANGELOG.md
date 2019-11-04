@@ -2,6 +2,7 @@
 
 ## Development
 - Scale and crop an image to dual width or height of the primary display
+- Data migrated to XGD-compliant locations
 
 ## v1.7.0 (2019-11-01)
 - **Scale & crop** backgrounds to virtual, custom display dimensions; define a custom display dimensions in preferences;
