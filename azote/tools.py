@@ -20,7 +20,7 @@ import pickle
 import subprocess
 import locale
 import pkg_resources
-from shutil import copyfile
+import shutil
 
 import json
 
@@ -111,8 +111,8 @@ def check_displays():
             display = {'name': names[i],
                        'x': 0,
                        'y': 0,
-                       'width': w_h[0],
-                       'height': w_h[1]}
+                       'width': int(w_h[0]),
+                       'height': int(w_h[1])}
             displays.append(display)
             log("Output found: {}".format(display), common.INFO)
 
@@ -124,13 +124,53 @@ def check_displays():
 
 
 def set_env(language=None):
-    # application folder
+    xdg_config_home = os.getenv('XDG_CONFIG_HOME')
+    common.config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config/azote")
+    if not os.path.isdir(common.config_home):
+        os.mkdir(common.config_home)
+
+    xdg_data_home = os.getenv('XDG_CONFIG_HOME')
+    common.data_home = xdg_data_home if xdg_data_home else os.path.join(os.getenv("HOME"), ".local/share/azote")
+    if not os.path.isdir(common.data_home):
+        os.mkdir(common.data_home)
+    
+    # MIGRATE DATA to XDG Base_Directory Specification - compliant folders
+    # Up to v1.7.0 Azote used to store all the data here:
     common.app_dir = os.path.join(os.getenv("HOME"), ".azote")
-    if not os.path.isdir(common.app_dir):
-        os.mkdir(common.app_dir)
+
+    # Let's move all the content to their proper location, if not yet moved
+    data_migrated = False
+    migration_error = None
+    if os.path.isdir(common.app_dir):
+        try:
+            azote_rc = os.path.join(common.app_dir, 'azoterc')
+            if os.path.isfile(azote_rc):
+                shutil.move(azote_rc, os.path.join(common.config_home, 'azoterc'))
+
+            azote_pkl = os.path.join(common.app_dir, 'settings.pkl')
+            if os.path.isfile(azote_pkl):
+                shutil.move(azote_pkl, os.path.join(common.data_home, 'settings.pkl'))
+
+            bcg_feh_dir = os.path.join(common.app_dir, 'backgrounds-feh')
+            if os.path.isdir(bcg_feh_dir):
+                cmd = 'cp -rf {} {}'.format(bcg_feh_dir, os.path.join(common.data_home, 'backgrounds-feh'))
+                os.system(cmd)
+
+            bcg_sway_dir = os.path.join(common.app_dir, 'backgrounds-sway')
+            if os.path.isdir(bcg_sway_dir):
+                cmd = 'cp -rf {} {}'.format(bcg_sway_dir, os.path.join(common.data_home, 'backgrounds-sway'))
+                os.system(cmd)
+
+            data_migrated = True
+        except Exception as e:
+            migration_error = e
+
+    if data_migrated:
+        # Remove the old ~/.azote folder
+        shutil.rmtree(common.app_dir)
 
     # logging
-    common.log_file = os.path.join(common.app_dir, "log.txt")
+    common.log_file = os.path.join(common.data_home, "log.txt")
     logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
                         level=logging.INFO)
 
@@ -140,6 +180,12 @@ def set_env(language=None):
         version = ' unknown version: {}'.format(e)
 
     log('Azote v{}'.format(version), common.INFO)
+    
+    if data_migrated:
+        log('Data migrated to XDG-compliant folders', common.INFO)
+
+    if migration_error:
+        log('Data migration error: {}'.format(migration_error), common.ERROR)
 
     # We will preload the en_EN dictionary as default values
     common.lang = Language()
@@ -156,7 +202,7 @@ def set_env(language=None):
     common.displays = check_displays()
 
     # thumbnails folder
-    common.thumb_dir = os.path.join(common.app_dir, "thumbnails")
+    common.thumb_dir = os.path.join(common.data_home, "thumbnails")
     if not os.path.isdir(common.thumb_dir):
         os.mkdir(common.thumb_dir)
 
@@ -164,7 +210,7 @@ def set_env(language=None):
     common.cmd_file = os.path.join(os.getenv("HOME"), ".azotebg")
 
     # temporary folder
-    common.tmp_dir = os.path.join(common.app_dir, "temp")
+    common.tmp_dir = os.path.join(common.data_home, "temp")
     if not os.path.isdir(common.tmp_dir):
         os.mkdir(common.tmp_dir)
     # remove all files inside on start
@@ -175,17 +221,17 @@ def set_env(language=None):
 
     # backgrounds folder
     name = 'backgrounds-sway' if common.sway else 'backgrounds-feh'
-    common.bcg_dir = os.path.join(common.app_dir, name)
+    common.bcg_dir = os.path.join(common.data_home, name)
     if not os.path.isdir(common.bcg_dir):
         os.mkdir(common.bcg_dir)
 
     # Sample folder (will be set on 1st run only)
-    common.sample_dir = os.path.join(common.app_dir, "sample")
+    common.sample_dir = os.path.join(common.data_home, "sample")
     if not os.path.isdir(common.sample_dir):
         os.mkdir(common.sample_dir)
-    copyfile('images/azote-wallpaper.jpg', os.path.join(common.sample_dir, 'azote-wallpaper.jpg'))
-    copyfile('images/azote-wallpaper1.jpg', os.path.join(common.sample_dir, 'azote-wallpaper1.jpg'))
-    copyfile('images/azote-wallpaper2.jpg', os.path.join(common.sample_dir, 'azote-wallpaper2.jpg'))
+    shutil.copyfile('images/azote-wallpaper.jpg', os.path.join(common.sample_dir, 'azote-wallpaper.jpg'))
+    shutil.copyfile('images/azote-wallpaper1.jpg', os.path.join(common.sample_dir, 'azote-wallpaper1.jpg'))
+    shutil.copyfile('images/azote-wallpaper2.jpg', os.path.join(common.sample_dir, 'azote-wallpaper2.jpg'))
 
     # Sway comes with some sample wallpapers
     if common.sway and os.path.isdir('/usr/share/backgrounds/sway'):
@@ -259,7 +305,7 @@ def copy_backgrounds():
         os.remove(os.path.join(common.bcg_dir, file))
     # Copy manipulated (flip, split) files from the temporary folder
     for file in os.listdir(common.tmp_dir):
-        copyfile(os.path.join(common.tmp_dir, file), os.path.join(common.bcg_dir, file))
+        shutil.copyfile(os.path.join(common.tmp_dir, file), os.path.join(common.bcg_dir, file))
 
 
 def hash_name(full_path):
@@ -497,7 +543,7 @@ def create_pixbuf(size, color):
 class Settings(object):
     def __init__(self):
         # Settings available in GUI we'll store in a pickle file
-        self.file = os.path.join(common.app_dir, "settings.pkl")
+        self.file = os.path.join(common.data_home, "settings.pkl")
 
         self.src_path = common.sample_dir
         self.sorting = 'new'
@@ -508,7 +554,7 @@ class Settings(object):
         self.copy_as = '#rgb'
 
         # Runtime config (json) location
-        self.rc_file = os.path.join(common.app_dir, "azoterc")
+        self.rc_file = os.path.join(common.config_home, "azoterc")
         
         self.load()
 
