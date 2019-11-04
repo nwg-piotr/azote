@@ -567,7 +567,12 @@ class Settings(object):
         with open(self.file, 'rb') as input_data:
             settings = pickle.load(input_data)
 
-        self.src_path = settings.src_path  # holds selected path to source pictures
+        # Do not read if it's inside old folders (before data migration); save default value instead
+        if not settings.src_path == os.path.join(os.getenv('HOME'), '.azote/sample'):
+            self.src_path = settings.src_path
+        else:
+            save_needed = True
+
         try:
             self.sorting = settings.sorting  # 'new' 'old' 'az' 'za'
             log('Image sorting: {}'.format(self.sorting), common.INFO)

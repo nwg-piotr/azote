@@ -48,6 +48,7 @@ log_file = ''           # ~/.azote/log.txt
 cmd_file = ''           # ~/.azote/command.sh
 config_home = ''        # $XDG_CONFIG_HOME or ~/.config/azote
 data_home = ''          # $XDG_DATA_HOME or ~/.local/share/azote
+data_migrated = False
 
 logging_enabled = True
 displays = None         # detected displays details
