@@ -4,7 +4,8 @@
 
 **1.7.1 version note**: _running Azote for the first time will move all the program data to XDG-compliant folders. From now 
 on you'll find the `azoterc` file $XDG_CONFIG_HOME/azote/ (usually `~/.config/azote/azoterc`). Application data will be 
-placed in $XDG_DATA_HOME/azote (`~/.local/share/azote/`)._
+placed in $XDG_DATA_HOME/azote (`~/.local/share/azote/`). 
+Thumbnails may regenerate. You may need to re-apply wallpaper settings._
 
 **Azote** is a GTK+ 3 - based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
 (Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. During development I test it on sway, i3, 
