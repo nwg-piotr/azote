@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/nwg-piotr/azote.svg?branch=master)](https://travis-ci.com/nwg-piotr/azote)
 
-**1.7.1 version note**: _running Azote for the first time will move all the program data to XDG-compliant folders. From now 
+**1.7.2 version note**: _running Azote for the first time will move all the program data to XDG-compliant folders. From now 
 on you'll find the `azoterc` file $XDG_CONFIG_HOME/azote/ (usually `~/.config/azote/azoterc`). Application data will be 
 placed in $XDG_DATA_HOME/azote (`~/.local/share/azote/`). 
 Thumbnails may regenerate. You may need to re-apply wallpaper settings._
