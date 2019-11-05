@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## Development
-
+- Screen color picker: grabs the dominant colour of a selected screen area
 
 ## v1.7.2 (2019-11-04)
 - Scale and crop an image to dual width or height of the primary display
