@@ -296,12 +296,19 @@ def set_env(language=None):
         log("Failed creating image associations: /usr/share/applications/mimeinfo.cache file not found."
             " Setting feh as the only viewer.", common.ERROR)
 
+    # Check if packages necessary to pick colours from the screen available
     if common.sway:
-        grim = subprocess.run(['grim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+        try:
+            grim = subprocess.run(['grim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+        except FileNotFoundError:
+            grim = False
         av = 'found' if grim else 'not found'
         log("grim package {}".format(av), common.INFO)
     
-        slurp = subprocess.run(['slurp', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+        try:
+            slurp = subprocess.run(['slurp', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+        except FileNotFoundError:
+            slurp = False
         av = 'found' if slurp else 'not found'
         log("slurp package {}".format(av), common.INFO)
     
@@ -310,6 +317,26 @@ def set_env(language=None):
             common.picker = True
         else:
             log("Pick color from screen feature needs both grim and slurp packages installed", common.INFO)
+    else:
+        try:
+            maim = subprocess.run(['maim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+        except FileNotFoundError:
+            maim = False
+        av = 'found' if maim else 'not found'
+        log("maim package {}".format(av), common.INFO)
+
+        try:
+            slop = subprocess.run(['slop', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+        except FileNotFoundError:
+            slop = False
+        av = 'found' if slop else 'not found'
+        log("slurp package {}".format(av), common.INFO)
+
+        if maim and slop:
+            log("Pick color from screen feature available", common.INFO)
+            common.picker = True
+        else:
+            log("Pick color from screen feature needs both maim and slop packages installed", common.INFO)
 
 
 def copy_backgrounds():

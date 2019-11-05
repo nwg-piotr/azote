@@ -649,7 +649,7 @@ class GUI:
         window.set_default_size(common.settings.thumb_width * common.settings.columns + 160, h * 0.95)
         common.main_window = window
 
-        window.set_title("Azote")
+        window.set_title("Azote wallpaper manager")
         logo = GdkPixbuf.Pixbuf.new_from_file('images/icon.svg')
         window.set_default_icon(logo)
         window.set_role("azote")
@@ -793,6 +793,11 @@ class GUI:
         img.set_from_file('images/icon_picker.svg')
         picker_button.set_image(img)
         picker_button.set_sensitive(common.picker)
+        if common.sway:
+            tt = common.lang['screen_color_picker'] if common.picker else common.lang['grim_slurp_required']
+        else:
+            tt = common.lang['screen_color_picker'] if common.picker else common.lang['maim_slop_required']
+        picker_button.set_tooltip_text(tt)
         picker_button.connect('clicked', on_picker_button)
         status_box.add(picker_button)
 
@@ -858,13 +863,25 @@ def on_picker_button(button):
     
     
 def get_dominant_from_area():
-    cmd = 'grim -g "$(slurp)" {}'.format(os.path.join(common.tmp_dir, 'area.png'))
-    subprocess.call(cmd, shell=True)
-    color_thief = ColorThief(os.path.join(common.tmp_dir, 'area.png'))
-    try:
-        dominant = color_thief.get_color(quality=common.settings.palette_quality)
-    except:
-        dominant = None
+    """
+    Saves selected area with `grim -g "$(slurp)" common.tmp_dir/azote/temp/area.png`,
+    then calculates the dominant color with the colorthief module.
+    :return: tuple (r, g, b) or (255, 255, 255) if nothing selected
+    """
+    dominant = (255, 255, 255)
+    if common.sway:
+        cmd = 'grim -g "$(slurp)" {}'.format(os.path.join(common.tmp_dir, 'area.png'))
+    else:
+        cmd = 'maim -s {}'.format(os.path.join(common.tmp_dir, 'area.png'))
+
+    res = subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL).returncode
+    if res == 0:
+        color_thief = ColorThief(os.path.join(common.tmp_dir, 'area.png'))
+        try:
+            dominant = color_thief.get_color(quality=common.settings.palette_quality)
+        except:
+            pass
+
     return dominant
 
 
@@ -1013,7 +1030,7 @@ class ColorPickerDialog(Gtk.Window):
         if not color:
             color = (255, 255, 255)
 
-        self.set_title('Color picker')
+        self.set_title(common.lang['screen_color_picker'])
         self.set_role("pop-up")
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
         self.set_decorated(False)
