@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## v1.7.1 (2019-11-04)
+## Development
+- Screen color picker: grabs the dominant colour of a selected screen area
+
+## v1.7.2 (2019-11-04)
 - Scale and crop an image to dual width or height of the primary display
 - Data migrated to XGD-compliant locations
 - Scale & crop feature not working on X11 bug, previously fixed in 1.5.1, has been reintroduced accidentally. 

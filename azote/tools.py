@@ -57,12 +57,10 @@ def check_displays():
     # Sway or not Sway? If so, the `swaymsg -t get_seats` command should return exit code 0
     result = subprocess.run(['swaymsg', '-t', 'get_seats'], stdout=subprocess.DEVNULL)
     common.sway = result.returncode == 0
-    # ask for the wm name (just for logging: maybe we should give up on it to drop the wmctrl dependency?)
-    wm = subprocess.check_output("wmctrl -m | awk '/Name/{print $2}'", shell=True).decode("utf-8").strip()
     if common.sway:
         common.env['wm'] = 'sway'
     else:
-        common.env['wm'] = wm
+        common.env['wm'] = 'not sway'
 
     fnull = open(os.devnull, 'w')
     common.env['xrandr'] = subprocess.call(["which", "xrandr"], stdout=fnull, stderr=subprocess.STDOUT) == 0
@@ -297,6 +295,48 @@ def set_env(language=None):
         print('Failed opening /usr/share/applications/mimeinfo.cache')
         log("Failed creating image associations: /usr/share/applications/mimeinfo.cache file not found."
             " Setting feh as the only viewer.", common.ERROR)
+
+    # Check if packages necessary to pick colours from the screen available
+    if common.sway:
+        try:
+            grim = subprocess.run(['grim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+        except FileNotFoundError:
+            grim = False
+        av = 'found' if grim else 'not found'
+        log("grim package {}".format(av), common.INFO)
+    
+        try:
+            slurp = subprocess.run(['slurp', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+        except FileNotFoundError:
+            slurp = False
+        av = 'found' if slurp else 'not found'
+        log("slurp package {}".format(av), common.INFO)
+    
+        if grim and slurp:
+            log("Pick color from screen feature available", common.INFO)
+            common.picker = True
+        else:
+            log("Pick color from screen feature needs both grim and slurp packages installed", common.INFO)
+    else:
+        try:
+            maim = subprocess.run(['maim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+        except FileNotFoundError:
+            maim = False
+        av = 'found' if maim else 'not found'
+        log("maim package {}".format(av), common.INFO)
+
+        try:
+            slop = subprocess.run(['slop', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+        except FileNotFoundError:
+            slop = False
+        av = 'found' if slop else 'not found'
+        log("slurp package {}".format(av), common.INFO)
+
+        if maim and slop:
+            log("Pick color from screen feature available", common.INFO)
+            common.picker = True
+        else:
+            log("Pick color from screen feature needs both maim and slop packages installed", common.INFO)
 
 
 def copy_backgrounds():
