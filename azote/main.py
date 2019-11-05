@@ -32,20 +32,14 @@ except Exception as e:
     common.env['send2trash'] = False
     print('send2trash module not found', e)
 
-# same applies to the colorthief module https://github.com/fengsp/color-thief-py
-try:
-    from colorthief import ColorThief
-
-    common.env['colorthief'] = True
-except Exception as e:
-    common.env['colorthief'] = False
-    print('colorthief module not found', e)
+from colorthief import ColorThief
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from gi.repository.GdkPixbuf import InterpType
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, create_pixbuf, split_selected_wallpaper, scale_and_crop, clear_thumbnails
+    copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, create_pixbuf, split_selected_wallpaper, scale_and_crop, \
+    clear_thumbnails
 
 
 def get_files():
@@ -505,34 +499,37 @@ def show_image_menu(widget):
                 item = Gtk.SeparatorMenuItem()
                 menu.append(item)
 
-            if common.env['colorthief']:
-                item = Gtk.MenuItem.new_with_label(common.lang['create_palette'])
-                menu.append(item)
-                submenu = Gtk.Menu()
+            item = Gtk.MenuItem.new_with_label(common.lang['create_palette'])
+            menu.append(item)
+            submenu = Gtk.Menu()
 
-                # Hell knows why the library does not return the tuple of expected length for some num_colors values
-                # Let's cheat here
-                subitem = Gtk.MenuItem.new_with_label('4 {}'.format(common.lang['colors']))
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file, common.selected_wallpaper.filename,
-                                common.selected_wallpaper.source_path, 4)
-                submenu.append(subitem)
+            # Hell knows why the library does not return the tuple of expected length for some num_colors values
+            # Let's cheat here
+            subitem = Gtk.MenuItem.new_with_label('4 {}'.format(common.lang['colors']))
+            subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file,
+                            common.selected_wallpaper.filename,
+                            common.selected_wallpaper.source_path, 4)
+            submenu.append(subitem)
 
-                subitem = Gtk.MenuItem.new_with_label('8 {}'.format(common.lang['colors']))
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file, common.selected_wallpaper.filename,
-                                common.selected_wallpaper.source_path, 9)
-                submenu.append(subitem)
+            subitem = Gtk.MenuItem.new_with_label('8 {}'.format(common.lang['colors']))
+            subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file,
+                            common.selected_wallpaper.filename,
+                            common.selected_wallpaper.source_path, 9)
+            submenu.append(subitem)
 
-                subitem = Gtk.MenuItem.new_with_label('12 {}'.format(common.lang['colors']))
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file, common.selected_wallpaper.filename,
-                                common.selected_wallpaper.source_path, 13)
-                submenu.append(subitem)
+            subitem = Gtk.MenuItem.new_with_label('12 {}'.format(common.lang['colors']))
+            subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file,
+                            common.selected_wallpaper.filename,
+                            common.selected_wallpaper.source_path, 13)
+            submenu.append(subitem)
 
-                subitem = Gtk.MenuItem.new_with_label('16 {}'.format(common.lang['colors']))
-                subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file, common.selected_wallpaper.filename,
-                                common.selected_wallpaper.source_path, 17)
-                submenu.append(subitem)
+            subitem = Gtk.MenuItem.new_with_label('16 {}'.format(common.lang['colors']))
+            subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file,
+                            common.selected_wallpaper.filename,
+                            common.selected_wallpaper.source_path, 17)
+            submenu.append(subitem)
 
-                item.set_submenu(submenu)
+            item.set_submenu(submenu)
 
             item = Gtk.MenuItem.new_with_label(common.lang['scale_and_crop'])
             menu.append(item)
@@ -790,6 +787,15 @@ class GUI:
         settings_button.connect('clicked', on_settings_button)
         status_box.add(settings_button)
 
+        # Color picker button
+        picker_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_picker.svg')
+        picker_button.set_image(img)
+        picker_button.set_sensitive(common.picker)
+        picker_button.connect('clicked', on_picker_button)
+        status_box.add(picker_button)
+
         common.status_bar = Gtk.Statusbar()
         common.status_bar.set_property("name", "status-bar")
         common.status_bar.set_halign(Gtk.Align.CENTER)
@@ -846,6 +852,22 @@ def on_settings_button(button):
     menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
 
 
+def on_picker_button(button):
+    dominant = get_dominant_from_area()
+    cpd = ColorPickerDialog(dominant)
+    
+    
+def get_dominant_from_area():
+    cmd = 'grim -g "$(slurp)" {}'.format(os.path.join(common.tmp_dir, 'area.png'))
+    subprocess.call(cmd, shell=True)
+    color_thief = ColorThief(os.path.join(common.tmp_dir, 'area.png'))
+    try:
+        dominant = color_thief.get_color(quality=common.settings.palette_quality)
+    except:
+        dominant = None
+    return dominant
+
+
 def show_custom_display_dialog(item):
     cdd = CustomDisplayDialog()
 
@@ -899,7 +921,6 @@ class ColorPaletteDialog(Gtk.Window):
             self.hbox.pack_start(button, False, False, 0)
 
             if (i + 1) % 4 == 0:
-
                 self.vbox.add(self.hbox)
                 self.hbox = Gtk.HBox()
                 self.hbox.set_spacing(5)
@@ -911,20 +932,20 @@ class ColorPaletteDialog(Gtk.Window):
         button2 = Gtk.RadioButton.new_with_label_from_widget(button1, 'r, g, b')
         button2.set_label('r, g, b')
         button2.connect('toggled', self.rgb_toggled)
-        
+
         for button in [button1, button2]:
             if button.get_label() == self.copy_as:
                 button.set_active(True)
 
         label = Gtk.Label()
         label.set_text('Copy as:')
-        
+
         hbox = Gtk.HBox()
         hbox.set_spacing(5)
         hbox.set_border_width(5)
 
         hbox.pack_start(label, True, False, 0)
-        
+
         hbox.pack_start(button1, True, False, 0)
         hbox.pack_start(button2, True, False, 0)
 
@@ -944,7 +965,7 @@ class ColorPaletteDialog(Gtk.Window):
         button = Gtk.Button.new_with_label(common.lang['close'])
         button.connect_after('clicked', self.close_window)
         hbox.pack_start(button, False, False, 0)
-        
+
         self.vbox.add(hbox)
 
         self.add(self.vbox)
@@ -955,10 +976,10 @@ class ColorPaletteDialog(Gtk.Window):
         if state == 'on':
             common.settings.copy_as = button.get_label()
             common.settings.save()
-    
+
     def close_window(self, widget):
         self.close()
-        
+
     def to_clipboard(self, widget):
         common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
@@ -967,7 +988,7 @@ class ColorPaletteDialog(Gtk.Window):
             content = '{}, {}, {}'.format(t[0], t[1], t[2])
         else:
             content = widget.get_label()
-                          
+
         common.clipboard.set_text(content, -1)
         label = '{}'.format(content)
         self.clipboard_preview.update(widget.get_label())
@@ -983,6 +1004,115 @@ class ClipboardPreview(Gtk.Image):
     def update(self, color):
         pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size), hex_to_rgb(color))
         self.set_from_pixbuf(pixbuf)
+
+
+class ColorPickerDialog(Gtk.Window):
+    def __init__(self, color):
+        super().__init__()
+        
+        if not color:
+            color = (255, 255, 255)
+
+        self.set_title('Color picker')
+        self.set_role("pop-up")
+        self.set_type_hint(Gtk.WindowType.TOPLEVEL)
+        self.set_decorated(False)
+        self.set_modal(True)
+        self.set_transient_for(common.main_window)
+        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+        self.set_keep_above(True)
+
+        try:
+            self.copy_as = common.settings.copy_as
+        except AttributeError:
+            self.copy_as = '#rgb'
+
+        self.vbox = Gtk.VBox()
+        self.vbox.set_spacing(5)
+        self.vbox.set_border_width(5)
+        
+        self.image= Gtk.Image()
+        pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), color)
+        self.image.set_from_pixbuf(pixbuf)
+        self.vbox.add(self.image)
+        
+        self.label = Gtk.Label()
+        self.label.set_text(rgb_to_hex(color))
+        self.vbox.add(self.label)
+
+        button1 = Gtk.RadioButton(label='#rgb')
+        button1.connect('toggled', self.rgb_toggled)
+
+        button2 = Gtk.RadioButton.new_with_label_from_widget(button1, 'r, g, b')
+        button2.set_label('r, g, b')
+        button2.connect('toggled', self.rgb_toggled)
+
+        for button in [button1, button2]:
+            if button.get_label() == self.copy_as:
+                button.set_active(True)
+
+        hbox = Gtk.HBox()
+        hbox.set_spacing(5)
+        hbox.set_border_width(5)
+
+        hbox.pack_start(button1, True, False, 0)
+        hbox.pack_start(button2, True, False, 0)
+        
+        self.vbox.add(hbox)
+
+        hbox = Gtk.HBox()
+        hbox.set_spacing(5)
+        hbox.set_border_width(5)
+
+        button = Gtk.Button.new_with_label(common.lang['copy'])
+        button.connect_after('clicked', self.to_clipboard)
+        hbox.pack_start(button, True, False, 0)
+
+        button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_picker.svg')
+        button.set_image(img)
+        button.connect_after('clicked', self.pick_new_color)
+        hbox.pack_start(button, True, False, 0)
+
+        button = Gtk.Button.new_with_label(common.lang['close'])
+        button.connect_after('clicked', self.close_window)
+        hbox.pack_start(button, True, False, 0)
+
+        self.vbox.add(hbox)
+
+        self.add(self.vbox)
+        self.show_all()
+
+    def rgb_toggled(self, button):
+        state = 'on' if button.get_active() else 'off'
+        if state == 'on':
+            common.settings.copy_as = button.get_label()
+            common.settings.save()
+
+    def close_window(self, widget):
+        self.close()
+
+    def to_clipboard(self, widget):
+        common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+
+        if common.settings.copy_as == 'r, g, b':
+            t = hex_to_rgb(self.label.get_text())
+            content = '{}, {}, {}'.format(t[0], t[1], t[2])
+        else:
+            content = self.label.get_text()
+
+        common.clipboard.set_text(content, -1)
+        
+    def pick_new_color(self, button):
+        dominant = get_dominant_from_area()
+        if not dominant:
+            dominant = (255, 255, 255)
+
+        pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), dominant)
+        self.image.set_from_pixbuf(pixbuf)
+
+        self.label.set_text(rgb_to_hex(dominant))
 
 
 class CustomDisplayDialog(Gtk.Window):

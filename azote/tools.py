@@ -296,6 +296,21 @@ def set_env(language=None):
         log("Failed creating image associations: /usr/share/applications/mimeinfo.cache file not found."
             " Setting feh as the only viewer.", common.ERROR)
 
+    if common.sway:
+        grim = subprocess.run(['grim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+        av = 'found' if grim else 'not found'
+        log("grim package {}".format(av), common.INFO)
+    
+        slurp = subprocess.run(['slurp', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+        av = 'found' if slurp else 'not found'
+        log("slurp package {}".format(av), common.INFO)
+    
+        if grim and slurp:
+            log("Pick color from screen feature available", common.INFO)
+            common.picker = True
+        else:
+            log("Pick color from screen feature needs both grim and slurp packages installed", common.INFO)
+
 
 def copy_backgrounds():
     # Clear current folder content
