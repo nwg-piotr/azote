@@ -3,6 +3,7 @@
 ## Development
 New:
 - Screen color picker: grabs the dominant colour of a selected screen area
+- `wmctrl` dependency removed
 
 Bug fixes:
 - prevent program from crashing in case Sway not installed
