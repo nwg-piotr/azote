@@ -55,8 +55,11 @@ def str_to_bool(s):
 
 def check_displays():
     # Sway or not Sway? If so, the `swaymsg -t get_seats` command should return exit code 0
-    result = subprocess.run(['swaymsg', '-t', 'get_seats'], stdout=subprocess.DEVNULL)
-    common.sway = result.returncode == 0
+    try:
+        result = subprocess.run(['swaymsg', '-t', 'get_seats'], stdout=subprocess.DEVNULL)
+        common.sway = result.returncode == 0
+    except:
+        common.sway = False
     if common.sway:
         common.env['wm'] = 'sway'
     else:
