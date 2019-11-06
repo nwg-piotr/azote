@@ -293,6 +293,12 @@ def set_env(language=None):
                         common.associations['jpeg'] = together
                     except KeyError:
                         pass
+                    # What if nothing found for 'jpg' or 'jpeg'?
+                    if 'jpg' not in common.associations and 'jpeg' in common.associations:
+                        common.associations['jpg'] = common.associations['jpeg']
+                    elif 'jpeg' not in common.associations and 'jpg' in common.associations:
+                        common.associations['jpeg'] = common.associations['jpg']
+
         log("Image associations: {}".format(common.associations), common.INFO)
     else:
         print('Failed opening /usr/share/applications/mimeinfo.cache')
