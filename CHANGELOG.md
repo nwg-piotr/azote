@@ -1,7 +1,13 @@
 # CHANGELOG
 
 ## Development
+New:
 - Screen color picker: grabs the dominant colour of a selected screen area
+
+Bug fixes:
+- prevent program from crashing in case Sway not installed
+- fix for context menu not shown on jpg or jpeg file association missing
+- icon_flip.svg converted from font to shape
 
 ## v1.7.2 (2019-11-04)
 - Scale and crop an image to dual width or height of the primary display
