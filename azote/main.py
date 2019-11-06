@@ -43,8 +43,13 @@ from tools import set_env, hash_name, create_thumbnails, file_allowed, update_st
 
 
 def get_files():
-    file_names = [f for f in os.listdir(common.settings.src_path)
+    try:
+        file_names = [f for f in os.listdir(common.settings.src_path)
                   if os.path.isfile(os.path.join(common.settings.src_path, f))]
+    except FileNotFoundError:
+        common.settings.src_path = os.getenv('HOME')
+        file_names = [f for f in os.listdir(common.settings.src_path)
+                      if os.path.isfile(os.path.join(common.settings.src_path, f))]
 
     if common.settings.sorting == 'new':
         file_names.sort(reverse=True, key=lambda f: os.path.getmtime(os.path.join(common.settings.src_path, f)))
