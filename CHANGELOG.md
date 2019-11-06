@@ -8,6 +8,7 @@ Bug fixes:
 - prevent program from crashing in case Sway not installed
 - fix for context menu not shown on jpg or jpeg file association missing
 - icon_flip.svg converted from font to shape
+- exception on settings.src_path FileNotFoundError handled
 
 ## v1.7.2 (2019-11-04)
 - Scale and crop an image to dual width or height of the primary display
