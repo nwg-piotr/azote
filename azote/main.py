@@ -960,7 +960,7 @@ class ColorPaletteDialog(Gtk.Window):
                 button.set_active(True)
 
         label = Gtk.Label()
-        label.set_text('Copy as:')
+        label.set_text(common.lang['copy_as'])
 
         hbox = Gtk.HBox()
         hbox.set_spacing(5)
