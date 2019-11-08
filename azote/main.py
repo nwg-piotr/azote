@@ -463,19 +463,22 @@ def on_about_button(button):
 
     logo = GdkPixbuf.Pixbuf.new_from_file_at_size('images/azote.svg', 96, 96)
 
+    dialog.set_keep_above(True)
     dialog.set_logo(logo)
     dialog.set_copyright('(c) 2019 Piotr Miller')
     dialog.set_website('https://github.com/nwg-piotr/azote')
     dialog.set_comments(common.lang['app_desc'])
     dialog.set_license_type(Gtk.License.GPL_3_0)
     dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick', 'Libraries and dependencies:',
-                        '- send2trash python module (c) 2017 Virgil Dupras',
                         '- colorthief python module (c) 2015 Shipeng Feng',
                         '- python-pillow (c) 1995-2011, Fredrik Lundh, 2010-2019 Alex Clark and Contributors',
                         '- pygobject (c) 2005-2019 The GNOME Project',
                         '- GTK+ (c) 2007-2019 The GTK Team',
                         '- feh (c) 1999,2000 Tom Gilbert, 2010-2018 Daniel Friesel',
-                        '- swaybg (c) 2016-2019 Drew DeVault'])
+                        '- swaybg (c) 2016-2019 Drew DeVault',
+                        '- send2trash python module (c) 2017 Virgil Dupras',
+                        '- grim, slurp (c) 2018 emersion',
+                        '- maim, slop (c) 2014 Dalton Nell and Contributors'])
     dialog.set_translator_credits('xsme (de_DE), HumanG33k (fr_FR)')
     dialog.set_artists(['edskeye'])
 
