@@ -1348,7 +1348,6 @@ def main():
     )
     css = b"""
             button#thumb-btn {
-                background-color: #fefefe;
                 font-weight: normal;
                 font-size: 11px;
             }
