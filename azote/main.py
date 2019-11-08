@@ -949,6 +949,7 @@ class ColorPaletteDialog(Gtk.Window):
             gtk_image = Gtk.Image.new_from_pixbuf(pixbuf)
 
             button = Gtk.Button.new_with_label(hex_color)
+            button.set_always_show_image(True)
             button.set_image(gtk_image)
             button.set_image_position(2)  # TOP
             button.set_tooltip_text(common.lang['copy'])
