@@ -127,6 +127,7 @@ class ThumbButton(Gtk.Button):
         super().__init__()
 
         self.set_property("name", "thumb-btn")
+        self.set_always_show_image(True)
 
         self.folder = folder
         self.filename = filename
@@ -206,6 +207,7 @@ class DisplayBox(Gtk.Box):
         self.img = Gtk.Image.new_from_pixbuf(pixbuf)
 
         self.select_button = Gtk.Button()
+        self.select_button.set_always_show_image(True)
         self.select_button.set_label("{} ({} x {})".format(name, width, height))  # label on top: name (with x height)
         self.select_button.set_image(self.img)  # preview of selected wallpaper
         self.select_button.set_image_position(3)  # label on top, image below
@@ -256,6 +258,7 @@ class DisplayBox(Gtk.Box):
             options_box.add(self.color_button)
 
         self.flip_button = Gtk.Button()
+        self.flip_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_flip.svg')
         self.flip_button.set_image(img)
@@ -319,6 +322,7 @@ class DisplayBox(Gtk.Box):
 class SortingButton(Gtk.Button):
     def __init__(self):
         super().__init__()
+        self.set_always_show_image(True)
         self.img = Gtk.Image()
         self.refresh()
         self.set_tooltip_text(common.lang['sorting_order'])
@@ -707,6 +711,7 @@ class GUI:
 
         # Button to refresh currently selected folder thumbnails
         refresh_button = Gtk.Button()
+        refresh_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_refresh.svg')
         refresh_button.set_image(img)
@@ -731,6 +736,7 @@ class GUI:
         # Button to split wallpaper between displays
         if len(common.displays) > 1:
             common.split_button = Gtk.Button()
+            common.split_button.set_always_show_image(True)
             img = Gtk.Image()
             img.set_from_file('images/icon_split.svg')
             common.split_button.set_image(img)
@@ -741,6 +747,7 @@ class GUI:
 
         # Button to apply selected wallpaper to all displays (connected at the moment or not)
         common.apply_to_all_button = Gtk.Button()
+        common.apply_to_all_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_all.svg')
         common.apply_to_all_button.set_image(img)
@@ -755,6 +762,7 @@ class GUI:
             names += '{} '.format(display['name'])
 
         common.apply_button = Gtk.Button()
+        common.apply_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_apply.svg')
         common.apply_button.set_image(img)
@@ -776,6 +784,7 @@ class GUI:
 
         # Button to call About dialog
         about_button = Gtk.Button()
+        about_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_about.svg')
         about_button.set_image(img)
@@ -785,6 +794,7 @@ class GUI:
 
         # Button to display settings menu
         settings_button = Gtk.Button()
+        settings_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_menu.svg')
         settings_button.set_image(img)
@@ -794,6 +804,7 @@ class GUI:
 
         # Color picker button
         picker_button = Gtk.Button()
+        picker_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_picker.svg')
         picker_button.set_image(img)
@@ -1091,6 +1102,7 @@ class ColorPickerDialog(Gtk.Window):
         hbox.pack_start(button, True, False, 0)
 
         button = Gtk.Button()
+        button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_picker.svg')
         button.set_image(img)
@@ -1355,9 +1367,12 @@ def main():
                 font-size: 12px;
             }
             button#thumb-btn-selected {
-                background-color: #66ccff;
                 font-weight: bold;
                 font-size: 12px;
+                border-top: 1px solid #eee;
+                border-left: 1px solid #eee;
+                border-bottom: 1px solid #222222;
+                border-right: 1px solid #222222;
             }
             button#display-btn {
                 font-weight: normal;
@@ -1374,7 +1389,10 @@ def main():
                 font-size: 12px;
             }
             label#selected-label {
-                background-color: #66ccff;
+                border-top: 1px solid #eee;
+                border-left: 1px solid #eee;
+                border-bottom: 1px solid #111111;
+                border-right: 1px solid #111111;
                 font-size: 12px;
             }
             """
