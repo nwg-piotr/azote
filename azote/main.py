@@ -1372,10 +1372,10 @@ def main():
             button#thumb-btn-selected {
                 font-weight: bold;
                 font-size: 12px;
-                border-top: 1px solid #eee;
-                border-left: 1px solid #eee;
-                border-bottom: 1px solid #222222;
-                border-right: 1px solid #222222;
+                border-top: 1px solid #ccc;
+                border-left: 1px solid #ccc;
+                border-bottom: 1px solid #333;
+                border-right: 1px solid #333;
             }
             button#display-btn {
                 font-weight: normal;
@@ -1392,10 +1392,10 @@ def main():
                 font-size: 12px;
             }
             label#selected-label {
-                border-top: 1px solid #eee;
-                border-left: 1px solid #eee;
-                border-bottom: 1px solid #111111;
-                border-right: 1px solid #111111;
+                border-top: 1px solid #ccc;
+                border-left: 1px solid #ccc;
+                border-bottom: 1px solid #333;
+                border-right: 1px solid #333;
                 font-size: 12px;
             }
             """
