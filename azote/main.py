@@ -918,12 +918,12 @@ class ColorPaletteDialog(Gtk.Window):
         self.label.set_property('name', 'image-label')
 
         self.set_title(filename)
-        self.set_role("pop-up")
+        self.set_role("toolbox")
+        self.set_resizable(False)
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        self.set_decorated(False)
         self.set_modal(True)
         self.set_transient_for(common.main_window)
-        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+        self.set_position(Gtk.WindowPosition.NONE)
         self.set_keep_above(True)
         try:
             self.copy_as = common.settings.copy_as
@@ -1051,12 +1051,12 @@ class ColorPickerDialog(Gtk.Window):
             color = (255, 255, 255)
 
         self.set_title(common.lang['screen_color_picker'])
-        self.set_role("pop-up")
+        self.set_role("toolbox")
+        self.set_resizable(False)
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        self.set_decorated(False)
         self.set_modal(True)
         self.set_transient_for(common.main_window)
-        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+        self.set_position(Gtk.WindowPosition.MOUSE)
         self.set_keep_above(True)
 
         try:
