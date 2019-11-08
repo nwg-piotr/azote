@@ -1,5 +1,8 @@
 # CHANGELOG
 
+# Development
+- Layout adjusted to look well in light and dark GTK themes
+
 ## v1.7.3 (2019-11-07)
 New:
 - Screen color picker: grabs the dominant colour of a selected screen area.
