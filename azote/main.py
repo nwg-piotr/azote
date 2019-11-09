@@ -43,8 +43,13 @@ from tools import set_env, hash_name, create_thumbnails, file_allowed, update_st
 
 
 def get_files():
-    file_names = [f for f in os.listdir(common.settings.src_path)
+    try:
+        file_names = [f for f in os.listdir(common.settings.src_path)
                   if os.path.isfile(os.path.join(common.settings.src_path, f))]
+    except FileNotFoundError:
+        common.settings.src_path = os.getenv('HOME')
+        file_names = [f for f in os.listdir(common.settings.src_path)
+                      if os.path.isfile(os.path.join(common.settings.src_path, f))]
 
     if common.settings.sorting == 'new':
         file_names.sort(reverse=True, key=lambda f: os.path.getmtime(os.path.join(common.settings.src_path, f)))
@@ -122,6 +127,7 @@ class ThumbButton(Gtk.Button):
         super().__init__()
 
         self.set_property("name", "thumb-btn")
+        self.set_always_show_image(True)
 
         self.folder = folder
         self.filename = filename
@@ -201,6 +207,7 @@ class DisplayBox(Gtk.Box):
         self.img = Gtk.Image.new_from_pixbuf(pixbuf)
 
         self.select_button = Gtk.Button()
+        self.select_button.set_always_show_image(True)
         self.select_button.set_label("{} ({} x {})".format(name, width, height))  # label on top: name (with x height)
         self.select_button.set_image(self.img)  # preview of selected wallpaper
         self.select_button.set_image_position(3)  # label on top, image below
@@ -251,6 +258,7 @@ class DisplayBox(Gtk.Box):
             options_box.add(self.color_button)
 
         self.flip_button = Gtk.Button()
+        self.flip_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_flip.svg')
         self.flip_button.set_image(img)
@@ -314,6 +322,7 @@ class DisplayBox(Gtk.Box):
 class SortingButton(Gtk.Button):
     def __init__(self):
         super().__init__()
+        self.set_always_show_image(True)
         self.img = Gtk.Image()
         self.refresh()
         self.set_tooltip_text(common.lang['sorting_order'])
@@ -454,19 +463,22 @@ def on_about_button(button):
 
     logo = GdkPixbuf.Pixbuf.new_from_file_at_size('images/azote.svg', 96, 96)
 
+    dialog.set_keep_above(True)
     dialog.set_logo(logo)
     dialog.set_copyright('(c) 2019 Piotr Miller')
     dialog.set_website('https://github.com/nwg-piotr/azote')
     dialog.set_comments(common.lang['app_desc'])
     dialog.set_license_type(Gtk.License.GPL_3_0)
     dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick', 'Libraries and dependencies:',
-                        '- send2trash python module (c) 2017 Virgil Dupras',
                         '- colorthief python module (c) 2015 Shipeng Feng',
                         '- python-pillow (c) 1995-2011, Fredrik Lundh, 2010-2019 Alex Clark and Contributors',
                         '- pygobject (c) 2005-2019 The GNOME Project',
                         '- GTK+ (c) 2007-2019 The GTK Team',
                         '- feh (c) 1999,2000 Tom Gilbert, 2010-2018 Daniel Friesel',
-                        '- swaybg (c) 2016-2019 Drew DeVault'])
+                        '- swaybg (c) 2016-2019 Drew DeVault',
+                        '- send2trash python module (c) 2017 Virgil Dupras',
+                        '- grim, slurp (c) 2018 emersion',
+                        '- maim, slop (c) 2014 Dalton Nell and Contributors'])
     dialog.set_translator_credits('xsme (de_DE), HumanG33k (fr_FR)')
     dialog.set_artists(['edskeye'])
 
@@ -702,6 +714,7 @@ class GUI:
 
         # Button to refresh currently selected folder thumbnails
         refresh_button = Gtk.Button()
+        refresh_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_refresh.svg')
         refresh_button.set_image(img)
@@ -726,6 +739,7 @@ class GUI:
         # Button to split wallpaper between displays
         if len(common.displays) > 1:
             common.split_button = Gtk.Button()
+            common.split_button.set_always_show_image(True)
             img = Gtk.Image()
             img.set_from_file('images/icon_split.svg')
             common.split_button.set_image(img)
@@ -736,6 +750,7 @@ class GUI:
 
         # Button to apply selected wallpaper to all displays (connected at the moment or not)
         common.apply_to_all_button = Gtk.Button()
+        common.apply_to_all_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_all.svg')
         common.apply_to_all_button.set_image(img)
@@ -750,6 +765,7 @@ class GUI:
             names += '{} '.format(display['name'])
 
         common.apply_button = Gtk.Button()
+        common.apply_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_apply.svg')
         common.apply_button.set_image(img)
@@ -771,6 +787,7 @@ class GUI:
 
         # Button to call About dialog
         about_button = Gtk.Button()
+        about_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_about.svg')
         about_button.set_image(img)
@@ -780,6 +797,7 @@ class GUI:
 
         # Button to display settings menu
         settings_button = Gtk.Button()
+        settings_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_menu.svg')
         settings_button.set_image(img)
@@ -789,6 +807,7 @@ class GUI:
 
         # Color picker button
         picker_button = Gtk.Button()
+        picker_button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_picker.svg')
         picker_button.set_image(img)
@@ -899,12 +918,12 @@ class ColorPaletteDialog(Gtk.Window):
         self.label.set_property('name', 'image-label')
 
         self.set_title(filename)
-        self.set_role("pop-up")
+        self.set_role("toolbox")
+        self.set_resizable(False)
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        self.set_decorated(False)
         self.set_modal(True)
         self.set_transient_for(common.main_window)
-        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+        self.set_position(Gtk.WindowPosition.NONE)
         self.set_keep_above(True)
         try:
             self.copy_as = common.settings.copy_as
@@ -930,6 +949,7 @@ class ColorPaletteDialog(Gtk.Window):
             gtk_image = Gtk.Image.new_from_pixbuf(pixbuf)
 
             button = Gtk.Button.new_with_label(hex_color)
+            button.set_always_show_image(True)
             button.set_image(gtk_image)
             button.set_image_position(2)  # TOP
             button.set_tooltip_text(common.lang['copy'])
@@ -955,7 +975,7 @@ class ColorPaletteDialog(Gtk.Window):
                 button.set_active(True)
 
         label = Gtk.Label()
-        label.set_text('Copy as:')
+        label.set_text(common.lang['copy_as'])
 
         hbox = Gtk.HBox()
         hbox.set_spacing(5)
@@ -1031,12 +1051,12 @@ class ColorPickerDialog(Gtk.Window):
             color = (255, 255, 255)
 
         self.set_title(common.lang['screen_color_picker'])
-        self.set_role("pop-up")
+        self.set_role("toolbox")
+        self.set_resizable(False)
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        self.set_decorated(False)
         self.set_modal(True)
         self.set_transient_for(common.main_window)
-        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+        self.set_position(Gtk.WindowPosition.MOUSE)
         self.set_keep_above(True)
 
         try:
@@ -1086,6 +1106,7 @@ class ColorPickerDialog(Gtk.Window):
         hbox.pack_start(button, True, False, 0)
 
         button = Gtk.Button()
+        button.set_always_show_image(True)
         img = Gtk.Image()
         img.set_from_file('images/icon_picker.svg')
         button.set_image(img)
@@ -1343,7 +1364,6 @@ def main():
     )
     css = b"""
             button#thumb-btn {
-                background-color: #fefefe;
                 font-weight: normal;
                 font-size: 11px;
             }
@@ -1351,9 +1371,12 @@ def main():
                 font-size: 12px;
             }
             button#thumb-btn-selected {
-                background-color: #66ccff;
                 font-weight: bold;
                 font-size: 12px;
+                border-top: 1px solid #ccc;
+                border-left: 1px solid #ccc;
+                border-bottom: 1px solid #333;
+                border-right: 1px solid #333;
             }
             button#display-btn {
                 font-weight: normal;
@@ -1370,7 +1393,10 @@ def main():
                 font-size: 12px;
             }
             label#selected-label {
-                background-color: #66ccff;
+                border-top: 1px solid #ccc;
+                border-left: 1px solid #ccc;
+                border-bottom: 1px solid #333;
+                border-right: 1px solid #333;
                 font-size: 12px;
             }
             """

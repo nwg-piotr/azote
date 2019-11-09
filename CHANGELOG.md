@@ -1,7 +1,25 @@
 # CHANGELOG
 
-## Development
-- Screen color picker: grabs the dominant colour of a selected screen area
+# Development
+- Layout adjusted to look well in light and dark GTK themes;
+- set_always_show_image(True) for all image buttons, to avoid setting `gtk-button-images=1` in `gtk-3.0/settings.ini`;
+- toolbox windows properties modified (will only affect tiling WMs).
+
+## v1.7.3 (2019-11-07)
+New:
+- Screen color picker: grabs the dominant colour of a selected screen area.
+
+Dependencies:
+- `wmctrl` dependency removed;
+- `grim`, `slurp` - optional dependency added: for screen color picker on Sway;
+- `maim` - optional dependency added: for screen color picker on X11; (it'll also install `slop`, necessary as well).
+
+Bug fixes:
+- prevent program from crashing in case Sway not installed;
+- prevent program from crashing in case wallpaper folder manually removed;
+- fix for context menu not being shown if jpg or jpeg file association not detected;
+- icon_flip.svg converted from font to shape;
+- hardcoded 'Copy as' string replaced with the dictionary value.
 
 ## v1.7.2 (2019-11-04)
 - Scale and crop an image to dual width or height of the primary display
