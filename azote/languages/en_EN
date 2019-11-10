@@ -17,6 +17,7 @@ create_palette = Create palette
 custom_display = Custom display
 delete = Delete
 display_mode = Display mode
+dotfiles = .dotfiles
 dual_height = dual height
 dual_width = dual width
 flip_image = Flip image

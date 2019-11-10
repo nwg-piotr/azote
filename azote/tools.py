@@ -126,9 +126,10 @@ def check_displays():
 
 def set_env(language=None):
     xdg_config_home = os.getenv('XDG_CONFIG_HOME')
-    common.config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config/azote")
-    if not os.path.isdir(common.config_home):
-        os.mkdir(common.config_home)
+    common.config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config")
+    common.azote_config_home = os.path.join(xdg_config_home, ".config/azote") if xdg_config_home else os.path.join(os.getenv("HOME"), ".config/azote")
+    if not os.path.isdir(common.azote_config_home):
+        os.mkdir(common.azote_config_home)
 
     xdg_data_home = os.getenv('XDG_DATA_HOME')
     common.data_home = xdg_data_home if xdg_data_home else os.path.join(os.getenv("HOME"), ".local/share/azote")
@@ -146,7 +147,7 @@ def set_env(language=None):
         try:
             azote_rc = os.path.join(common.app_dir, 'azoterc')
             if os.path.isfile(azote_rc):
-                shutil.move(azote_rc, os.path.join(common.config_home, 'azoterc'))
+                shutil.move(azote_rc, os.path.join(common.azote_config_home, 'azoterc'))
 
             azote_pkl = os.path.join(common.app_dir, 'settings.pkl')
             if os.path.isfile(azote_pkl):
@@ -603,7 +604,7 @@ class Settings(object):
         self.copy_as = '#rgb'
 
         # Runtime config (json) location
-        self.rc_file = os.path.join(common.config_home, "azoterc")
+        self.rc_file = os.path.join(common.azote_config_home, "azoterc")
         
         self.load()
 

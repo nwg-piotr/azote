@@ -40,6 +40,7 @@ from gi.repository.GdkPixbuf import InterpType
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
     copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, create_pixbuf, split_selected_wallpaper, scale_and_crop, \
     clear_thumbnails
+from plugins import Alacritty
 
 
 def get_files():
@@ -819,6 +820,16 @@ class GUI:
         picker_button.set_tooltip_text(tt)
         picker_button.connect('clicked', on_picker_button)
         status_box.add(picker_button)
+        
+        # dotfiles button
+        dotfiles_button = Gtk.Button()
+        dotfiles_button.set_always_show_image(True)
+        img = Gtk.Image()
+        img.set_from_file('images/icon_config.svg')
+        dotfiles_button.set_image(img)
+        dotfiles_button.set_tooltip_text(common.lang['dotfiles'])
+        dotfiles_button.connect('clicked', on_dotfiles_button)
+        status_box.add(dotfiles_button)
 
         common.status_bar = Gtk.Statusbar()
         common.status_bar.set_property("name", "status-bar")
@@ -879,6 +890,10 @@ def on_settings_button(button):
 def on_picker_button(button):
     dominant = get_dominant_from_area()
     cpd = ColorPickerDialog(dominant)
+
+
+def on_dotfiles_button(button):
+    common.dotfile_window = Alacritty()
     
     
 def get_dominant_from_area():
@@ -1397,6 +1412,23 @@ def main():
                 border-left: 1px solid #ccc;
                 border-bottom: 1px solid #333;
                 border-right: 1px solid #333;
+                font-size: 12px;
+            }
+            label#dotfiles {
+                font-size: 12px;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                margin-right: 10px;
+            }
+            label#dotfiles-header {
+                font-size: 14px;
+                font-weight: bold;
+            }
+            button#dotfiles-button {
+                padding: 1px;
+                margin: 0px;
+            }
+            textview#preview {
                 font-size: 12px;
             }
             """

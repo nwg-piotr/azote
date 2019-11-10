@@ -46,7 +46,8 @@ bcg_dir = ''            # ~/.azote/backgrounds-sway or ~/.azote/backgrounds-feh
 sample_dir = ''         # ~/.azote/sample
 log_file = ''           # ~/.azote/log.txt
 cmd_file = ''           # ~/.azote/command.sh
-config_home = ''        # $XDG_CONFIG_HOME or ~/.config/azote
+config_home = ''
+azote_config_home = ''        # $XDG_CONFIG_HOME or ~/.config/azote
 data_home = ''          # $XDG_DATA_HOME or ~/.local/share/azote
 data_migrated = False
 
@@ -61,3 +62,5 @@ modes_feh = ["scale", "max", "fill", "center", "tile"]
 main_window = None
 clipboard = None
 picker = False
+
+dotfile_window_open = None
