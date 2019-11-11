@@ -900,7 +900,8 @@ def on_dotfiles_button(button):
     if common.dotfile_window:
         common.dotfile_window.close()
     
-    common.dotfile_window = Alacritty()
+    if common.dotfile_alacritty:
+        common.dotfile_window = Alacritty()
     
     
 def get_dominant_from_area():
@@ -1468,9 +1469,8 @@ def main():
                 margin: 0px;
                 font-size: 12px;
             }
-            label#preview {
+            textview#preview {
                 font-size: 12px;
-                padding: 10px;
             }
             """
     provider.load_from_data(css)

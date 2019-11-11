@@ -347,6 +347,14 @@ def set_env(language=None):
             common.picker = True
         else:
             log("Pick color from screen feature needs both maim and slop packages installed", common.INFO)
+            
+    # Find dotfiles
+    if os.path.isfile(os.path.join(common.config_home, 'alacritty/alacritty.yml')):
+        common.dotfile_alacritty = os.path.join(common.config_home, 'alacritty.yml')
+    elif os.path.isfile(os.path.join(os.getenv('HOME'), '.alacritty.yml')):
+        common.dotfile_alacritty = os.path.join(os.getenv('HOME'), '.alacritty.yml')
+    msg = common.dotfile_alacritty if common.dotfile_alacritty else 'not found'
+    log('Alacritty config file: {}'.format(msg), common.INFO)
 
 
 def copy_backgrounds():

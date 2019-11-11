@@ -24,36 +24,44 @@ class Alacritty(Gtk.Window):
         self.set_position(Gtk.WindowPosition.NONE)
         self.set_keep_above(True)
 
+        vbox0 = Gtk.VBox()
+        vbox0.set_spacing(5)
+        vbox0.set_border_width(5)
+
+        label = Gtk.Label(common.dotfile_alacritty)
+        vbox0.add(label)
+        
         hbox0 = Gtk.HBox()
         hbox0.set_spacing(5)
-        hbox0.set_border_width(15)
+        hbox0.set_border_width(5)
         
         f = open(os.path.join(common.config_home, "alacritty/alacritty.yml"), "rb")
         self.data = load(f, Loader=Loader)
         output = dump(self.data['colors'], Dumper=Dumper, default_flow_style=False, sort_keys=False)
 
-        self.frame = Gtk.Frame()
-        self.frame.set_label('alacritty.yml')
-        self.frame.set_shadow_type(Gtk.ShadowType.IN)
+        scrolled_window = Gtk.ScrolledWindow()
+        scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scrolled_window.set_propagate_natural_width(True)
 
-        self.preview = Gtk.Label()
-        self.preview.set_property("name", "preview")
-        self.preview.set_selectable(True)
-        self.preview.set_yalign(0)
-        self.preview.set_text(output)
+        self.textview = Gtk.TextView()
+        self.textview.set_property("name", "preview")
+        self.textview.set_editable(False)
 
-        self.frame.add(self.preview)
-        hbox0.pack_start(self.frame, False, False, 0)
+        self.textbuffer = self.textview.get_buffer()
+        self.textbuffer.set_text(output)
+        scrolled_window.add(self.textview)
 
-        self.vbox = Gtk.VBox()
-        self.vbox.set_spacing(5)
-        self.vbox.set_border_width(15)
+        hbox0.add(scrolled_window)
+
+        vbox = Gtk.VBox()
+        vbox.set_spacing(3)
+        vbox.set_border_width(5)
 
         for key in self.data['colors']:
             label = Gtk.Label()
             label.set_property("name", "dotfiles-header")
             label.set_text(key.upper())
-            self.vbox.pack_start(label, True, False, 0)
+            vbox.add(label)
             for key1 in self.data['colors'][key]:
                 hbox = Gtk.HBox()
                 label = Gtk.Label()
@@ -71,33 +79,29 @@ class Alacritty(Gtk.Window):
 
                 hbox.pack_start(preview_box, False, False, 0)
 
-                self.vbox.pack_start(hbox, False, False, 0)
+                vbox.pack_start(hbox, False, False, 0)
+
+        hbox0.add(vbox)
+
+        vbox0.add(hbox0)
 
         hbox = Gtk.HBox()
         hbox.set_spacing(5)
-        hbox.set_border_width(10)
-        refresh_button = Gtk.Button()
-        refresh_button.set_always_show_image(True)
-        img = Gtk.Image()
-        img.set_from_file('images/icon_refresh.svg')
-        refresh_button.set_image(img)
-        refresh_button.set_tooltip_text(common.lang['reload'])
-        #refresh_button.connect_after('clicked', on_refresh_clicked)
-        hbox.pack_start(refresh_button, True, False, 0)
-
+        hbox.set_border_width(5)
+        label = Gtk.Label('Copy above, paste into .dotfile')
+        hbox.add(label)
         button = Gtk.Button.new_with_label(common.lang['close'])
         button.connect_after('clicked', self.close_window)
         hbox.pack_start(button, False, False, 0)
+        
+        vbox0.pack_start(hbox, False, False, 0)
 
-        self.vbox.add(hbox)
-
-        hbox0.add(self.vbox)
-        self.add(hbox0)
+        self.add(vbox0)
         self.show_all()
 
     def update_preview(self):
         output = dump(self.data['colors'], Dumper=Dumper, default_flow_style=False, sort_keys=False)
-        self.preview.set_text(output)
+        self.textbuffer.set_text(output)
         
     def on_box_press(self, preview_box, event, label, section, key):
         if common.clipboard_text:
