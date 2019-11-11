@@ -582,6 +582,15 @@ def hex_to_rgb(string):
     return tuple(int(string[i:i+2], 16) for i in (0, 2, 4))
 
 
+def rgb_to_rgba(rgb):
+    """
+    :param rgb: tuple (rrr, ggg, bbb)
+    :return: tuple (r.r, g.g, b.b, 1.0)
+    """
+    rgba = (rgb[0] / 255, rgb[1] / 255, rgb [2] / 255, 1.0)
+    return rgba
+
+
 def create_pixbuf(size, color):
     image = Image.new("RGB", size, color)
     data = image.tobytes()

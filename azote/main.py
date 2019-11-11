@@ -38,8 +38,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from gi.repository.GdkPixbuf import InterpType
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, create_pixbuf, split_selected_wallpaper, scale_and_crop, \
-    clear_thumbnails
+    copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, rgb_to_rgba, create_pixbuf, split_selected_wallpaper, \
+    scale_and_crop, clear_thumbnails
 from plugins import Alacritty
 
 
@@ -621,7 +621,9 @@ def generate_palette(item, thumb_file, filename, image_path, num_colors):
     color_thief = ColorThief(image_path)
     # dominant = color_thief.get_color(quality=10)
     palette = color_thief.get_palette(color_count=num_colors, quality=common.settings.palette_quality)
-    cpd = ColorPaletteDialog(thumb_file, filename, palette)
+    if common.cpd:
+        common.cpd.close()
+    common.cpd = ColorPaletteDialog(thumb_file, filename, palette)
 
 
 def on_folder_clicked(button):
@@ -888,11 +890,16 @@ def on_settings_button(button):
 
 
 def on_picker_button(button):
+    if common.picker_window:
+        common.picker_window.close()
     dominant = get_dominant_from_area()
-    cpd = ColorPickerDialog(dominant)
+    common.picker_window = ColorPickerDialog(dominant)
 
 
 def on_dotfiles_button(button):
+    if common.dotfile_window:
+        common.dotfile_window.close()
+    
     common.dotfile_window = Alacritty()
     
     
@@ -936,7 +943,7 @@ class ColorPaletteDialog(Gtk.Window):
         self.set_role("toolbox")
         self.set_resizable(False)
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        self.set_modal(True)
+        #self.set_modal(True)
         self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.NONE)
         self.set_keep_above(True)
@@ -1031,6 +1038,9 @@ class ColorPaletteDialog(Gtk.Window):
 
     def close_window(self, widget):
         self.close()
+        
+    def show(self):
+        self.show_all()
 
     def to_clipboard(self, widget):
         common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
@@ -1042,20 +1052,53 @@ class ColorPaletteDialog(Gtk.Window):
             content = widget.get_label()
 
         common.clipboard.set_text(content, -1)
+        common.clipboard_text = widget.get_label()
+        #print(common.clipboard_text)
+        
         label = '{}'.format(content)
         self.clipboard_preview.update(widget.get_label())
         self.clipboard_label.set_text(label)
 
 
-class ClipboardPreview(Gtk.Image):
+class ClipboardPreview(Gtk.ColorButton):
     def __init__(self):
         super().__init__()
-        pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size), (255, 255, 255))
-        self.set_from_pixbuf(pixbuf)
+        rgba = rgb_to_rgba((255, 255, 255))
+
+        color = Gdk.RGBA()
+        color.red = rgba[0]
+        color.green = rgba[1]
+        color.blue = rgba[2]
+        color.alpha = rgba[3]
+        self.set_rgba(color)
+        self.connect("color-set", self.to_clipboard)
 
     def update(self, color):
-        pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size), hex_to_rgb(color))
-        self.set_from_pixbuf(pixbuf)
+        rgb = hex_to_rgb(color)
+        rgba = rgb_to_rgba(rgb)
+
+        color = Gdk.RGBA()
+        color.red = rgba[0]
+        color.green = rgba[1]
+        color.blue = rgba[2]
+        color.alpha = rgba[3]
+        self.set_rgba(color)
+        
+    def to_clipboard(self, widget):
+        common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        rgba = self.get_rgba()
+        if common.settings.copy_as == 'r, g, b':
+            hex = rgba_to_hex(rgba)
+            t = hex_to_rgb(hex)
+            content = '{}, {}, {}'.format(t[0], t[1], t[2])
+        else:
+            content = rgba_to_hex(rgba)
+            hex = content
+
+        common.clipboard.set_text(content, -1)
+        common.clipboard_text = hex
+        label = '{}'.format(content)
+        common.cpd.clipboard_label.set_text(label)
 
 
 class ColorPickerDialog(Gtk.Window):
@@ -1069,7 +1112,6 @@ class ColorPickerDialog(Gtk.Window):
         self.set_role("toolbox")
         self.set_resizable(False)
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        self.set_modal(True)
         self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.MOUSE)
         self.set_keep_above(True)
@@ -1156,6 +1198,8 @@ class ColorPickerDialog(Gtk.Window):
             content = self.label.get_text()
 
         common.clipboard.set_text(content, -1)
+        common.clipboard_text = self.label.get_text()
+        #print('copied', common.clipboard_text)
         
     def pick_new_color(self, button):
         dominant = get_dominant_from_area()
@@ -1280,11 +1324,6 @@ class NumberEntry(Gtk.Entry):
     def on_changed(self, *args):
         text = self.get_text().strip()
         self.set_text(''.join([i for i in text if i in '0123456789']))
-
-
-def dialog_ok(widget, window, name, width, height, callback_data=None):
-    print(window, name, width, height)
-    window.close()
 
 
 def dialog_cancel(widget, window, callback_data=None):
@@ -1427,9 +1466,11 @@ def main():
             button#dotfiles-button {
                 padding: 1px;
                 margin: 0px;
-            }
-            textview#preview {
                 font-size: 12px;
+            }
+            label#preview {
+                font-size: 12px;
+                padding: 10px;
             }
             """
     provider.load_from_data(css)

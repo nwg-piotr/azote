@@ -36,6 +36,7 @@ open_folder = Open folder
 open_with = Open with {}
 preferences = Preferences
 refresh_folder_preview = Refresh folder preview
+reload = Reload
 remove_image = Remove image
 scale_and_crop = Scale and crop
 screen_color_picker = Screen color picker

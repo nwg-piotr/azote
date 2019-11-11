@@ -35,6 +35,7 @@ open_folder = Ouvrir le dossier
 open_with = Ovrir avec {}
 preferences = Préférences
 refresh_folder_preview = Rafraîchir l'aperçu du dossier
+reload = Recharger
 remove_image = Enlever l'image
 scale_and_crop = Échelle et recadrer
 screen_color_picker = Sélecteur de couleur d'écran

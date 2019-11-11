@@ -61,6 +61,9 @@ modes_feh = ["scale", "max", "fill", "center", "tile"]
 
 main_window = None
 clipboard = None
+clipboard_text = ''     # to transfer colors between toolbars we'll use this instead of the real clipboard content
 picker = False
 
-dotfile_window_open = None
+cpd = None              # ColorPaletteDialog object
+dotfile_window = None
+picker_window = None
