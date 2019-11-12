@@ -32,7 +32,7 @@ class Alacritty(Gtk.Window):
         hbox0.set_spacing(5)
         hbox0.set_border_width(5)
         
-        f = open(os.path.join(common.config_home, "alacritty/alacritty.yml"), "rb")
+        f = open(common.alacritty_config, "rb")
         self.data = load(f, Loader=Loader)
         output = dump(self.data['colors'], Dumper=Dumper, default_flow_style=False, sort_keys=False)
 
@@ -132,9 +132,18 @@ class Xresources(Gtk.Window):
         hbox0.set_spacing(5)
         hbox0.set_border_width(5)
 
-        f = open(os.path.join(common.config_home, "alacritty/alacritty.yml"), "rb")
-        self.data = load(f, Loader=Loader)
-        output = dump(self.data['colors'], Dumper=Dumper, default_flow_style=False, sort_keys=False)
+        f = open(common.xresources, "r")
+        lines = f.read().splitlines()
+        f.close()
+        self.data = {}
+        for line in lines:
+            if line.startswith('*background:') or line.startswith('*foreground:') or line.startswith('*color'):
+                key, value = line.split()
+                self.data[key] = value
+
+        output = ''
+        for key, value in self.data.items():
+            output += '{}  {}\n'.format(key, value)
 
         scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -154,29 +163,24 @@ class Xresources(Gtk.Window):
         vbox.set_spacing(3)
         vbox.set_border_width(5)
 
-        for key in self.data['colors']:
+        for key, value in self.data.items():
+            hbox = Gtk.HBox()
             label = Gtk.Label()
-            label.set_property("name", "dotfiles-header")
-            label.set_text(key.upper())
-            vbox.add(label)
-            for key1 in self.data['colors'][key]:
-                hbox = Gtk.HBox()
-                label = Gtk.Label()
-                label.set_property("name", "dotfiles")
-                label.set_text(key1)
-                hbox.pack_start(label, True, False, 0)
-                label = Gtk.Label()
-                label.set_property("name", "dotfiles")
-                hex_color = self.data['colors'][key][key1].replace('0x', '#')
-                label.set_text(hex_color)
-                hbox.pack_start(label, True, False, 0)
+            label.set_property("name", "dotfiles")
+            label.set_text(key)
+            hbox.pack_start(label, True, False, 0)
+            label = Gtk.Label()
+            label.set_property("name", "dotfiles")
+            hex_color = self.data[key]
+            label.set_text(hex_color)
+            hbox.pack_start(label, True, False, 0)
 
-                preview_box = ColorPreviewBox(hex_color)
-                preview_box.connect('button-press-event', self.on_box_press, label, key, key1)
+            preview_box = ColorPreviewBox(hex_color)
+            preview_box.connect('button-press-event', self.on_box_press, label, key)
 
-                hbox.pack_start(preview_box, False, False, 0)
+            hbox.pack_start(preview_box, False, False, 0)
 
-                vbox.pack_start(hbox, False, False, 0)
+            vbox.pack_start(hbox, False, False, 0)
 
         hbox0.add(vbox)
 
@@ -198,12 +202,14 @@ class Xresources(Gtk.Window):
         self.show_all()
 
     def update_preview(self):
-        output = dump(self.data['colors'], Dumper=Dumper, default_flow_style=False, sort_keys=False)
+        output = ''
+        for key, value in self.data.items():
+            output += '{}  {}\n'.format(key, value)
         self.textbuffer.set_text(output)
 
-    def on_box_press(self, preview_box, event, label, section, key):
+    def on_box_press(self, preview_box, event, label, key):
         if common.clipboard_text:
-            self.data['colors'][section][key] = common.clipboard_text.replace('#', '0x')
+            self.data[key] = common.clipboard_text
             label.set_text(common.clipboard_text)
             preview_box.update()
             self.update_preview()

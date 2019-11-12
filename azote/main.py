@@ -935,7 +935,7 @@ def get_dominant_from_area():
     if res == 0:
         color_thief = ColorThief(os.path.join(common.tmp_dir, 'area.png'))
         try:
-            dominant = color_thief.get_color(quality=common.settings.palette_quality)
+            dominant = color_thief.get_color(quality=10)
         except:
             pass
 
@@ -1470,7 +1470,7 @@ def main():
                 font-size: 12px;
             }
             label#dotfiles {
-                font-size: 12px;
+                font-size: 13px;
                 margin-top: 0px;
                 margin-bottom: 0px;
                 margin-right: 10px;
@@ -1485,7 +1485,7 @@ def main():
                 font-size: 12px;
             }
             textview#preview {
-                font-size: 12px;
+                font-size: 13px;
             }
             """
     provider.load_from_data(css)

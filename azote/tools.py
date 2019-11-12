@@ -350,7 +350,7 @@ def set_env(language=None):
             
     # Find dotfiles
     if os.path.isfile(os.path.join(common.config_home, 'alacritty/alacritty.yml')):
-        common.alacritty_config = os.path.join(common.config_home, 'alacritty.yml')
+        common.alacritty_config = os.path.join(common.config_home, 'alacritty/alacritty.yml')
     elif os.path.isfile(os.path.join(os.getenv('HOME'), '.alacritty.yml')):
         common.alacritty_config = os.path.join(os.getenv('HOME'), '.alacritty.yml')
     msg = common.alacritty_config if common.alacritty_config else 'not found'
