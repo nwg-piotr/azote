@@ -918,12 +918,12 @@ class ColorPaletteDialog(Gtk.Window):
         self.label.set_property('name', 'image-label')
 
         self.set_title(filename)
-        self.set_role("pop-up")
+        self.set_role("toolbox")
+        self.set_resizable(False)
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        self.set_decorated(False)
         self.set_modal(True)
         self.set_transient_for(common.main_window)
-        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+        self.set_position(Gtk.WindowPosition.NONE)
         self.set_keep_above(True)
         try:
             self.copy_as = common.settings.copy_as
@@ -949,6 +949,7 @@ class ColorPaletteDialog(Gtk.Window):
             gtk_image = Gtk.Image.new_from_pixbuf(pixbuf)
 
             button = Gtk.Button.new_with_label(hex_color)
+            button.set_always_show_image(True)
             button.set_image(gtk_image)
             button.set_image_position(2)  # TOP
             button.set_tooltip_text(common.lang['copy'])
@@ -1050,12 +1051,12 @@ class ColorPickerDialog(Gtk.Window):
             color = (255, 255, 255)
 
         self.set_title(common.lang['screen_color_picker'])
-        self.set_role("pop-up")
+        self.set_role("toolbox")
+        self.set_resizable(False)
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        self.set_decorated(False)
         self.set_modal(True)
         self.set_transient_for(common.main_window)
-        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+        self.set_position(Gtk.WindowPosition.MOUSE)
         self.set_keep_above(True)
 
         try:
