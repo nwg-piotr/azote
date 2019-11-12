@@ -892,8 +892,8 @@ def on_settings_button(button):
 def pick_color():
     """
     In sway we'll just use grim & slurp to pick a color: it returns accurate values.
-    In sway same should be possible with maim & slop, but happens to crash.
-    In both cases the fallback will be: calculate the dominant colour of a selected region.
+    On X11 same should be possible with maim & slop, but it happens to crash.
+    In both cases we'll use the same fallback: calculate the dominant colour of a selected region with colorthief.
     This is less accurate, alas.
     :return: tuple (rrr, ggg, bbb)
     """
