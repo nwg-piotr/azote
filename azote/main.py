@@ -40,7 +40,7 @@ from gi.repository.GdkPixbuf import InterpType
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
     copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, rgb_to_rgba, create_pixbuf, split_selected_wallpaper, \
     scale_and_crop, clear_thumbnails
-from plugins import Alacritty
+from plugins import Alacritty, Xresources
 
 
 def get_files():
@@ -897,11 +897,26 @@ def on_picker_button(button):
 
 
 def on_dotfiles_button(button):
+    menu = Gtk.Menu()
+    item = Gtk.MenuItem.new_with_label(common.xresources)
+    item.connect('activate', open_dotfile, 'xresources')
+    menu.append(item)
+    item = Gtk.MenuItem.new_with_label(common.alacritty_config)
+    item.connect('activate', open_dotfile, 'alacritty')
+    menu.append(item)
+    menu.show_all()
+    menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
+    
+    
+def open_dotfile(widget, which):
     if common.dotfile_window:
         common.dotfile_window.close()
-    
-    if common.dotfile_alacritty:
+
+    if which == 'alacritty' and common.alacritty_config:
         common.dotfile_window = Alacritty()
+        
+    elif which == 'xresources' and common.xresources:
+        common.dotfile_window = Xresources()
     
     
 def get_dominant_from_area():

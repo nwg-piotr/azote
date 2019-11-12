@@ -13,6 +13,7 @@ colors = colors
 copied = Copied
 copy = Copy
 copy_as = Copy as:
+copy_paste_into = Copy & paste into {}
 create_palette = Create palette
 custom_display = Custom display
 delete = Delete

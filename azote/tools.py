@@ -343,18 +343,24 @@ def set_env(language=None):
         log("slurp package {}".format(av), common.INFO)
 
         if maim and slop:
-            log("Pick color from screen feature available", common.INFO)
+            log("Pick color from screen - feature available", common.INFO)
             common.picker = True
         else:
             log("Pick color from screen feature needs both maim and slop packages installed", common.INFO)
             
     # Find dotfiles
     if os.path.isfile(os.path.join(common.config_home, 'alacritty/alacritty.yml')):
-        common.dotfile_alacritty = os.path.join(common.config_home, 'alacritty.yml')
+        common.alacritty_config = os.path.join(common.config_home, 'alacritty.yml')
     elif os.path.isfile(os.path.join(os.getenv('HOME'), '.alacritty.yml')):
-        common.dotfile_alacritty = os.path.join(os.getenv('HOME'), '.alacritty.yml')
-    msg = common.dotfile_alacritty if common.dotfile_alacritty else 'not found'
+        common.alacritty_config = os.path.join(os.getenv('HOME'), '.alacritty.yml')
+    msg = common.alacritty_config if common.alacritty_config else 'not found'
     log('Alacritty config file: {}'.format(msg), common.INFO)
+    
+    if os.path.isfile(os.path.join(os.getenv('HOME'), '.Xresources')):
+        common.xresources = os.path.join(os.getenv('HOME'), '.Xresources')
+        log('{} file found'.format(common.xresources), common.INFO)
+    else:
+        log('~/.Xresources file not found', common.INFO)
 
 
 def copy_backgrounds():

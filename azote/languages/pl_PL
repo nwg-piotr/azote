@@ -13,6 +13,7 @@ colors = kolorów
 copied = Skopiowano
 copy = Kopiuj
 copy_as = Kopiuj jako:
+copy_paste_into = Skopiuj i wklej do {}
 create_palette = Utwórz paletę
 custom_display = Niestandardowy ekran
 delete = Usuń
