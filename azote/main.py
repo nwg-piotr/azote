@@ -889,11 +889,16 @@ def on_settings_button(button):
     menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
 
 
+def pick_color():
+    return hex_to_rgb(subprocess.check_output(
+        'grim -g "$(slurp -p)" -t ppm - | convert - -format \'%[pixel:p{0,0}]\' txt:- | awk \'NR==2 {print $3}\'',
+        shell=True).decode("utf-8"))
+
 def on_picker_button(button):
     if common.picker_window:
         common.picker_window.close()
-    dominant = get_dominant_from_area()
-    common.picker_window = ColorPickerDialog(dominant)
+    color = pick_color()
+    common.picker_window = ColorPickerDialog(color)
 
 
 def on_dotfiles_button(button):
@@ -917,29 +922,6 @@ def open_dotfile(widget, which):
         
     elif which == 'xresources' and common.xresources:
         common.dotfile_window = Xresources()
-    
-    
-def get_dominant_from_area():
-    """
-    Saves selected area with `grim -g "$(slurp)" common.tmp_dir/azote/temp/area.png`,
-    then calculates the dominant color with the colorthief module.
-    :return: tuple (r, g, b) or (255, 255, 255) if nothing selected
-    """
-    dominant = (255, 255, 255)
-    if common.sway:
-        cmd = 'grim -g "$(slurp)" {}'.format(os.path.join(common.tmp_dir, 'area.png'))
-    else:
-        cmd = 'maim -s {}'.format(os.path.join(common.tmp_dir, 'area.png'))
-
-    res = subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL).returncode
-    if res == 0:
-        color_thief = ColorThief(os.path.join(common.tmp_dir, 'area.png'))
-        try:
-            dominant = color_thief.get_color(quality=10)
-        except:
-            pass
-
-    return dominant
 
 
 def show_custom_display_dialog(item):
@@ -1215,17 +1197,16 @@ class ColorPickerDialog(Gtk.Window):
 
         common.clipboard.set_text(content, -1)
         common.clipboard_text = self.label.get_text()
-        #print('copied', common.clipboard_text)
         
     def pick_new_color(self, button):
-        dominant = get_dominant_from_area()
-        if not dominant:
-            dominant = (255, 255, 255)
+        color = pick_color()
+        if not color:
+            color = (255, 255, 255)
 
-        pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), dominant)
+        pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), color)
         self.image.set_from_pixbuf(pixbuf)
 
-        self.label.set_text(rgb_to_hex(dominant))
+        self.label.set_text(rgb_to_hex(color))
 
 
 class CustomDisplayDialog(Gtk.Window):
