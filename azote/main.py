@@ -890,9 +890,54 @@ def on_settings_button(button):
 
 
 def pick_color():
-    return hex_to_rgb(subprocess.check_output(
-        'grim -g "$(slurp -p)" -t ppm - | convert - -format \'%[pixel:p{0,0}]\' txt:- | awk \'NR==2 {print $3}\'',
-        shell=True).decode("utf-8"))
+    """
+    In sway we'll just use grim & slurp to pick a color: it returns accurate values.
+    In sway same should be possible with maim & slop, but happens to crash.
+    In such case let's calculate the dominant colour of a selected region. This is less accurate, alas.
+    :return: tuple (rrr, ggg, bbb)
+    """
+    color = (255, 255, 255)
+    if common.sway:
+        try:
+            color = hex_to_rgb(subprocess.check_output(
+            'grim -g "$(slurp -p)" -t ppm - | convert - -format \'%[pixel:p{0,0}]\' txt:- | awk \'NR==2 {print $3}\'',
+            shell=True).decode("utf-8"))
+        except:
+            pass
+    else:
+        try:
+            output = subprocess.check_output('maim -st 0 | convert - -resize 1x1! -format \'%[pixel:p{0,0}]\' info:-', shell=True).decode("utf-8")
+            values = output[6:-1].split(",")
+            color = (int(values[0]), int(values[1]), int(values[2]))
+        except:
+            try:
+                color = get_dominant_from_area()
+            except:
+                pass
+    return color
+
+
+def get_dominant_from_area():
+    """
+    Saves selected area with `grim -g "$(slurp)" common.tmp_dir/azote/temp/area.png`,
+    then calculates the dominant color with the colorthief module.
+    :return: tuple (r, g, b) or (255, 255, 255) if nothing selected
+    """
+    dominant = (255, 255, 255)
+    if common.sway:
+        cmd = 'grim -g "$(slurp)" {}'.format(os.path.join(common.tmp_dir, 'area.png'))
+    else:
+        cmd = 'maim -s {}'.format(os.path.join(common.tmp_dir, 'area.png'))
+
+    res = subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL).returncode
+    if res == 0:
+        color_thief = ColorThief(os.path.join(common.tmp_dir, 'area.png'))
+        try:
+            dominant = color_thief.get_color(quality=common.settings.palette_quality)
+        except:
+            pass
+
+    return dominant
 
 
 def on_picker_button(button):

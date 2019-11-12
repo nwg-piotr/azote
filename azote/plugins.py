@@ -121,7 +121,7 @@ class Xresources(Gtk.Window):
         self.set_resizable(False)
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
         self.set_transient_for(common.main_window)
-        self.set_position(Gtk.WindowPosition.NONE)
+        self.set_position(Gtk.WindowPosition.MOUSE)
         self.set_keep_above(True)
 
         vbox0 = Gtk.VBox()
