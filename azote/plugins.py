@@ -137,6 +137,7 @@ class Xresources(Gtk.Window):
         f.close()
         self.data = {}
         for line in lines:
+            line = line.strip()
             if line.startswith('*background:') or line.startswith('*foreground:') or line.startswith('*color'):
                 key, value = line.split()
                 self.data[key] = value
@@ -167,7 +168,7 @@ class Xresources(Gtk.Window):
             hbox = Gtk.HBox()
             label = Gtk.Label()
             label.set_property("name", "dotfiles")
-            label.set_text(key)
+            label.set_text(key[1:])
             hbox.pack_start(label, True, False, 0)
             label = Gtk.Label()
             label.set_property("name", "dotfiles")
