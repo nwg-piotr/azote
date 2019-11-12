@@ -894,6 +894,7 @@ def pick_color():
         'grim -g "$(slurp -p)" -t ppm - | convert - -format \'%[pixel:p{0,0}]\' txt:- | awk \'NR==2 {print $3}\'',
         shell=True).decode("utf-8"))
 
+
 def on_picker_button(button):
     if common.picker_window:
         common.picker_window.close()
