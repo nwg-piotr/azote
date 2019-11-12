@@ -46,7 +46,7 @@ from plugins import Alacritty, Xresources
 def get_files():
     try:
         file_names = [f for f in os.listdir(common.settings.src_path)
-                  if os.path.isfile(os.path.join(common.settings.src_path, f))]
+                      if os.path.isfile(os.path.join(common.settings.src_path, f))]
     except FileNotFoundError:
         common.settings.src_path = os.getenv('HOME')
         file_names = [f for f in os.listdir(common.settings.src_path)
@@ -822,7 +822,7 @@ class GUI:
         picker_button.set_tooltip_text(tt)
         picker_button.connect('clicked', on_picker_button)
         status_box.add(picker_button)
-        
+
         # dotfiles button
         dotfiles_button = Gtk.Button()
         dotfiles_button.set_always_show_image(True)
@@ -893,20 +893,25 @@ def pick_color():
     """
     In sway we'll just use grim & slurp to pick a color: it returns accurate values.
     In sway same should be possible with maim & slop, but happens to crash.
-    In such case let's calculate the dominant colour of a selected region. This is less accurate, alas.
+    In both cases the fallback will be: calculate the dominant colour of a selected region.
+    This is less accurate, alas.
     :return: tuple (rrr, ggg, bbb)
     """
     color = (255, 255, 255)
     if common.sway:
         try:
             color = hex_to_rgb(subprocess.check_output(
-            'grim -g "$(slurp -p)" -t ppm - | convert - -format \'%[pixel:p{0,0}]\' txt:- | awk \'NR==2 {print $3}\'',
-            shell=True).decode("utf-8"))
+                'grim -g "$(slurp -p)" -t ppm - | convert - -format \'%[pixel:p{0,0}]\' txt:- | awk \'NR==2 {print $3}\'',
+                shell=True).decode("utf-8"))
         except:
-            pass
+            try:
+                color = get_dominant_from_area()
+            except:
+                pass
     else:
         try:
-            output = subprocess.check_output('maim -st 0 | convert - -resize 1x1! -format \'%[pixel:p{0,0}]\' info:-', shell=True).decode("utf-8")
+            output = subprocess.check_output('maim -st 0 | convert - -resize 1x1! -format \'%[pixel:p{0,0}]\' info:-',
+                                             shell=True).decode("utf-8")
             values = output[6:-1].split(",")
             color = (int(values[0]), int(values[1]), int(values[2]))
         except:
@@ -957,15 +962,15 @@ def on_dotfiles_button(button):
     menu.append(item)
     menu.show_all()
     menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
-    
-    
+
+
 def open_dotfile(widget, which):
     if common.dotfile_window:
         common.dotfile_window.close()
 
     if which == 'alacritty' and common.alacritty_config:
         common.dotfile_window = Alacritty()
-        
+
     elif which == 'xresources' and common.xresources:
         common.dotfile_window = Xresources()
 
@@ -987,7 +992,7 @@ class ColorPaletteDialog(Gtk.Window):
         self.set_role("toolbox")
         self.set_resizable(False)
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        #self.set_modal(True)
+        # self.set_modal(True)
         self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.NONE)
         self.set_keep_above(True)
@@ -1082,7 +1087,7 @@ class ColorPaletteDialog(Gtk.Window):
 
     def close_window(self, widget):
         self.close()
-        
+
     def show(self):
         self.show_all()
 
@@ -1097,8 +1102,8 @@ class ColorPaletteDialog(Gtk.Window):
 
         common.clipboard.set_text(content, -1)
         common.clipboard_text = widget.get_label()
-        #print(common.clipboard_text)
-        
+        # print(common.clipboard_text)
+
         label = '{}'.format(content)
         self.clipboard_preview.update(widget.get_label())
         self.clipboard_label.set_text(label)
@@ -1127,7 +1132,7 @@ class ClipboardPreview(Gtk.ColorButton):
         color.blue = rgba[2]
         color.alpha = rgba[3]
         self.set_rgba(color)
-        
+
     def to_clipboard(self, widget):
         common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         rgba = self.get_rgba()
@@ -1148,7 +1153,7 @@ class ClipboardPreview(Gtk.ColorButton):
 class ColorPickerDialog(Gtk.Window):
     def __init__(self, color):
         super().__init__()
-        
+
         if not color:
             color = (255, 255, 255)
 
@@ -1168,12 +1173,12 @@ class ColorPickerDialog(Gtk.Window):
         self.vbox = Gtk.VBox()
         self.vbox.set_spacing(5)
         self.vbox.set_border_width(5)
-        
-        self.image= Gtk.Image()
+
+        self.image = Gtk.Image()
         pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), color)
         self.image.set_from_pixbuf(pixbuf)
         self.vbox.add(self.image)
-        
+
         self.label = Gtk.Label()
         self.label.set_text(rgb_to_hex(color))
         self.vbox.add(self.label)
@@ -1195,7 +1200,7 @@ class ColorPickerDialog(Gtk.Window):
 
         hbox.pack_start(button1, True, False, 0)
         hbox.pack_start(button2, True, False, 0)
-        
+
         self.vbox.add(hbox)
 
         hbox = Gtk.HBox()
@@ -1243,7 +1248,7 @@ class ColorPickerDialog(Gtk.Window):
 
         common.clipboard.set_text(content, -1)
         common.clipboard_text = self.label.get_text()
-        
+
     def pick_new_color(self, button):
         color = pick_color()
         if not color:
