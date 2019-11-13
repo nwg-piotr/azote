@@ -953,15 +953,19 @@ def on_picker_button(button):
 
 
 def on_dotfiles_button(button):
-    menu = Gtk.Menu()
-    item = Gtk.MenuItem.new_with_label(common.xresources)
-    item.connect('activate', open_dotfile, 'xresources')
-    menu.append(item)
-    item = Gtk.MenuItem.new_with_label(common.alacritty_config)
-    item.connect('activate', open_dotfile, 'alacritty')
-    menu.append(item)
-    menu.show_all()
-    menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
+    if common.xresources or common.alacritty_config:
+        if common.xresources:
+            menu = Gtk.Menu()
+            item = Gtk.MenuItem.new_with_label(common.xresources)
+            item.connect('activate', open_dotfile, 'xresources')
+            menu.append(item)
+
+        if common.alacritty_config:
+            item = Gtk.MenuItem.new_with_label(common.alacritty_config)
+            item.connect('activate', open_dotfile, 'alacritty')
+            menu.append(item)
+        menu.show_all()
+        menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
 
 
 def open_dotfile(widget, which):
