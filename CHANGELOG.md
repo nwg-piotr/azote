@@ -1,9 +1,15 @@
 # CHANGELOG
 
 # Development
+- Color picker will first try to pick a clicked point instead of an area; the colorthief-based calculation 
+of the dominant color of an area left as the fallback method;
+- .dotfiles toolboxes for `.Xresources` and `alacritty.yml`; allow to find colour definitions and redefine with colours
+selected from a palette or probed with the color picker; produce text output to paste into .dotfiles.
+
+## v1.7.4 (2019-11-10)
 - Layout adjusted to look well in light and dark GTK themes;
 - set_always_show_image(True) for all image buttons, to avoid setting `gtk-button-images=1` in `gtk-3.0/settings.ini`;
-- toolbox windows properties modified (will only affect tiling WMs).
+- toolbox windows properties modified (will only affect tiling WMs);
 
 ## v1.7.3 (2019-11-07)
 New:

@@ -38,14 +38,15 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from gi.repository.GdkPixbuf import InterpType
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, create_pixbuf, split_selected_wallpaper, scale_and_crop, \
-    clear_thumbnails
+    copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, rgb_to_rgba, create_pixbuf, split_selected_wallpaper, \
+    scale_and_crop, clear_thumbnails
+from plugins import Alacritty, Xresources
 
 
 def get_files():
     try:
         file_names = [f for f in os.listdir(common.settings.src_path)
-                  if os.path.isfile(os.path.join(common.settings.src_path, f))]
+                      if os.path.isfile(os.path.join(common.settings.src_path, f))]
     except FileNotFoundError:
         common.settings.src_path = os.getenv('HOME')
         file_names = [f for f in os.listdir(common.settings.src_path)
@@ -620,7 +621,9 @@ def generate_palette(item, thumb_file, filename, image_path, num_colors):
     color_thief = ColorThief(image_path)
     # dominant = color_thief.get_color(quality=10)
     palette = color_thief.get_palette(color_count=num_colors, quality=common.settings.palette_quality)
-    cpd = ColorPaletteDialog(thumb_file, filename, palette)
+    if common.cpd:
+        common.cpd.close()
+    common.cpd = ColorPaletteDialog(thumb_file, filename, palette)
 
 
 def on_folder_clicked(button):
@@ -820,6 +823,16 @@ class GUI:
         picker_button.connect('clicked', on_picker_button)
         status_box.add(picker_button)
 
+        # dotfiles button
+        dotfiles_button = Gtk.Button()
+        dotfiles_button.set_always_show_image(True)
+        img = Gtk.Image()
+        img.set_from_file('images/icon_config.svg')
+        dotfiles_button.set_image(img)
+        dotfiles_button.set_tooltip_text(common.lang['dotfiles'])
+        dotfiles_button.connect('clicked', on_dotfiles_button)
+        status_box.add(dotfiles_button)
+
         common.status_bar = Gtk.Statusbar()
         common.status_bar.set_property("name", "status-bar")
         common.status_bar.set_halign(Gtk.Align.CENTER)
@@ -876,11 +889,39 @@ def on_settings_button(button):
     menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
 
 
-def on_picker_button(button):
-    dominant = get_dominant_from_area()
-    cpd = ColorPickerDialog(dominant)
-    
-    
+def pick_color():
+    """
+    In sway we'll just use grim & slurp to pick a color: it returns accurate values.
+    On X11 same should be possible with maim & slop, but it happens to crash.
+    In both cases we'll use the same fallback: calculate the dominant colour of a selected region with colorthief.
+    This is less accurate, alas.
+    :return: tuple (rrr, ggg, bbb)
+    """
+    color = (255, 255, 255)
+    if common.sway:
+        try:
+            color = hex_to_rgb(subprocess.check_output(
+                'grim -g "$(slurp -p)" -t ppm - | convert - -format \'%[pixel:p{0,0}]\' txt:- | awk \'NR==2 {print $3}\'',
+                shell=True).decode("utf-8"))
+        except:
+            try:
+                color = get_dominant_from_area()
+            except:
+                pass
+    else:
+        try:
+            output = subprocess.check_output('maim -st 0 | convert - -resize 1x1! -format \'%[pixel:p{0,0}]\' info:-',
+                                             shell=True).decode("utf-8")
+            values = output[6:-1].split(",")
+            color = (int(values[0]), int(values[1]), int(values[2]))
+        except:
+            try:
+                color = get_dominant_from_area()
+            except:
+                pass
+    return color
+
+
 def get_dominant_from_area():
     """
     Saves selected area with `grim -g "$(slurp)" common.tmp_dir/azote/temp/area.png`,
@@ -904,6 +945,40 @@ def get_dominant_from_area():
     return dominant
 
 
+def on_picker_button(button):
+    if common.picker_window:
+        common.picker_window.close()
+    color = pick_color()
+    common.picker_window = ColorPickerDialog(color)
+
+
+def on_dotfiles_button(button):
+    if common.xresources or common.alacritty_config:
+        if common.xresources:
+            menu = Gtk.Menu()
+            item = Gtk.MenuItem.new_with_label(common.xresources)
+            item.connect('activate', open_dotfile, 'xresources')
+            menu.append(item)
+
+        if common.alacritty_config:
+            item = Gtk.MenuItem.new_with_label(common.alacritty_config)
+            item.connect('activate', open_dotfile, 'alacritty')
+            menu.append(item)
+        menu.show_all()
+        menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
+
+
+def open_dotfile(widget, which):
+    if common.dotfile_window:
+        common.dotfile_window.close()
+
+    if which == 'alacritty' and common.alacritty_config:
+        common.dotfile_window = Alacritty()
+
+    elif which == 'xresources' and common.xresources:
+        common.dotfile_window = Xresources()
+
+
 def show_custom_display_dialog(item):
     cdd = CustomDisplayDialog()
 
@@ -921,7 +996,7 @@ class ColorPaletteDialog(Gtk.Window):
         self.set_role("toolbox")
         self.set_resizable(False)
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        self.set_modal(True)
+        # self.set_modal(True)
         self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.NONE)
         self.set_keep_above(True)
@@ -1017,6 +1092,9 @@ class ColorPaletteDialog(Gtk.Window):
     def close_window(self, widget):
         self.close()
 
+    def show(self):
+        self.show_all()
+
     def to_clipboard(self, widget):
         common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
@@ -1027,26 +1105,59 @@ class ColorPaletteDialog(Gtk.Window):
             content = widget.get_label()
 
         common.clipboard.set_text(content, -1)
+        common.clipboard_text = widget.get_label()
+        # print(common.clipboard_text)
+
         label = '{}'.format(content)
         self.clipboard_preview.update(widget.get_label())
         self.clipboard_label.set_text(label)
 
 
-class ClipboardPreview(Gtk.Image):
+class ClipboardPreview(Gtk.ColorButton):
     def __init__(self):
         super().__init__()
-        pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size), (255, 255, 255))
-        self.set_from_pixbuf(pixbuf)
+        rgba = rgb_to_rgba((255, 255, 255))
+
+        color = Gdk.RGBA()
+        color.red = rgba[0]
+        color.green = rgba[1]
+        color.blue = rgba[2]
+        color.alpha = rgba[3]
+        self.set_rgba(color)
+        self.connect("color-set", self.to_clipboard)
 
     def update(self, color):
-        pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size), hex_to_rgb(color))
-        self.set_from_pixbuf(pixbuf)
+        rgb = hex_to_rgb(color)
+        rgba = rgb_to_rgba(rgb)
+
+        color = Gdk.RGBA()
+        color.red = rgba[0]
+        color.green = rgba[1]
+        color.blue = rgba[2]
+        color.alpha = rgba[3]
+        self.set_rgba(color)
+
+    def to_clipboard(self, widget):
+        common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        rgba = self.get_rgba()
+        if common.settings.copy_as == 'r, g, b':
+            hex = rgba_to_hex(rgba)
+            t = hex_to_rgb(hex)
+            content = '{}, {}, {}'.format(t[0], t[1], t[2])
+        else:
+            content = rgba_to_hex(rgba)
+            hex = content
+
+        common.clipboard.set_text(content, -1)
+        common.clipboard_text = hex
+        label = '{}'.format(content)
+        common.cpd.clipboard_label.set_text(label)
 
 
 class ColorPickerDialog(Gtk.Window):
     def __init__(self, color):
         super().__init__()
-        
+
         if not color:
             color = (255, 255, 255)
 
@@ -1054,7 +1165,6 @@ class ColorPickerDialog(Gtk.Window):
         self.set_role("toolbox")
         self.set_resizable(False)
         self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        self.set_modal(True)
         self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.MOUSE)
         self.set_keep_above(True)
@@ -1067,12 +1177,12 @@ class ColorPickerDialog(Gtk.Window):
         self.vbox = Gtk.VBox()
         self.vbox.set_spacing(5)
         self.vbox.set_border_width(5)
-        
-        self.image= Gtk.Image()
+
+        self.image = Gtk.Image()
         pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), color)
         self.image.set_from_pixbuf(pixbuf)
         self.vbox.add(self.image)
-        
+
         self.label = Gtk.Label()
         self.label.set_text(rgb_to_hex(color))
         self.vbox.add(self.label)
@@ -1094,7 +1204,7 @@ class ColorPickerDialog(Gtk.Window):
 
         hbox.pack_start(button1, True, False, 0)
         hbox.pack_start(button2, True, False, 0)
-        
+
         self.vbox.add(hbox)
 
         hbox = Gtk.HBox()
@@ -1141,16 +1251,17 @@ class ColorPickerDialog(Gtk.Window):
             content = self.label.get_text()
 
         common.clipboard.set_text(content, -1)
-        
-    def pick_new_color(self, button):
-        dominant = get_dominant_from_area()
-        if not dominant:
-            dominant = (255, 255, 255)
+        common.clipboard_text = self.label.get_text()
 
-        pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), dominant)
+    def pick_new_color(self, button):
+        color = pick_color()
+        if not color:
+            color = (255, 255, 255)
+
+        pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), color)
         self.image.set_from_pixbuf(pixbuf)
 
-        self.label.set_text(rgb_to_hex(dominant))
+        self.label.set_text(rgb_to_hex(color))
 
 
 class CustomDisplayDialog(Gtk.Window):
@@ -1265,11 +1376,6 @@ class NumberEntry(Gtk.Entry):
     def on_changed(self, *args):
         text = self.get_text().strip()
         self.set_text(''.join([i for i in text if i in '0123456789']))
-
-
-def dialog_ok(widget, window, name, width, height, callback_data=None):
-    print(window, name, width, height)
-    window.close()
 
 
 def dialog_cancel(widget, window, callback_data=None):
@@ -1398,6 +1504,24 @@ def main():
                 border-bottom: 1px solid #333;
                 border-right: 1px solid #333;
                 font-size: 12px;
+            }
+            label#dotfiles {
+                font-size: 13px;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                margin-right: 10px;
+            }
+            label#dotfiles-header {
+                font-size: 14px;
+                font-weight: bold;
+            }
+            button#dotfiles-button {
+                padding: 1px;
+                margin: 0px;
+                font-size: 12px;
+            }
+            textview#preview {
+                font-size: 13px;
             }
             """
     provider.load_from_data(css)

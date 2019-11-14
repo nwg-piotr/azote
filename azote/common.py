@@ -46,8 +46,12 @@ bcg_dir = ''            # ~/.azote/backgrounds-sway or ~/.azote/backgrounds-feh
 sample_dir = ''         # ~/.azote/sample
 log_file = ''           # ~/.azote/log.txt
 cmd_file = ''           # ~/.azote/command.sh
-config_home = ''        # $XDG_CONFIG_HOME or ~/.config/azote
+config_home = ''
+azote_config_home = ''        # $XDG_CONFIG_HOME or ~/.config/azote
 data_home = ''          # $XDG_DATA_HOME or ~/.local/share/azote
+alacritty_config = ''
+xresources = ''
+
 data_migrated = False
 
 logging_enabled = True
@@ -60,4 +64,9 @@ modes_feh = ["scale", "max", "fill", "center", "tile"]
 
 main_window = None
 clipboard = None
+clipboard_text = ''     # to transfer colors between toolbars we'll use this instead of the real clipboard content
 picker = False
+
+cpd = None              # ColorPaletteDialog object
+dotfile_window = None
+picker_window = None
