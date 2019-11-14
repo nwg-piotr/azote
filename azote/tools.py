@@ -126,9 +126,10 @@ def check_displays():
 
 def set_env(language=None):
     xdg_config_home = os.getenv('XDG_CONFIG_HOME')
-    common.config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config/azote")
-    if not os.path.isdir(common.config_home):
-        os.mkdir(common.config_home)
+    common.config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config")
+    common.azote_config_home = os.path.join(xdg_config_home, ".config/azote") if xdg_config_home else os.path.join(os.getenv("HOME"), ".config/azote")
+    if not os.path.isdir(common.azote_config_home):
+        os.mkdir(common.azote_config_home)
 
     xdg_data_home = os.getenv('XDG_DATA_HOME')
     common.data_home = xdg_data_home if xdg_data_home else os.path.join(os.getenv("HOME"), ".local/share/azote")
@@ -146,7 +147,7 @@ def set_env(language=None):
         try:
             azote_rc = os.path.join(common.app_dir, 'azoterc')
             if os.path.isfile(azote_rc):
-                shutil.move(azote_rc, os.path.join(common.config_home, 'azoterc'))
+                shutil.move(azote_rc, os.path.join(common.azote_config_home, 'azoterc'))
 
             azote_pkl = os.path.join(common.app_dir, 'settings.pkl')
             if os.path.isfile(azote_pkl):
@@ -342,10 +343,24 @@ def set_env(language=None):
         log("slurp package {}".format(av), common.INFO)
 
         if maim and slop:
-            log("Pick color from screen feature available", common.INFO)
+            log("Pick color from screen - feature available", common.INFO)
             common.picker = True
         else:
             log("Pick color from screen feature needs both maim and slop packages installed", common.INFO)
+            
+    # Find dotfiles
+    if os.path.isfile(os.path.join(common.config_home, 'alacritty/alacritty.yml')):
+        common.alacritty_config = os.path.join(common.config_home, 'alacritty/alacritty.yml')
+    elif os.path.isfile(os.path.join(os.getenv('HOME'), '.alacritty.yml')):
+        common.alacritty_config = os.path.join(os.getenv('HOME'), '.alacritty.yml')
+    msg = common.alacritty_config if common.alacritty_config else 'not found'
+    log('Alacritty config file: {}'.format(msg), common.INFO)
+    
+    if os.path.isfile(os.path.join(os.getenv('HOME'), '.Xresources')):
+        common.xresources = os.path.join(os.getenv('HOME'), '.Xresources')
+        log('{} file found'.format(common.xresources), common.INFO)
+    else:
+        log('~/.Xresources file not found', common.INFO)
 
 
 def copy_backgrounds():
@@ -581,6 +596,15 @@ def hex_to_rgb(string):
     return tuple(int(string[i:i+2], 16) for i in (0, 2, 4))
 
 
+def rgb_to_rgba(rgb):
+    """
+    :param rgb: tuple (rrr, ggg, bbb)
+    :return: tuple (r.r, g.g, b.b, 1.0)
+    """
+    rgba = (rgb[0] / 255, rgb[1] / 255, rgb [2] / 255, 1.0)
+    return rgba
+
+
 def create_pixbuf(size, color):
     image = Image.new("RGB", size, color)
     data = image.tobytes()
@@ -603,7 +627,7 @@ class Settings(object):
         self.copy_as = '#rgb'
 
         # Runtime config (json) location
-        self.rc_file = os.path.join(common.config_home, "azoterc")
+        self.rc_file = os.path.join(common.azote_config_home, "azoterc")
         
         self.load()
 
