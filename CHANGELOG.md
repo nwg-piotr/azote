@@ -1,6 +1,7 @@
 # CHANGELOG
 
-# Development
+# v1.7.5 (2019-11-14)
+- Python 3.8 ready;
 - Color picker in Sway: it'll will first try to pick a clicked point instead of an area with:
 
 `grim -g "$(slurp -p)" -t ppm - | convert - -format '%[pixel:p{0,0}]' txt:-`

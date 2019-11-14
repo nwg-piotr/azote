@@ -1,8 +1,10 @@
-import os
+#!/usr/bin/env python3
+# _*_ coding: utf-8 _*_
+
 import gi
 import common
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, Gdk
+from gi.repository import Gtk
 from tools import hex_to_rgb, create_pixbuf
 
 from yaml import load, dump
