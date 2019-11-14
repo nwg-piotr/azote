@@ -1,10 +1,30 @@
 # CHANGELOG
 
 # Development
-- Color picker will first try to pick a clicked point instead of an area; the colorthief-based calculation 
-of the dominant color of an area left as the fallback method;
-- .dotfiles toolboxes for `.Xresources` and `alacritty.yml`; allow to find colour definitions and redefine with colours
-selected from a palette or probed with the color picker; produce text output to paste into .dotfiles.
+- Color picker in Sway: it'll will first try to pick a clicked point instead of an area with:
+
+`grim -g "$(slurp -p)" -t ppm - | convert - -format '%[pixel:p{0,0}]' txt:-`
+
+Optional packages `grim`, `slurp` and `imagemagick` required.
+ 
+The colorthief-based calculation of the dominant color of an area left as the fallback method;
+
+- Color picker on X11: it'll will first try to pick an area and return a color with the maim command:
+
+`$ maim -st 0 | convert - -resize 1x1\! -format '%[pixel:p{0,0}]' info:-`
+
+Optional `maim` package required. 
+
+In case it fails, the colorthief-based calculation of the dominant color of an area will be used as the fallback method;
+
+- Toolboxes for `.Xresources` and `alacritty.yml`; allow to find colour definitions and redefine with colours
+selected from a palette or probed with the color picker;
+
+Usage: click a colour on the palette or pick with the Screen color picker -> click a colour inside the toolbox to apply.
+Copy - paste definitions into the .dot file. Mind the indentation in `alacritty.yml`. 
+
+**Why so?** The colorthief library is cool, but calculation of the dominant colour in not accurate enough. If you select
+a region filled with `#333333`, the calculated value will be `#343434`.
 
 ## v1.7.4 (2019-11-10)
 - Layout adjusted to look well in light and dark GTK themes;

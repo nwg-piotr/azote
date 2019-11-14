@@ -10,9 +10,12 @@ Website: http://nwg.pl
 Project: https://github.com/nwg-piotr/azote
 License: GPL3
 
-Dependencies:
-python, python-setuptools, python-gobject, python-cairo, python-pillow, gtk3, wmctrl, feh, xorg-xrandr
-Optional: python-send2trash
+depends=('python' 'python-setuptools' 'python-gobject' 'python-pillow' 'gtk3' 'feh' 'xorg-xrandr' 'python-pyaml')
+optdepends=('python-send2trash: trash support'
+            'grim: screen color picker on Sway'
+            'slurp: screen color picker on Sway'
+            'imagemagick: screen color picker on Sway'
+            'maim: screen color picker on X11')
 """
 import os
 import sys
