@@ -13,7 +13,7 @@ The colorthief-based calculation of the dominant color of an area left as the fa
 
 `$ maim -st 0 | convert - -resize 1x1\! -format '%[pixel:p{0,0}]' info:-`
 
-Optional `maim` package required. 
+Optional `maim` and `imagemagick` packages required. 
 
 In case it fails, the colorthief-based calculation of the dominant color of an area will be used as the fallback method;
 

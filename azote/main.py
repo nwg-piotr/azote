@@ -14,7 +14,7 @@ depends=('python' 'python-setuptools' 'python-gobject' 'python-pillow' 'gtk3' 'f
 optdepends=('python-send2trash: trash support'
             'grim: screen color picker on Sway'
             'slurp: screen color picker on Sway'
-            'imagemagick: screen color picker on Sway'
+            'imagemagick: screen color picker on both Sway and X11'
             'maim: screen color picker on X11')
 """
 import os
