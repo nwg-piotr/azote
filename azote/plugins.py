@@ -136,11 +136,36 @@ class Xresources(Gtk.Window):
         lines = f.read().splitlines()
         f.close()
         self.data = {}
+
+        # We'll consider 2 possible formats here: '*color0:  #rrggbb' or '#define name #rrggbb'
+        define = False
         for line in lines:
             line = line.strip()
+            
             if line.startswith('*background:') or line.startswith('*foreground:') or line.startswith('*color'):
-                key, value = line.split()
-                self.data[key] = value
+                if len(line.split()) == 2:
+                    key, value = line.split()
+                    if value.startswith('#') and len(value) == 7:
+                        self.data[key] = value
+                    else:
+                        self.data[key] = '#000000'
+                        print('Improper color format: {}'.format(value))
+                else:
+                    print('Error parsing line: {}'.format(line))
+                    
+            elif line.startswith('#define'):
+                try:
+                    keyword, name, value = line.split()
+                    key = '{} {}'.format(keyword, name)
+                    if value.startswith('#') and len(value) == 7:   
+                        self.data[key] = value
+                    else:
+                        self.data[key] = '#000000'
+                        print('Improper color format: {}'.format(value))
+                    define = True
+                except:
+                    print('Error parsing line: {}'.format(line))
+                    pass
 
         output = ''
         for key, value in self.data.items():
@@ -168,7 +193,10 @@ class Xresources(Gtk.Window):
             hbox = Gtk.HBox()
             label = Gtk.Label()
             label.set_property("name", "dotfiles")
-            label.set_text(key[1:])
+            if not define:
+                label.set_text(key[1:])
+            else:
+                label.set_text(key.split()[1])
             hbox.pack_start(label, True, False, 0)
             label = Gtk.Label()
             label.set_property("name", "dotfiles")
@@ -222,8 +250,13 @@ class Xresources(Gtk.Window):
 class ColorPreviewBox(Gtk.EventBox):
     def __init__(self, hex_color):
         super().__init__()
-        pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size // 2),
+        try:
+            pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size // 2),
                                hex_to_rgb(hex_color))
+        except:
+            print('Improper color value: {}'.format(hex_color))
+            pixbuf = create_pixbuf((common.settings.clip_prev_size, common.settings.clip_prev_size // 2),
+                                   hex_to_rgb('#000000'))
         self.gtk_image = Gtk.Image.new_from_pixbuf(pixbuf)
         self.add(self.gtk_image)
         
