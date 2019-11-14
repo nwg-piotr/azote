@@ -1,7 +1,6 @@
 # CHANGELOG
 
-# v1.7.5 (2019-11-14)
-- Python 3.8 ready;
+## Development
 - Color picker in Sway: it'll will first try to pick a clicked point instead of an area with:
 
 `grim -g "$(slurp -p)" -t ppm - | convert - -format '%[pixel:p{0,0}]' txt:-`
@@ -24,7 +23,7 @@ selected from a palette or probed with the color picker;
 Usage: click a colour on the palette or pick with the Screen color picker -> click a colour inside the toolbox to apply.
 Copy - paste definitions into the .dot file. Mind the indentation in `alacritty.yml`. 
 
-**Why so?** The colorthief library is cool, but calculation of the dominant colour in not accurate enough. If you select
+**Why so?** The colorthief library is cool, but calculation of the dominant colour is not accurate enough. If you select
 a region filled with `#333333`, the calculated value will be `#343434`.
 
 ## v1.7.4 (2019-11-10)
