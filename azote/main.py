@@ -44,6 +44,7 @@ from tools import set_env, hash_name, create_thumbnails, file_allowed, update_st
     copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, rgb_to_rgba, create_pixbuf, split_selected_wallpaper, \
     scale_and_crop, clear_thumbnails
 from plugins import Alacritty, Xresources
+from color_tools import WikiColours
 
 
 def get_files():
@@ -1030,7 +1031,14 @@ class ColorPaletteDialog(Gtk.Window):
             button.set_always_show_image(True)
             button.set_image(gtk_image)
             button.set_image_position(2)  # TOP
-            button.set_tooltip_text(common.lang['copy'])
+            exact, closest = common.color_names.get_colour_name(hex_color)
+            if exact:
+                name = common.lang['exact'].format(exact)
+            else:
+                name = common.lang['closest'].format(closest)
+            button.set_tooltip_text(name)
+            # button.set_tooltip_text(common.lang['copy'])
+            
             button.connect_after('clicked', self.to_clipboard)
 
             self.hbox.pack_start(button, False, False, 0)
@@ -1448,6 +1456,7 @@ def print_help():
 def main():
     lang = None
     clear_thumbs, clear_all = False, False
+    common.color_names = WikiColours()
     for i in range(1, len(sys.argv)):
         if sys.argv[i].upper() == '-H' or sys.argv[i].upper() == '--HELP':
             print_help()
