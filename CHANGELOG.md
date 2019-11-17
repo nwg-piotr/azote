@@ -26,6 +26,8 @@ Copy - paste definitions into the .dot file. Mind the indentation in `alacritty.
 **Why so?** The colorthief library is cool, but calculation of the dominant colour is not accurate enough. If you select
 a region filled with `#333333`, the calculated value will be `#343434`.
 
+- Colour names dictionary: displays the colour name as the tooltip text.
+
 ## v1.7.4 (2019-11-10)
 - Layout adjusted to look well in light and dark GTK themes;
 - set_always_show_image(True) for all image buttons, to avoid setting `gtk-button-images=1` in `gtk-3.0/settings.ini`;
