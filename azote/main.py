@@ -521,17 +521,11 @@ def show_image_menu(widget):
             submenu = Gtk.Menu()
 
             # Hell knows why the library does not return the tuple of expected length for some num_colors values
-            # Let's cheat here
-            subitem = Gtk.MenuItem.new_with_label('4 {}'.format(common.lang['colors']))
+            # Let's cheat a little bit
+            subitem = Gtk.MenuItem.new_with_label('6 {}'.format(common.lang['colors']))
             subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file,
                             common.selected_wallpaper.filename,
-                            common.selected_wallpaper.source_path, 4)
-            submenu.append(subitem)
-
-            subitem = Gtk.MenuItem.new_with_label('8 {}'.format(common.lang['colors']))
-            subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file,
-                            common.selected_wallpaper.filename,
-                            common.selected_wallpaper.source_path, 9)
+                            common.selected_wallpaper.source_path, 6)
             submenu.append(subitem)
 
             subitem = Gtk.MenuItem.new_with_label('12 {}'.format(common.lang['colors']))
@@ -540,10 +534,22 @@ def show_image_menu(widget):
                             common.selected_wallpaper.source_path, 13)
             submenu.append(subitem)
 
-            subitem = Gtk.MenuItem.new_with_label('16 {}'.format(common.lang['colors']))
+            subitem = Gtk.MenuItem.new_with_label('18 {}'.format(common.lang['colors']))
             subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file,
                             common.selected_wallpaper.filename,
-                            common.selected_wallpaper.source_path, 17)
+                            common.selected_wallpaper.source_path, 19)
+            submenu.append(subitem)
+
+            subitem = Gtk.MenuItem.new_with_label('24 {}'.format(common.lang['colors']))
+            subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file,
+                            common.selected_wallpaper.filename,
+                            common.selected_wallpaper.source_path, 25)
+            submenu.append(subitem)
+
+            subitem = Gtk.MenuItem.new_with_label('30 {}'.format(common.lang['colors']))
+            subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file,
+                            common.selected_wallpaper.filename,
+                            common.selected_wallpaper.source_path, 31)
             submenu.append(subitem)
 
             item.set_submenu(submenu)
@@ -1060,7 +1066,7 @@ class ColorPaletteDialog(Gtk.Window):
 
             self.hbox.pack_start(button, False, False, 0)
 
-            if (i + 1) % 4 == 0:
+            if (i + 1) % 6 == 0:
                 self.vbox.add(self.hbox)
                 self.hbox = Gtk.HBox()
                 self.hbox.set_spacing(5)
