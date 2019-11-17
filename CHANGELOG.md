@@ -28,7 +28,7 @@ a region filled with `#333333`, the calculated value will be `#343434`.
 
 - Colour names dictionary: displays the colour name as the tooltip text.
 
-- Colour palette steps: 6, 12, 16, 24, 30.
+- Colour palette steps: 6, 12, 18, 24, 30.
 
 ## v1.7.4 (2019-11-10)
 - Layout adjusted to look well in light and dark GTK themes;
