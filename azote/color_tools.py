@@ -1,5 +1,33 @@
-from tools import hex_to_rgb, rgb_to_hex
+#!/usr/bin/env python3
+# _*_ coding: utf-8 _*_
 
+
+def rgba_to_hex(color):
+    """
+    Return hexadecimal string for :class:`Gdk.RGBA` `color`
+    http://wrhansen.blogspot.com/2012/09/how-to-convert-gdkrgba-to-hex-string-in.html
+    """
+    return "#{0:02x}{1:02x}{2:02x}".format(int(color.red * 255),
+                                           int(color.green * 255),
+                                           int(color.blue * 255))
+
+
+def rgb_to_hex(rgb_color):
+    return '#%02x%02x%02x' % (rgb_color[0], rgb_color[1], rgb_color[2])
+
+
+def hex_to_rgb(string):
+    string = string.lstrip('#')
+    return tuple(int(string[i:i+2], 16) for i in (0, 2, 4))
+
+
+def rgb_to_rgba(rgb):
+    """
+    :param rgb: tuple (rrr, ggg, bbb)
+    :return: tuple (r.r, g.g, b.b, 1.0)
+    """
+    rgba = (rgb[0] / 255, rgb[1] / 255, rgb [2] / 255, 1.0)
+    return rgba
 
 class WikiColours(object):
     def __init__(self):
@@ -902,7 +930,14 @@ class WikiColours(object):
             bd = (b_c - requested_colour[2]) ** 2
             min_colours[(rd + gd + bd)] = name
 
-        return min_colours[min(min_colours.keys())]
+        c_name = min_colours[min(min_colours.keys())]
+        hex_value = None
+        for key, name in self.colours.items():
+            if name == c_name:
+                hex_value = ' {}'.format(key)
+                break
+
+        return c_name + hex_value
 
     def get_colour_name(self, requested_colour):
         try:

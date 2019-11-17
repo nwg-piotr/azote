@@ -41,8 +41,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk
 from gi.repository.GdkPixbuf import InterpType
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, rgba_to_hex, hex_to_rgb, rgb_to_hex, rgb_to_rgba, create_pixbuf, split_selected_wallpaper, \
-    scale_and_crop, clear_thumbnails
+    copy_backgrounds, create_pixbuf, split_selected_wallpaper, scale_and_crop, clear_thumbnails
+from color_tools import rgba_to_hex, hex_to_rgb, rgb_to_hex, rgb_to_rgba
 from plugins import Alacritty, Xresources
 from color_tools import WikiColours
 
@@ -889,6 +889,11 @@ def on_settings_button(button):
     item.connect('activate', show_custom_display_dialog)
     menu.append(item)
 
+    item = Gtk.CheckMenuItem.new_with_label(common.lang['color_dictionary'])
+    item.set_active(common.settings.color_dictionary)
+    item.connect('activate', switch_color_dictionary)
+    menu.append(item)
+
     menu.show_all()
     menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
 
@@ -987,6 +992,16 @@ def show_custom_display_dialog(item):
     cdd = CustomDisplayDialog()
 
 
+def switch_color_dictionary(item):
+    if item.get_active():
+        common.settings.color_dictionary = True
+        common.settings.save()
+
+    else:
+        common.settings.color_dictionary = False
+        common.settings.save()
+
+
 class ColorPaletteDialog(Gtk.Window):
     def __init__(self, thumb_file, filename, palette):
         super().__init__()
@@ -1031,13 +1046,15 @@ class ColorPaletteDialog(Gtk.Window):
             button.set_always_show_image(True)
             button.set_image(gtk_image)
             button.set_image_position(2)  # TOP
-            exact, closest = common.color_names.get_colour_name(hex_color)
-            if exact:
-                name = common.lang['exact'].format(exact)
+            if common.settings.color_dictionary:
+                exact, closest = common.color_names.get_colour_name(hex_color)
+                if exact:
+                    name = common.lang['exact'].format(exact)
+                else:
+                    name = common.lang['closest'].format(closest)
+                button.set_tooltip_text('{}'.format(name))
             else:
-                name = common.lang['closest'].format(closest)
-            button.set_tooltip_text(name)
-            # button.set_tooltip_text(common.lang['copy'])
+                button.set_tooltip_text(common.lang['copy'])
             
             button.connect_after('clicked', self.to_clipboard)
 
@@ -1197,6 +1214,17 @@ class ColorPickerDialog(Gtk.Window):
         self.label = Gtk.Label()
         self.label.set_text(rgb_to_hex(color))
         self.vbox.add(self.label)
+        
+        if common.settings.color_dictionary:
+            self.closest_label = Gtk.Label()
+            self.closest_label.set_property('name', 'closest')
+            exact, closest = common.color_names.get_colour_name(rgb_to_hex(color))
+            if exact:
+                name = common.lang['exact'].format(exact)
+            else:
+                name = common.lang['closest'].format(closest)
+            self.closest_label.set_text(name)
+            self.vbox.add(self.closest_label)
 
         button1 = Gtk.RadioButton(label='#rgb')
         button1.connect('toggled', self.rgb_toggled)
@@ -1273,6 +1301,15 @@ class ColorPickerDialog(Gtk.Window):
         self.image.set_from_pixbuf(pixbuf)
 
         self.label.set_text(rgb_to_hex(color))
+
+        if common.settings.color_dictionary:
+            exact, closest = common.color_names.get_colour_name(rgb_to_hex(color))
+            if exact:
+                name = common.lang['exact'].format(exact)
+            else:
+                name = common.lang['closest'].format(closest)
+            self.closest_label.set_text(name)
+            self.vbox.add(self.closest_label)
 
 
 class CustomDisplayDialog(Gtk.Window):
@@ -1526,6 +1563,9 @@ def main():
             label#dotfiles-header {
                 font-size: 14px;
                 font-weight: bold;
+            }
+            label#closest {
+                font-size: 12px;
             }
             button#dotfiles-button {
                 padding: 1px;

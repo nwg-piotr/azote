@@ -577,34 +577,6 @@ def convert_bytes(num):
         num /= 1024.0
 
 
-def rgba_to_hex(color):
-    """
-    Return hexadecimal string for :class:`Gdk.RGBA` `color`
-    http://wrhansen.blogspot.com/2012/09/how-to-convert-gdkrgba-to-hex-string-in.html
-    """
-    return "#{0:02x}{1:02x}{2:02x}".format(int(color.red * 255),
-                                           int(color.green * 255),
-                                           int(color.blue * 255))
-
-
-def rgb_to_hex(rgb_color):
-    return '#%02x%02x%02x' % (rgb_color[0], rgb_color[1], rgb_color[2])
-
-
-def hex_to_rgb(string):
-    string = string.lstrip('#')
-    return tuple(int(string[i:i+2], 16) for i in (0, 2, 4))
-
-
-def rgb_to_rgba(rgb):
-    """
-    :param rgb: tuple (rrr, ggg, bbb)
-    :return: tuple (r.r, g.g, b.b, 1.0)
-    """
-    rgba = (rgb[0] / 255, rgb[1] / 255, rgb [2] / 255, 1.0)
-    return rgba
-
-
 def create_pixbuf(size, color):
     image = Image.new("RGB", size, color)
     data = image.tobytes()
@@ -625,6 +597,7 @@ class Settings(object):
         self.old_thumb_width = None
         self.clear_thumbnails = False
         self.copy_as = '#rgb'
+        self.color_dictionary = False
 
         # Runtime config (json) location
         self.rc_file = os.path.join(common.azote_config_home, "azoterc")
@@ -666,6 +639,11 @@ class Settings(object):
             
         try:
             self.copy_as = settings.copy_as
+        except AttributeError:
+            save_needed = True
+            
+        try:
+            self.color_dictionary = settings.color_dictionary
         except AttributeError:
             save_needed = True
 
