@@ -29,6 +29,7 @@ def rgb_to_rgba(rgb):
     rgba = (rgb[0] / 255, rgb[1] / 255, rgb [2] / 255, 1.0)
     return rgba
 
+
 class WikiColours(object):
     def __init__(self):
         super().__init__()
