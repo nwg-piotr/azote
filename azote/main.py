@@ -546,12 +546,6 @@ def show_image_menu(widget):
                             common.selected_wallpaper.source_path, 25)
             submenu.append(subitem)
 
-            subitem = Gtk.MenuItem.new_with_label('30 {}'.format(common.lang['colors']))
-            subitem.connect('activate', generate_palette, common.selected_wallpaper.thumb_file,
-                            common.selected_wallpaper.filename,
-                            common.selected_wallpaper.source_path, 31)
-            submenu.append(subitem)
-
             item.set_submenu(submenu)
 
             item = Gtk.MenuItem.new_with_label(common.lang['scale_and_crop'])
