@@ -306,6 +306,9 @@ def set_env(language=None):
         log("Failed creating image associations: /usr/share/applications/mimeinfo.cache file not found."
             " Setting feh as the only viewer.", common.ERROR)
 
+    av = 'found' if common.env['yaml'] else 'not found - alacritty.yml toolbox disabled'
+    log("python yaml module {}".format(av), common.INFO)
+    
     # Check if packages necessary to pick colours from the screen available
     try:
         magick = subprocess.run(['convert', '-version'], stdout=subprocess.DEVNULL).returncode == 0
@@ -330,7 +333,7 @@ def set_env(language=None):
         log("slurp package {}".format(av), common.INFO)
     
         if magick and grim and slurp:
-            log("Pick color from screen feature available", common.INFO)
+            log("Pick color from screen feature enabled", common.INFO)
             common.picker = True
         else:
             log("Pick color from screen feature needs imagemagick, grim and slurp packages installed", common.WARNING)

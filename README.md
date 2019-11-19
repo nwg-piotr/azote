@@ -120,23 +120,27 @@ Binary package `azote` available in the Void repository.
 
 ### Other Linux distributions:
 
-Packagers wanted! Personally I only maintain Arch (AUR) and Void Linux packages. Please do remember to copy all LICENSE*
- files to `/usr/share/licenses/azote/`.
+Packagers wanted! Personally I only maintain Arch (AUR) and Void Linux packages. Please do remember to copy the 
+LICENSE-COLORTHIEF file to `/usr/share/licenses/azote/`.
 
 **Dependencies:**
 
-- python
+- python (python3)
 - python-setuptools
 - python-gobject
-- python-pillow 
+- python-pillow
 - gtk3
-- feh 
+- feh
 - xorg-xrandr
-- wmctrl
 
-**Optional:** 
+**Optional dependencies:** 
 
-- python-send2trash: trash support
+- python-send2trash: for trash support
+- grim: for screen color picker on Sway
+- slurp: for screen color picker on Sway
+- maim: for screen color picker on X11
+- imagemagick: for screen color picker on both Sway and X11
+- python-pyaml: (python3-yaml) for alacritty.yml toolbox
 
 Please use assets from the [latest release](https://github.com/nwg-piotr/azote/releases/latest).
 

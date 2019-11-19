@@ -8,11 +8,18 @@ from gi.repository import Gtk
 from tools import create_pixbuf
 from color_tools import hex_to_rgb
 
-from yaml import load, dump
+# Check if python yaml module available
 try:
-    from yaml import CLoader as Loader, CDumper as Dumper
-except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import load, dump
+    common.env['yaml'] = True
+except Exception as e:
+    common.env['yaml'] = False
+
+if common.env['yaml']:
+    try:
+        from yaml import CLoader as Loader, CDumper as Dumper
+    except ImportError:
+        from yaml import Loader, Dumper
 
 
 class Alacritty(Gtk.Window):

@@ -32,6 +32,8 @@ a region filled with `#333333`, the calculated value will be `#343434`.
 
 - Added check if imagemagick available, as the 3rd requirement for the Screen color picker.
 
+- Python yaml module moved to optional dependencies.
+
 ## v1.7.4 (2019-11-10)
 - Layout adjusted to look well in light and dark GTK themes;
 - set_always_show_image(True) for all image buttons, to avoid setting `gtk-button-images=1` in `gtk-3.0/settings.ini`;

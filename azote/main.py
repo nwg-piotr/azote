@@ -2,7 +2,7 @@
 # _*_ coding: utf-8 _*_
 
 """
-Wallpaper manager for Sway, i3 and some other WMs, as a frontend to swaybg and feh
+Wallpaper and colour manager for Sway, i3 and some other WMs, as a frontend to swaybg and feh
 
 Author: Piotr Miller
 e-mail: nwg.piotr@gmail.com
@@ -10,12 +10,13 @@ Website: http://nwg.pl
 Project: https://github.com/nwg-piotr/azote
 License: GPL3
 
-depends=('python' 'python-setuptools' 'python-gobject' 'python-pillow' 'gtk3' 'feh' 'xorg-xrandr' 'python-pyaml')
-optdepends=('python-send2trash: trash support'
-            'grim: screen color picker on Sway'
-            'slurp: screen color picker on Sway'
-            'imagemagick: screen color picker on both Sway and X11'
-            'maim: screen color picker on X11')
+depends=('python' 'python-setuptools' 'python-gobject' 'python-pillow' 'gtk3' 'feh' 'xorg-xrandr')
+optdepends=('python-send2trash: for trash support'
+            'grim: for screen color picker on Sway'
+            'slurp: for screen color picker on Sway'
+            'maim: for screen color picker on X11'
+            'imagemagick: for screen color picker on both Sway and X11'
+            'python-pyaml: (python3-yaml) for alacritty.yml toolbox')
 """
 import os
 import sys
@@ -969,7 +970,7 @@ def on_dotfiles_button(button):
             item.connect('activate', open_dotfile, 'xresources')
             menu.append(item)
 
-        if common.alacritty_config:
+        if common.env['yaml'] and common.alacritty_config:
             item = Gtk.MenuItem.new_with_label(common.alacritty_config)
             item.connect('activate', open_dotfile, 'alacritty')
             menu.append(item)

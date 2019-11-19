@@ -17,3 +17,5 @@ module (c) 2015 by Shipeng Feng. The module in version 2.0.1 has been included d
 - optional [python-send2trash](https://github.com/hsoft/send2trash) - for trash support
 - optional [grim](https://github.com/emersion/grim), [slurp](https://github.com/emersion/slurp) -  for screen color picker on Sway
 - optional [maim](https://github.com/naelstrof/maim), [slop](https://github.com/naelstrof/slop) - for screen color picker on X11
+- optional [imagemagick](https://imagemagick.org) - for screen color picker
+- optional [python-yaml](https://pyyaml.org/wiki/PyYAML) - for alacritty.yml toolbox
