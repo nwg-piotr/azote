@@ -484,7 +484,9 @@ def on_about_button(button):
                         '- swaybg (c) 2016-2019 Drew DeVault',
                         '- send2trash python module (c) 2017 Virgil Dupras',
                         '- grim, slurp (c) 2018 emersion',
-                        '- maim, slop (c) 2014 Dalton Nell and Contributors'])
+                        '- maim, slop (c) 2014 Dalton Nell and Contributors',
+                        '- imagemagick (c) 1999-2019 ImageMagick Studio LLC',
+                        '- PyYAML (c) 2017-2019 Ingy döt Net Copyright (c) 2006-2016 Kirill Simonov'])
     dialog.set_translator_credits('xsme (de_DE), HumanG33k (fr_FR)')
     dialog.set_artists(['edskeye'])
 
