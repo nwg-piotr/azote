@@ -141,11 +141,13 @@ class Xresources(Gtk.Window):
         self.data = {}
 
         # We'll consider 2 possible formats here: '*color0:  #rrggbb' or '#define name #rrggbb'
+        # Let's add one more, like `'XTerm*vt100.foreground: #bfbfbf' / 'UXTerm*vt100.color0: #000000'
         define = False
         for line in lines:
             line = line.strip()
-            
-            if line.startswith('*background:') or line.startswith('*foreground:') or line.startswith('*color'):
+
+            if line.startswith('*background:') or line.startswith('*foreground:') or line.startswith('*color') \
+                    or '.foreground' in line or '.background' in line or '.color' in line:
                 if len(line.split()) == 2:
                     key, value = line.split()
                     if value.startswith('#') and len(value) == 7:
