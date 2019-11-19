@@ -99,7 +99,7 @@ def check_displays():
             return displays
 
         except Exception as e:
-            log("Failed checking displays: {}".format(e))
+            log("Failed checking displays: {}".format(e), common.ERROR)
 
     # On i3 we could use i3-msg here, but xrandr should also return what we need. If not on Sway - let's use xrandr
     elif common.env['xrandr']:
@@ -308,7 +308,7 @@ def set_env(language=None):
 
     # Check if packages necessary to pick colours from the screen available
     try:
-        magick = subprocess.run(['magick', '-version'], stdout=subprocess.DEVNULL).returncode == 0
+        magick = subprocess.run(['convert', '-version'], stdout=subprocess.DEVNULL).returncode == 0
     except FileNotFoundError:
         magick = False
     av = 'found' if magick else 'not found'
@@ -333,7 +333,7 @@ def set_env(language=None):
             log("Pick color from screen feature available", common.INFO)
             common.picker = True
         else:
-            log("Pick color from screen feature needs both grim and slurp packages installed", common.INFO)
+            log("Pick color from screen feature needs imagemagick, grim and slurp packages installed", common.WARNING)
     else:
         try:
             maim = subprocess.run(['maim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
@@ -353,7 +353,7 @@ def set_env(language=None):
             log("Pick color from screen - feature available", common.INFO)
             common.picker = True
         else:
-            log("Pick color from screen feature needs both maim and slop packages installed", common.INFO)
+            log("Pick color from screen feature needs imagemagick, maim and slop packages installed", common.WARNING)
             
     # Find dotfiles
     if os.path.isfile(os.path.join(common.config_home, 'alacritty/alacritty.yml')):
