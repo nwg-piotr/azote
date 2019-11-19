@@ -307,6 +307,13 @@ def set_env(language=None):
             " Setting feh as the only viewer.", common.ERROR)
 
     # Check if packages necessary to pick colours from the screen available
+    try:
+        magick = subprocess.run(['magick', '-version'], stdout=subprocess.DEVNULL).returncode == 0
+    except FileNotFoundError:
+        magick = False
+    av = 'found' if magick else 'not found'
+    log("imagemagick library {}".format(av), common.INFO)
+    
     if common.sway:
         try:
             grim = subprocess.run(['grim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
@@ -322,7 +329,7 @@ def set_env(language=None):
         av = 'found' if slurp else 'not found'
         log("slurp package {}".format(av), common.INFO)
     
-        if grim and slurp:
+        if magick and grim and slurp:
             log("Pick color from screen feature available", common.INFO)
             common.picker = True
         else:
@@ -342,7 +349,7 @@ def set_env(language=None):
         av = 'found' if slop else 'not found'
         log("slurp package {}".format(av), common.INFO)
 
-        if maim and slop:
+        if magick and maim and slop:
             log("Pick color from screen - feature available", common.INFO)
             common.picker = True
         else:
