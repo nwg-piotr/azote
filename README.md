@@ -140,7 +140,7 @@ LICENSE-COLORTHIEF file to `/usr/share/licenses/azote/`.
 - slurp: for screen color picker on Sway
 - maim: for screen color picker on X11
 - imagemagick: for screen color picker on both Sway and X11
-- python-pyaml: (python3-yaml) for alacritty.yml toolbox
+- python-yaml: (python3-yaml) for alacritty.yml toolbox
 
 Please use assets from the [latest release](https://github.com/nwg-piotr/azote/releases/latest).
 
