@@ -836,7 +836,12 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_config.svg')
         dotfiles_button.set_image(img)
-        dotfiles_button.set_tooltip_text(common.lang['dotfiles'])
+        active = common.xresources or common.alacritty_config and common.env['yaml']
+        if active:
+            dotfiles_button.set_tooltip_text(common.lang['dotfiles'])
+        else:
+            dotfiles_button.set_tooltip_text(common.lang['check_log'].format(common.log_file))
+            dotfiles_button.set_sensitive(False)
         dotfiles_button.connect('clicked', on_dotfiles_button)
         status_box.add(dotfiles_button)
 
@@ -966,8 +971,8 @@ def on_picker_button(button):
 
 def on_dotfiles_button(button):
     if common.xresources or common.alacritty_config:
+        menu = Gtk.Menu()
         if common.xresources:
-            menu = Gtk.Menu()
             item = Gtk.MenuItem.new_with_label(common.xresources)
             item.connect('activate', open_dotfile, 'xresources')
             menu.append(item)

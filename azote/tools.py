@@ -338,7 +338,7 @@ def set_env(language=None):
             log("Pick color from screen feature enabled", common.INFO)
             common.picker = True
         else:
-            log("Pick color from screen feature needs imagemagick, grim and slurp packages installed", common.WARNING)
+            log("Pick color from screen feature needs imagemagick, grim and slurp packages packages", common.WARNING)
     else:
         try:
             maim = subprocess.run(['maim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
