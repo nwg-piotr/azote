@@ -63,7 +63,12 @@ def check_displays():
     if common.sway:
         common.env['wm'] = 'sway'
     else:
-        common.env['wm'] = 'not sway'
+        if os.getenv('XDG_SESSION_DESKTOP'):
+            common.env['wm'] = os.getenv('XDG_SESSION_DESKTOP')
+        elif os.getenv('DESKTOP_SESSION'):
+            common.env['wm'] = os.getenv('DESKTOP_SESSION')
+        else:
+            common.env['wm'] = 'not sway'
 
     fnull = open(os.devnull, 'w')
     common.env['xrandr'] = subprocess.call(["which", "xrandr"], stdout=fnull, stderr=subprocess.STDOUT) == 0
@@ -305,9 +310,6 @@ def set_env(language=None):
         print('Failed opening /usr/share/applications/mimeinfo.cache')
         log("Failed creating image associations: /usr/share/applications/mimeinfo.cache file not found."
             " Setting feh as the only viewer.", common.ERROR)
-
-    av = 'found' if common.env['yaml'] else 'not found - alacritty.yml toolbox disabled'
-    log("python yaml module {}".format(av), common.INFO)
     
     # Check if packages necessary to pick colours from the screen available
     try:
@@ -363,8 +365,11 @@ def set_env(language=None):
         common.alacritty_config = os.path.join(common.config_home, 'alacritty/alacritty.yml')
     elif os.path.isfile(os.path.join(os.getenv('HOME'), '.alacritty.yml')):
         common.alacritty_config = os.path.join(os.getenv('HOME'), '.alacritty.yml')
+
     msg = common.alacritty_config if common.alacritty_config else 'not found'
     log('Alacritty config file: {}'.format(msg), common.INFO)
+    if common.alacritty_config and not common.env['yaml']:
+        log("python yaml module not found - alacritty.yml toolbox disabled", common.WARNING)
     
     if os.path.isfile(os.path.join(os.getenv('HOME'), '.Xresources')):
         common.xresources = os.path.join(os.getenv('HOME'), '.Xresources')
