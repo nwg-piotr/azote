@@ -1,40 +1,40 @@
 # CHANGELOG
 
-## Development
-- Color picker in Sway: it'll will first try to pick a clicked point instead of an area with:
+## v1.7.5 (2019-11-22)
+
+**Changes**
+
+- Color picker on Sway: it'll will first try to pick a clicked point instead of an area with:
 
 `grim -g "$(slurp -p)" -t ppm - | convert - -format '%[pixel:p{0,0}]' txt:-`
 
-Optional packages `grim`, `slurp` and `imagemagick` required.
- 
-The colorthief-based calculation of the dominant color of an area left as the fallback method;
+*Optional packages `grim`, `slurp` and `imagemagick` required; The colorthief-based calculation of the dominant color 
+of an area left as the fallback method.*
 
 - Color picker on X11: it'll will first try to pick an area and return a color with the maim command:
 
 `$ maim -st 0 | convert - -resize 1x1\! -format '%[pixel:p{0,0}]' info:-`
 
-Optional `maim` and `imagemagick` packages required. 
+*Optional `maim` and `imagemagick` packages required. In case it fails, the colorthief-based calculation of the dominant 
+color of an area will be used as the fallback method.*
 
-In case it fails, the colorthief-based calculation of the dominant color of an area will be used as the fallback method;
+*Why so? The colorthief library is cool, but calculation of the dominant colour is not accurate enough to this 
+purpose. If you select a region filled with `#333333`, the calculated value will be `#343434`.*
+
+- Colour palette steps altered to 6, 12, 18, 24.
+
+- Several improvements to the environment detection and logging.
+
+**New**
 
 - Toolboxes for `.Xresources` and `alacritty.yml`; allow to find colour definitions and redefine with colours
-selected from a palette or probed with the color picker;
+selected from a palette or probed with the color picker. The alacritty toolbox depends on the optional `python-yaml`
+package.
 
-Usage: click a colour on the palette or pick with the Screen color picker -> click a colour inside the toolbox to apply.
-Copy - paste definitions into the .dot file. Mind the indentation in `alacritty.yml`. 
-
-**Why so?** The colorthief library is cool, but calculation of the dominant colour is not accurate enough. If you select
-a region filled with `#333333`, the calculated value will be `#343434`.
+*Usage: click a colour on the palette or pick with the Screen color picker -> click a colour inside the toolbox to apply.
+Copy - paste definitions into the .dot file. Mind the indentation in `alacritty.yml`.*
 
 - Colour names dictionary: displays the colour name as the tooltip text.
-
-- Colour palette steps: 6, 12, 18, 24.
-
-- Added check if imagemagick available, as the 3rd requirement for the Screen color picker.
-
-- Python yaml module moved to optional dependencies.
-
-- Several improvements to logging.
 
 ## v1.7.4 (2019-11-10)
 - Layout adjusted to look well in light and dark GTK themes;
