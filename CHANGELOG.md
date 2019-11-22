@@ -63,6 +63,11 @@ Bug fixes:
 - Scale & crop feature not working on X11 bug, previously fixed in 1.5.1, has been reintroduced accidentally. 
 Fixed one more time.
 
+_Running Azote for the first time will move all the program data to XDG-compliant folders. From now 
+on you'll find the `azoterc` file $XDG_CONFIG_HOME/azote/ (usually `~/.config/azote/azoterc`). Application data will be 
+placed in $XDG_DATA_HOME/azote (`~/.local/share/azote/`). Thumbnails may regenerate. You may need to re-apply wallpaper 
+settings._
+
 ## v1.7.0 (2019-11-01)
 - **Scale & crop** backgrounds to virtual, custom display dimensions; define a custom display dimensions in preferences;
 - **CLI arguments** added: `-h | --help`, `-c | --clear` (clear unused thumbnails), 
