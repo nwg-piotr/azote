@@ -63,7 +63,12 @@ def check_displays():
     if common.sway:
         common.env['wm'] = 'sway'
     else:
-        common.env['wm'] = 'not sway'
+        if os.getenv('XDG_SESSION_DESKTOP'):
+            common.env['wm'] = os.getenv('XDG_SESSION_DESKTOP')
+        elif os.getenv('DESKTOP_SESSION'):
+            common.env['wm'] = os.getenv('DESKTOP_SESSION')
+        else:
+            common.env['wm'] = 'not sway'
 
     fnull = open(os.devnull, 'w')
     common.env['xrandr'] = subprocess.call(["which", "xrandr"], stdout=fnull, stderr=subprocess.STDOUT) == 0
@@ -305,7 +310,7 @@ def set_env(language=None):
         print('Failed opening /usr/share/applications/mimeinfo.cache')
         log("Failed creating image associations: /usr/share/applications/mimeinfo.cache file not found."
             " Setting feh as the only viewer.", common.ERROR)
-
+    
     # Check if packages necessary to pick colours from the screen available
     try:
         magick = subprocess.run(['convert', '-version'], stdout=subprocess.DEVNULL).returncode == 0
@@ -330,10 +335,10 @@ def set_env(language=None):
         log("slurp package {}".format(av), common.INFO)
     
         if magick and grim and slurp:
-            log("Pick color from screen feature available", common.INFO)
+            log("Pick color from screen feature enabled", common.INFO)
             common.picker = True
         else:
-            log("Pick color from screen feature needs imagemagick, grim and slurp packages installed", common.WARNING)
+            log("Pick color from screen feature needs imagemagick, grim and slurp packages packages", common.WARNING)
     else:
         try:
             maim = subprocess.run(['maim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
@@ -360,8 +365,11 @@ def set_env(language=None):
         common.alacritty_config = os.path.join(common.config_home, 'alacritty/alacritty.yml')
     elif os.path.isfile(os.path.join(os.getenv('HOME'), '.alacritty.yml')):
         common.alacritty_config = os.path.join(os.getenv('HOME'), '.alacritty.yml')
+
     msg = common.alacritty_config if common.alacritty_config else 'not found'
     log('Alacritty config file: {}'.format(msg), common.INFO)
+    if common.alacritty_config and not common.env['yaml']:
+        log("python yaml module not found - alacritty.yml toolbox disabled", common.WARNING)
     
     if os.path.isfile(os.path.join(os.getenv('HOME'), '.Xresources')):
         common.xresources = os.path.join(os.getenv('HOME'), '.Xresources')

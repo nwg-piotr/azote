@@ -2,20 +2,16 @@
 
 [![Build Status](https://travis-ci.com/nwg-piotr/azote.svg?branch=master)](https://travis-ci.com/nwg-piotr/azote)
 
-**1.7.2 version note**: _running Azote for the first time will move all the program data to XDG-compliant folders. From now 
-on you'll find the `azoterc` file $XDG_CONFIG_HOME/azote/ (usually `~/.config/azote/azoterc`). Application data will be 
-placed in $XDG_DATA_HOME/azote (`~/.local/share/azote/`). 
-Thumbnails may regenerate. You may need to re-apply wallpaper settings._
+**Azote** is a GTK+3 - based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
+(Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. It also includes several colour management 
+tools.
 
-**Azote** is a GTK+ 3 - based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
-(Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. During development I test it on sway, i3, 
-Openbox, qtile and dwm, so I'm not sure if it works on others window managers.
+The program is confirmed to work on sway, i3, Openbox, Fluxbox and dwm window managers, on Arch Linux, Void Linux and 
+Debian (Buster).
 
 ![screenshot](http://nwg.pl/Lychee/uploads/big/a66c84b60a605b78e5fc4dd5ffbf8dbf.png)
 
 *Pictures above come from https://wallhaven.cc*
-
-Also see [Azote in action on YouTube](https://youtu.be/Cjqr0LRL67I).
 
 ## Project assumptions
 
@@ -25,7 +21,7 @@ In order not to limit the program usage to the single environment, Azote is also
 when running on i3, Openbox or other X11 window managers.
 
 *The description below takes into account the latest release. All the features may or may not be available in the
-package already prepared for a certain Linux distribution.*
+package already prepared for a certain Linux distribution. Some features rely on optional dependencies.*
 
 ### Main features:
 
@@ -34,7 +30,9 @@ package already prepared for a certain Linux distribution.*
 - flips wallpapers horizontally;
 - splits wallpapers between 2 or more displays;
 - scales and crops images to detected or user-defined display dimensions;
-- generates a colour palette on the basis of an image.
+- generates a colour palette on the basis of an image;
+- picks a colour from the screen;
+- allows to find and edit colour definitions in `.Xresources` and `alacritty.yml` files.
 
 ## Usage
 
@@ -120,23 +118,27 @@ Binary package `azote` available in the Void repository.
 
 ### Other Linux distributions:
 
-Packagers wanted! Personally I only maintain Arch (AUR) and Void Linux packages. Please do remember to copy all LICENSE*
- files to `/usr/share/licenses/azote/`.
+Packagers wanted! Personally I only maintain Arch (AUR) and Void Linux packages. Please do remember to copy the 
+LICENSE-COLORTHIEF file to `/usr/share/licenses/azote/`.
 
 **Dependencies:**
 
-- python
+- python (python3)
 - python-setuptools
 - python-gobject
-- python-pillow 
+- python-pillow
 - gtk3
-- feh 
+- feh
 - xorg-xrandr
-- wmctrl
 
-**Optional:** 
+**Optional dependencies:** 
 
-- python-send2trash: trash support
+- python-send2trash: for trash support
+- grim: for screen color picker on Sway
+- slurp: for screen color picker on Sway
+- maim: for screen color picker on X11
+- imagemagick: for screen color picker on both Sway and X11
+- python-yaml: (python3-yaml) for alacritty.yml toolbox
 
 Please use assets from the [latest release](https://github.com/nwg-piotr/azote/releases/latest).
 

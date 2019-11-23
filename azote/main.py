@@ -2,7 +2,7 @@
 # _*_ coding: utf-8 _*_
 
 """
-Wallpaper manager for Sway, i3 and some other WMs, as a frontend to swaybg and feh
+Wallpaper and colour manager for Sway, i3 and some other WMs, as a frontend to swaybg and feh
 
 Author: Piotr Miller
 e-mail: nwg.piotr@gmail.com
@@ -10,12 +10,13 @@ Website: http://nwg.pl
 Project: https://github.com/nwg-piotr/azote
 License: GPL3
 
-depends=('python' 'python-setuptools' 'python-gobject' 'python-pillow' 'gtk3' 'feh' 'xorg-xrandr' 'python-pyaml')
-optdepends=('python-send2trash: trash support'
-            'grim: screen color picker on Sway'
-            'slurp: screen color picker on Sway'
-            'imagemagick: screen color picker on both Sway and X11'
-            'maim: screen color picker on X11')
+depends=('python' 'python-setuptools' 'python-gobject' 'python-pillow' 'gtk3' 'feh' 'xorg-xrandr')
+optdepends=('python-send2trash: for trash support'
+            'grim: for screen color picker on Sway'
+            'slurp: for screen color picker on Sway'
+            'maim: for screen color picker on X11'
+            'imagemagick: for screen color picker on both Sway and X11'
+            'python-pyaml: (python3-yaml) for alacritty.yml toolbox')
 """
 import os
 import sys
@@ -483,7 +484,9 @@ def on_about_button(button):
                         '- swaybg (c) 2016-2019 Drew DeVault',
                         '- send2trash python module (c) 2017 Virgil Dupras',
                         '- grim, slurp (c) 2018 emersion',
-                        '- maim, slop (c) 2014 Dalton Nell and Contributors'])
+                        '- maim, slop (c) 2014 Dalton Nell and Contributors',
+                        '- imagemagick (c) 1999-2019 ImageMagick Studio LLC',
+                        '- PyYAML (c) 2017-2019 Ingy döt Net Copyright (c) 2006-2016 Kirill Simonov'])
     dialog.set_translator_credits('xsme (de_DE), HumanG33k (fr_FR)')
     dialog.set_artists(['edskeye'])
 
@@ -833,7 +836,12 @@ class GUI:
         img = Gtk.Image()
         img.set_from_file('images/icon_config.svg')
         dotfiles_button.set_image(img)
-        dotfiles_button.set_tooltip_text(common.lang['dotfiles'])
+        active = common.xresources or common.alacritty_config and common.env['yaml']
+        if active:
+            dotfiles_button.set_tooltip_text(common.lang['dotfiles'])
+        else:
+            dotfiles_button.set_tooltip_text(common.lang['check_log'].format(common.log_file))
+            dotfiles_button.set_sensitive(False)
         dotfiles_button.connect('clicked', on_dotfiles_button)
         status_box.add(dotfiles_button)
 
@@ -963,13 +971,13 @@ def on_picker_button(button):
 
 def on_dotfiles_button(button):
     if common.xresources or common.alacritty_config:
+        menu = Gtk.Menu()
         if common.xresources:
-            menu = Gtk.Menu()
             item = Gtk.MenuItem.new_with_label(common.xresources)
             item.connect('activate', open_dotfile, 'xresources')
             menu.append(item)
 
-        if common.alacritty_config:
+        if common.env['yaml'] and common.alacritty_config:
             item = Gtk.MenuItem.new_with_label(common.alacritty_config)
             item.connect('activate', open_dotfile, 'alacritty')
             menu.append(item)

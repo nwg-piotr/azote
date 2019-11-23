@@ -8,11 +8,18 @@ from gi.repository import Gtk
 from tools import create_pixbuf
 from color_tools import hex_to_rgb
 
-from yaml import load, dump
+# Check if python yaml module available
 try:
-    from yaml import CLoader as Loader, CDumper as Dumper
-except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import load, dump
+    common.env['yaml'] = True
+except Exception as e:
+    common.env['yaml'] = False
+
+if common.env['yaml']:
+    try:
+        from yaml import CLoader as Loader, CDumper as Dumper
+    except ImportError:
+        from yaml import Loader, Dumper
 
 
 class Alacritty(Gtk.Window):
@@ -140,37 +147,24 @@ class Xresources(Gtk.Window):
         f.close()
         self.data = {}
 
-        # We'll consider 2 possible formats here: '*color0:  #rrggbb' or '#define name #rrggbb'
-        # Let's add one more, like `'XTerm*vt100.foreground: #bfbfbf' / 'UXTerm*vt100.color0: #000000'
-        define = False
+        # We only parse the lines 2 or 3 words long; the last one must be a hex color like '#rrggbb'.
         for line in lines:
             line = line.strip()
+            parts = line.split()
 
-            if line.startswith('*background:') or line.startswith('*foreground:') or line.startswith('*color') \
-                    or '.foreground' in line or '.background' in line or '.color' in line:
-                if len(line.split()) == 2:
-                    key, value = line.split()
-                    if value.startswith('#') and len(value) == 7:
-                        self.data[key] = value
-                    else:
-                        self.data[key] = '#000000'
-                        print('Improper color format: {}'.format(value))
-                else:
-                    print('Error parsing line: {}'.format(line))
-                    
-            elif line.startswith('#define'):
+            if 0 < len(parts) < 4 and parts[-1].startswith('#') and len(parts[-1]) == 7:
                 try:
-                    keyword, name, value = line.split()
-                    key = '{} {}'.format(keyword, name)
-                    if value.startswith('#') and len(value) == 7:   
+                    rgb = hex_to_rgb(parts[-1])  # validate the hex colour value
+                    if len(parts) == 2:
+                        key, value = parts
                         self.data[key] = value
-                    else:
-                        self.data[key] = '#000000'
-                        print('Improper color format: {}'.format(value))
-                    define = True
-                except:
-                    print('Error parsing line: {}'.format(line))
-                    pass
+
+                    elif len(parts) == 3:
+                        keyword, name, value = parts
+                        key = '{} {}'.format(keyword, name)
+                        self.data[key] = value
+                except ValueError:
+                    print('Improper color value', parts[-1])
 
         output = ''
         for key, value in self.data.items():
@@ -198,10 +192,7 @@ class Xresources(Gtk.Window):
             hbox = Gtk.HBox()
             label = Gtk.Label()
             label.set_property("name", "dotfiles")
-            if not define:
-                label.set_text(key[1:])
-            else:
-                label.set_text(key.split()[1])
+            label.set_text(key)
             hbox.pack_start(label, True, False, 0)
             label = Gtk.Label()
             label.set_property("name", "dotfiles")
