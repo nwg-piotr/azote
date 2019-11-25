@@ -613,6 +613,7 @@ class Settings(object):
         self.clear_thumbnails = False
         self.copy_as = '#rgb'
         self.color_dictionary = False
+        self.image_menu_button = False
 
         # Runtime config (json) location
         self.rc_file = os.path.join(common.azote_config_home, "azoterc")
@@ -659,6 +660,11 @@ class Settings(object):
             
         try:
             self.color_dictionary = settings.color_dictionary
+        except AttributeError:
+            save_needed = True
+
+        try:
+            self.image_menu_button = settings.image_menu_button
         except AttributeError:
             save_needed = True
 
