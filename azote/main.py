@@ -77,7 +77,7 @@ class Preview(Gtk.ScrolledWindow):
         self.set_propagate_natural_height(True)
         self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
 
-        common.buttons_list = []
+        common.thumbnails_list = []
         self.grid = Gtk.Grid()
         self.grid.set_column_spacing(25)
         self.grid.set_row_spacing(15)
@@ -89,10 +89,10 @@ class Preview(Gtk.ScrolledWindow):
 
         for file in src_pictures:
             if file_allowed(file):
-                btn = ThumbButton(common.settings.src_path, file)
-                btn.column = col
-                common.buttons_list.append(btn)
-                self.grid.attach(btn, col, row, 1, 1)
+                thumbnail = Thumbnail(common.settings.src_path, file)
+                thumbnail.column = col
+                common.thumbnails_list.append(thumbnail)
+                self.grid.attach(thumbnail, col, row, 1, 1)
                 if col < common.cols - 1:
                     col += 1
                 else:
@@ -105,35 +105,39 @@ class Preview(Gtk.ScrolledWindow):
         if create_thumbs:
             create_thumbnails(common.settings.src_path)
 
-        for button in common.buttons_list:
-            self.grid.remove(button)
-            button.destroy()
+        for thumbnail in common.thumbnails_list:
+            self.grid.remove(thumbnail)
+            thumbnail.destroy()
 
         col, row = 0, 0
         src_pictures = get_files()
 
         for file in src_pictures:
             if file_allowed(file):
-                btn = ThumbButton(common.settings.src_path, file)
-                btn.column = col
-                common.buttons_list.append(btn)
-                self.grid.attach(btn, col, row, 1, 1)
+                thumbnail = Thumbnail(common.settings.src_path, file)
+                thumbnail.column = col
+                common.thumbnails_list.append(thumbnail)
+                self.grid.attach(thumbnail, col, row, 1, 1)
                 if col < common.cols - 1:
                     col += 1
                 else:
                     col = 0
                     row += 1
-                btn.show()
+                thumbnail.show_all()
+                thumbnail.toolbar.hide()
 
         update_status_bar()
 
 
-class ThumbButton(Gtk.Button):
+class Thumbnail(Gtk.VBox):
     def __init__(self, folder, filename):
         super().__init__()
-
-        self.set_property("name", "thumb-btn")
-        self.set_always_show_image(True)
+        self.toolbar = ImageToolbar(self)
+        self.add(self.toolbar)
+        
+        self.image_button = Gtk.Button()
+        self.image_button.set_property("name", "thumb-btn")
+        self.image_button.set_always_show_image(True)
 
         self.folder = folder
         self.filename = filename
@@ -143,10 +147,9 @@ class ThumbButton(Gtk.Button):
         self.thumb_file = "{}.png".format(os.path.join(common.thumb_dir, hash_name(self.source_path)))
         self.img.set_from_file(self.thumb_file)
 
-        self.set_image(self.img)
-        self.set_image_position(2)  # TOP
-        self.set_tooltip_text(
-            common.lang['thumbnail_tooltip'])
+        self.image_button.set_image(self.img)
+        self.image_button.set_image_position(2)  # TOP
+        self.image_button.set_tooltip_text(common.lang['thumbnail_tooltip'])
 
         # Workaround: column is a helper value to identify thumbnails placed in column 0. 
         # They need different context menu gravity in Sway
@@ -154,42 +157,77 @@ class ThumbButton(Gtk.Button):
 
         if len(filename) > 30:
             filename = '…{}'.format(filename[-28::])
-        self.set_label(filename)
+        self.image_button.set_label(filename)
         self.selected = False
 
         # self.connect('clicked', self.on_button_press)
-        self.connect('button-press-event', self.on_button_press)
+        self.image_button.connect('button-press-event', self.on_image_button_press)
 
-    def on_button_press(self, button, event):
+        self.add(self.image_button)
+
+    def on_image_button_press(self, button, event):
+
+        self.select(button)
+
+        if event.type == Gdk.EventType._2BUTTON_PRESS:
+            on_thumb_double_click(button)
+        if event.button == 3:
+            show_image_menu(self)
+            
+    def on_menu_button_press(self, button):
+        show_image_menu(self)
+        
+    def select(self, thumbnail):
         if common.split_button:
             common.split_button.set_sensitive(True)
 
         common.apply_to_all_button.set_sensitive(True)
 
-        self.selected = True
+        self.image_button.selected = True
         common.selected_wallpaper = self
         deselect_all()
-        button.set_property("name", "thumb-btn-selected")
+        if common.settings.image_menu_button:
+            self.toolbar.show_all()
+        thumbnail.set_property("name", "thumb-btn-selected")
 
         with Image.open(self.source_path) as img:
             filename = self.filename
             if len(filename) > 30:
                 filename = '…{}'.format(filename[-28::])
             common.selected_picture_label.set_text("{} ({} x {})".format(filename, img.size[0], img.size[1]))
-        if event.type == Gdk.EventType._2BUTTON_PRESS:
-            on_thumb_double_click(button)
-        if event.button == 3:
-            show_image_menu(button)
-
-    def deselect(self, button):
+    
+    def deselect(self, thumbnail):
         self.selected = False
-        button.set_property("name", "thumb-btn")
-
+        self.toolbar.hide()
+        thumbnail.image_button.set_property("name", "thumb-btn")
+        
 
 def deselect_all():
-    for btn in common.buttons_list:
-        btn.deselect(btn)
+    for thumbnail in common.thumbnails_list:
+        thumbnail.deselect(thumbnail)
+        
+        
+class ImageToolbar(Gtk.HBox):
+    def __init__(self, thumbnail):
+        super().__init__()
+        self.parent_thumbnail = thumbnail
+        self.set_spacing(0)
+        self.set_border_width(0)
 
+        test_label = Gtk.Label()
+        test_label.set_text('')
+        self.pack_start(test_label, True, True, 0)
+
+        self.menu_btn = Gtk.EventBox()
+        img = Gtk.Image()
+        img.set_from_file('images/icon_image_menu.svg')
+        self.menu_btn.add(img)
+        self.menu_btn.connect('button-press-event', self.on_menu_button_press)
+        self.pack_start(self.menu_btn, False, False, 0)
+
+    def on_menu_button_press(self, button, event):
+        show_image_menu(self.parent_thumbnail, from_toolbar=True)
+    
 
 class DisplayBox(Gtk.Box):
     """
@@ -454,6 +492,7 @@ def clear_wallpaper_selection():
     if common.split_button:
         common.split_button.set_sensitive(False)
     common.apply_button.set_sensitive(False)
+    common.apply_to_all_button.set_sensitive(False)
 
 
 def on_about_button(button):
@@ -505,7 +544,7 @@ def move_to_trash(widget):
     common.preview.refresh()
 
 
-def show_image_menu(widget):
+def show_image_menu(widget, event=None, parent=None, from_toolbar=False):
     if common.selected_wallpaper:
         if common.associations:  # not None if /usr/share/applications/mimeinfo.cache found and parse
             openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
@@ -607,11 +646,20 @@ def show_image_menu(widget):
 
             if widget.column:
                 if widget.column == 0:
-                    menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
+                    if not from_toolbar:
+                        menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
+                    else:
+                        menu.popup_at_widget(widget.toolbar, Gdk.Gravity.WEST, Gdk.Gravity.NORTH_WEST, None)
                 else:
-                    menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_EAST, None)
+                    if not from_toolbar:
+                        menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_EAST, None)
+                    else:
+                        menu.popup_at_widget(widget.toolbar, Gdk.Gravity.EAST, Gdk.Gravity.NORTH_EAST, None)
             else:
-                menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH, None)
+                if not from_toolbar:
+                    menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH, None)
+                else:
+                    menu.popup_at_widget(widget.toolbar, Gdk.Gravity.EAST, Gdk.Gravity.NORTH, None)
         else:  # fallback in case mimeinfo.cache not found
             print("No registered program found. Does the /usr/share/applications/mimeinfo.cache file exist?")
             command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
@@ -854,6 +902,7 @@ class GUI:
         main_box.add(status_box)
 
         window.show_all()
+        deselect_all()
 
         common.progress_bar.hide()
 
@@ -900,6 +949,11 @@ def on_settings_button(button):
     item = Gtk.CheckMenuItem.new_with_label(common.lang['color_dictionary'])
     item.set_active(common.settings.color_dictionary)
     item.connect('activate', switch_color_dictionary)
+    menu.append(item)
+
+    item = Gtk.CheckMenuItem.new_with_label(common.lang['image_menu_button'])
+    item.set_active(common.settings.image_menu_button)
+    item.connect('activate', switch_image_menu_button)
     menu.append(item)
 
     menu.show_all()
@@ -1004,9 +1058,17 @@ def switch_color_dictionary(item):
     if item.get_active():
         common.settings.color_dictionary = True
         common.settings.save()
-
     else:
         common.settings.color_dictionary = False
+        common.settings.save()
+
+
+def switch_image_menu_button(item):
+    if item.get_active():
+        common.settings.image_menu_button = True
+        common.settings.save()
+    else:
+        common.settings.image_menu_button = False
         common.settings.save()
 
 
