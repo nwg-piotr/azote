@@ -9,7 +9,7 @@ tools.
 The program is confirmed to work on sway, i3, Openbox, Fluxbox and dwm window managers, on Arch Linux, Void Linux and 
 Debian (Buster).
 
-![screenshot](http://nwg.pl/Lychee/uploads/big/a66c84b60a605b78e5fc4dd5ffbf8dbf.png)
+![screenshot](http://nwg.pl/Lychee/uploads/big/78510b1f9358767e8407d66e933f1d8c.png)
 
 *Pictures above come from https://wallhaven.cc*
 
