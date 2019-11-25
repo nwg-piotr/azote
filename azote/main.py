@@ -492,6 +492,7 @@ def clear_wallpaper_selection():
     if common.split_button:
         common.split_button.set_sensitive(False)
     common.apply_button.set_sensitive(False)
+    common.apply_to_all_button.set_sensitive(False)
 
 
 def on_about_button(button):
