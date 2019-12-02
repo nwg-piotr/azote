@@ -2,7 +2,7 @@
 # '=' ist ein Separator, der nicht in Strings verwendet werden kann.
 
 about_azote = Über azote
-app_desc = Bildschirmhintergrund-Manager für Sway, i3 und andere Window Manager
+app_desc = Bildschirmhintergrund & Color-Manager für Sway, i3 und andere Window Manager
 apply_settings = Einstellungen zum: {} anwenden
 apply_to_all = Ausgewähltes Bild auf alle Bildschirme anwenden
 background_color = Hintergrundfarbe
