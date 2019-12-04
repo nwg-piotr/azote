@@ -9,7 +9,7 @@ tools.
 The program is confirmed to work on sway, i3, Openbox, Fluxbox and dwm window managers, on Arch Linux, Void Linux and 
 Debian (Buster).
 
-![screenshot](http://nwg.pl/Lychee/uploads/big/a66c84b60a605b78e5fc4dd5ffbf8dbf.png)
+![screenshot](http://nwg.pl/Lychee/uploads/big/78510b1f9358767e8407d66e933f1d8c.png)
 
 *Pictures above come from https://wallhaven.cc*
 
@@ -172,10 +172,16 @@ better, but slower; default value is 10.
 
 ## Command line arguments
 
-- `-h | --help` - displays help;
-- `-l | --lang <ln_LN>` - forces a locale if available (de_DE, en_EN, fr_FR, pl_PL at the moment);
-- `[-c] | [--clear]` - clears unused thumbnails;
-- `[-a] | [--clear-all]` - clears all thumbnails.
+```text
+$ azote -h
+
+Azote wallpaper manager version 1.x.y
+
+[-h] | [--help]			 Print help
+[-l] | [--lang] <ln_LN> 	 Force a locale (de_DE, en_EN, fr_FR, pl_PL)
+[-c] | [--clear]		 Clear unused thumbnails
+[-a] | [--clear-all]		 Clear all thumbnails
+```
 
 ## Troubleshooting
 
@@ -190,13 +196,13 @@ please make sure that button images are turned on in the `~/.config/gtk-3.0/sett
 gtk-button-images=1
 ```
 
-### Open selected picture button doesn't work
+### 'Open with...' feature doesn't work
 
-![Open image menu](http://nwg.pl/Lychee/uploads/big/156b73ac880bca02ed04bd1886404ba8.png)
+![screenshot](http://nwg.pl/Lychee/uploads/big/4372deec10eb787fbf8f840c2abf3b67.png)
 
-**Azote v1.2.0 and below** - the button does not work at all.
+**Azote v1.2.0 and below** - no 'Open with' menu entry at all;
 
-**Azote v1.3.0 and above** - the button opens selected picture with feh, does not allow to choose a program.
+**Azote v1.3.0 and above** - the only program listed is feh.
 
 The `/usr/share/applications/mimeinfo.cache` is probably missing from your system. Regenerate it:
 

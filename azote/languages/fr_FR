@@ -2,7 +2,7 @@
 # As '=' is a separator, don't use it inside strings
 
 about_azote = À propos d’Azote
-app_desc = Gestionnaire de fonds d’écran pour Sway, i3 et d’autres gestionnaires de fenêtres
+app_desc = Gestionnaire de fonds d’écran & couleurs pour Sway, i3 et d’autres gestionnaires de fenêtres
 apply_settings = Appliquer à: {}
 apply_to_all = Appliquer l'image sélectionnée à tous les écrans
 background_color = Couleur de fonds

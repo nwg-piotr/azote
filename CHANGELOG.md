@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Development
+
+- **Image menu button**: available in the top right thumbnail corner; turn on in preferences and use if the context
+menu not always appears on right mouse click (this may happen on Sway running on older gtk+ versions).
+
 ## v1.7.5 (2019-11-22)
 
 **Changes**
