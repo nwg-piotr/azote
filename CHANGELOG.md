@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Development
+
+- styling clicked palette button with `button#color-btn-selected`;
+- colour picker: colour image converted into the Gtk.ColorButton class, to the colour allow edition.
+
 ## v1.7.7 (2019-12-07)
 
 - Image menu button: available in the top right thumbnail corner; turn on in preferences and use if the context
