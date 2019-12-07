@@ -1089,6 +1089,8 @@ class ColorPaletteDialog(Gtk.Window):
         self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.NONE)
         self.set_keep_above(True)
+        self.all_buttons = []
+
         try:
             self.copy_as = common.settings.copy_as
         except AttributeError:
@@ -1127,6 +1129,7 @@ class ColorPaletteDialog(Gtk.Window):
                 button.set_tooltip_text(common.lang['copy'])
             
             button.connect_after('clicked', self.to_clipboard)
+            self.all_buttons.append(button)
 
             self.hbox.pack_start(button, False, False, 0)
 
@@ -1194,6 +1197,10 @@ class ColorPaletteDialog(Gtk.Window):
         self.show_all()
 
     def to_clipboard(self, widget):
+        for button in self.all_buttons:
+            button.set_property("name", "color-btn")
+        widget.set_property("name", "color-btn-selected")
+        
         common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
         if common.settings.copy_as == 'r, g, b':
@@ -1603,6 +1610,17 @@ def main():
                 border-bottom: 1px solid #333;
                 border-right: 1px solid #333;
             }
+            button#color-btn {
+                font-weight: normal;
+            }
+            button#color-btn-selected {
+                font-weight: bold;
+                border-top: 1px solid #ccc;
+                border-left: 1px solid #ccc;
+                border-bottom: 1px solid #333;
+                border-right: 1px solid #333;
+            }
+            
             button#display-btn {
                 font-weight: normal;
                 font-size: 12px;
