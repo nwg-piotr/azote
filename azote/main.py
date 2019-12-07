@@ -1089,6 +1089,8 @@ class ColorPaletteDialog(Gtk.Window):
         self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.NONE)
         self.set_keep_above(True)
+        self.all_buttons = []
+
         try:
             self.copy_as = common.settings.copy_as
         except AttributeError:
@@ -1127,6 +1129,7 @@ class ColorPaletteDialog(Gtk.Window):
                 button.set_tooltip_text(common.lang['copy'])
             
             button.connect_after('clicked', self.to_clipboard)
+            self.all_buttons.append(button)
 
             self.hbox.pack_start(button, False, False, 0)
 
@@ -1194,6 +1197,12 @@ class ColorPaletteDialog(Gtk.Window):
         self.show_all()
 
     def to_clipboard(self, widget):
+        # clear selection
+        for button in self.all_buttons:
+            button.set_property("name", "color-btn")
+        # mark selected
+        widget.set_property("name", "color-btn-selected")
+        
         common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
         if common.settings.copy_as == 'r, g, b':
@@ -1204,7 +1213,6 @@ class ColorPaletteDialog(Gtk.Window):
 
         common.clipboard.set_text(content, -1)
         common.clipboard_text = widget.get_label()
-        # print(common.clipboard_text)
 
         label = '{}'.format(content)
         self.clipboard_preview.update(widget.get_label())
@@ -1275,11 +1283,19 @@ class ColorPickerDialog(Gtk.Window):
         self.vbox = Gtk.VBox()
         self.vbox.set_spacing(5)
         self.vbox.set_border_width(5)
+        
+        rgba = rgb_to_rgba(color)
 
-        self.image = Gtk.Image()
-        pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), color)
-        self.image.set_from_pixbuf(pixbuf)
-        self.vbox.add(self.image)
+        self.color_button = Gtk.ColorButton()
+        rgba_color = Gdk.RGBA()
+        rgba_color.red = rgba[0]
+        rgba_color.green = rgba[1]
+        rgba_color.blue = rgba[2]
+        rgba_color.alpha = 1.0
+        self.color_button.set_rgba(rgba_color)
+        self.color_button.connect("color-set", self.on_color_chosen, self.color_button)
+        self.color_button.set_tooltip_text(common.lang['background_color'])
+        self.vbox.pack_start(self.color_button, False, False, 0)
 
         self.label = Gtk.Label()
         self.label.set_text(rgb_to_hex(color))
@@ -1341,6 +1357,15 @@ class ColorPickerDialog(Gtk.Window):
         self.add(self.vbox)
         self.show_all()
 
+    def on_color_chosen(self, user_data, button):
+        self.label.set_text(rgba_to_hex(button.get_rgba()))
+        exact, closest = common.color_names.get_colour_name(self.label.get_text())
+        if exact:
+            name = common.lang['exact'].format(exact)
+        else:
+            name = common.lang['closest'].format(closest)
+        self.closest_label.set_text(name)
+
     def rgb_toggled(self, button):
         state = 'on' if button.get_active() else 'off'
         if state == 'on':
@@ -1367,8 +1392,13 @@ class ColorPickerDialog(Gtk.Window):
         if not color:
             color = (255, 255, 255)
 
-        pixbuf = create_pixbuf((common.settings.color_icon_w, common.settings.color_icon_h), color)
-        self.image.set_from_pixbuf(pixbuf)
+        rgba = rgb_to_rgba(color)
+        rgba_color = Gdk.RGBA()
+        rgba_color.red = rgba[0]
+        rgba_color.green = rgba[1]
+        rgba_color.blue = rgba[2]
+        rgba_color.alpha = 1.0
+        self.color_button.set_rgba(rgba_color)
 
         self.label.set_text(rgb_to_hex(color))
 
@@ -1603,6 +1633,17 @@ def main():
                 border-bottom: 1px solid #333;
                 border-right: 1px solid #333;
             }
+            button#color-btn {
+                font-weight: normal;
+            }
+            button#color-btn-selected {
+                font-weight: bold;
+                border-top: 1px solid #ccc;
+                border-left: 1px solid #ccc;
+                border-bottom: 1px solid #333;
+                border-right: 1px solid #333;
+            }
+            
             button#display-btn {
                 font-weight: normal;
                 font-size: 12px;
