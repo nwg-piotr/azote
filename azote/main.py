@@ -719,7 +719,7 @@ class GUI:
         window.set_default_size(common.settings.thumb_width * common.settings.columns + 160, h * 0.95)
         common.main_window = window
 
-        window.set_title("Azote wallpaper manager")
+        window.set_title("Azote~")
         logo = GdkPixbuf.Pixbuf.new_from_file('images/icon.svg')
         window.set_default_icon(logo)
         window.set_role("azote")
