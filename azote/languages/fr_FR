@@ -53,4 +53,5 @@ sorting_old = Ancien en haut
 split_selection_between_displays = Répartition de la sélection entre les écrans
 thumbnail_tooltip = Click to select, double to set, right for menu
 thumbnails_in_cache = {} miniatures en cache ({})
+track_file_changes = Suivre les modifications du fichier
 width = Largeur

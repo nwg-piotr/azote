@@ -39,7 +39,7 @@ except Exception as e:
 from colorthief import ColorThief
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, Gdk
+from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
 from gi.repository.GdkPixbuf import InterpType
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
     copy_backgrounds, create_pixbuf, split_selected_wallpaper, scale_and_crop, clear_thumbnails
@@ -83,6 +83,7 @@ class Preview(Gtk.ScrolledWindow):
         self.grid.set_row_spacing(15)
 
         create_thumbnails(common.settings.src_path)
+        self.files_dict = dict([(f, None) for f in os.listdir(common.settings.src_path)])
 
         col, row = 0, 0
         src_pictures = get_files()
@@ -102,6 +103,8 @@ class Preview(Gtk.ScrolledWindow):
         self.add(self.grid)
 
     def refresh(self, create_thumbs=True):
+        self.files_dict = dict([(f, None) for f in os.listdir(common.settings.src_path)])
+
         if create_thumbs:
             create_thumbnails(common.settings.src_path)
 
@@ -956,6 +959,11 @@ def on_settings_button(button):
     item.connect('activate', switch_image_menu_button)
     menu.append(item)
 
+    item = Gtk.CheckMenuItem.new_with_label(common.lang['track_file_changes'])
+    item.set_active(common.settings.track_files)
+    item.connect('activate', switch_tracking_files)
+    menu.append(item)
+
     menu.show_all()
     menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
 
@@ -1069,6 +1077,16 @@ def switch_image_menu_button(item):
         common.settings.save()
     else:
         common.settings.image_menu_button = False
+        common.settings.save()
+
+
+def switch_tracking_files(item):
+    if item.get_active():
+        common.settings.track_files = True
+        common.settings.save()
+        GLib.timeout_add_seconds(common.settings.tracking_interval_seconds, track_changes)
+    else:
+        common.settings.track_files = False
         common.settings.save()
 
 
@@ -1590,6 +1608,15 @@ def print_help():
     print('[-a] | [--clear-all]\t\t Clear all thumbnails\n')
 
 
+def track_changes():
+    if common.preview and common.settings.src_path:
+        files_dict = dict([(f, None) for f in os.listdir(common.settings.src_path)])
+        print(files_dict == common.preview.files_dict)
+        if not files_dict == common.preview.files_dict:
+            common.preview.refresh()
+    return common.settings.track_files
+
+
 def main():
     lang = None
     clear_thumbs, clear_all = False, False
@@ -1696,6 +1723,8 @@ def main():
 
     common.cols = len(common.displays) if len(common.displays) > common.settings.columns else common.settings.columns
     app = GUI()
+    if common.settings.track_files:
+        GLib.timeout_add_seconds(common.settings.tracking_interval_seconds, track_changes)
     Gtk.main()
 
 

@@ -132,7 +132,8 @@ def check_displays():
 def set_env(language=None):
     xdg_config_home = os.getenv('XDG_CONFIG_HOME')
     common.config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config")
-    common.azote_config_home = os.path.join(xdg_config_home, ".config/azote") if xdg_config_home else os.path.join(os.getenv("HOME"), ".config/azote")
+    common.azote_config_home = os.path.join(xdg_config_home, ".config/azote") if xdg_config_home else os.path.join(
+        os.getenv("HOME"), ".config/azote")
     if not os.path.isdir(common.azote_config_home):
         os.mkdir(common.azote_config_home)
 
@@ -140,7 +141,7 @@ def set_env(language=None):
     common.data_home = xdg_data_home if xdg_data_home else os.path.join(os.getenv("HOME"), ".local/share/azote")
     if not os.path.isdir(common.data_home):
         os.mkdir(common.data_home)
-    
+
     # MIGRATE DATA to XDG Base_Directory Specification - compliant folders
     # Up to v1.7.0 Azote used to store all the data here:
     common.app_dir = os.path.join(os.getenv("HOME"), ".azote")
@@ -187,7 +188,7 @@ def set_env(language=None):
         version = ' unknown version: {}'.format(e)
 
     log('Azote v{}'.format(version), common.INFO)
-    
+
     if data_migrated:
         log('Data migrated to XDG-compliant folders', common.INFO)
 
@@ -310,7 +311,7 @@ def set_env(language=None):
         print('Failed opening /usr/share/applications/mimeinfo.cache')
         log("Failed creating image associations: /usr/share/applications/mimeinfo.cache file not found."
             " Setting feh as the only viewer.", common.ERROR)
-    
+
     # Check if packages necessary to pick colours from the screen available
     try:
         magick = subprocess.run(['convert', '-version'], stdout=subprocess.DEVNULL).returncode == 0
@@ -318,7 +319,7 @@ def set_env(language=None):
         magick = False
     av = 'found' if magick else 'not found'
     log("imagemagick library {}".format(av), common.INFO)
-    
+
     if common.sway:
         try:
             grim = subprocess.run(['grim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
@@ -326,14 +327,14 @@ def set_env(language=None):
             grim = False
         av = 'found' if grim else 'not found'
         log("grim package {}".format(av), common.INFO)
-    
+
         try:
             slurp = subprocess.run(['slurp', '-h'], stdout=subprocess.DEVNULL).returncode == 0
         except FileNotFoundError:
             slurp = False
         av = 'found' if slurp else 'not found'
         log("slurp package {}".format(av), common.INFO)
-    
+
         if magick and grim and slurp:
             log("Pick color from screen feature enabled", common.INFO)
             common.picker = True
@@ -359,7 +360,7 @@ def set_env(language=None):
             common.picker = True
         else:
             log("Pick color from screen feature needs imagemagick, maim and slop packages installed", common.WARNING)
-            
+
     # Find dotfiles
     if os.path.isfile(os.path.join(common.config_home, 'alacritty/alacritty.yml')):
         common.alacritty_config = os.path.join(common.config_home, 'alacritty/alacritty.yml')
@@ -370,7 +371,7 @@ def set_env(language=None):
     log('Alacritty config file: {}'.format(msg), common.INFO)
     if common.alacritty_config and not common.env['yaml']:
         log("python yaml module not found - alacritty.yml toolbox disabled", common.WARNING)
-    
+
     if os.path.isfile(os.path.join(os.getenv('HOME'), '.Xresources')):
         common.xresources = os.path.join(os.getenv('HOME'), '.Xresources')
         log('{} file found'.format(common.xresources), common.INFO)
@@ -560,14 +561,14 @@ def update_status_bar():
             file_info = os.stat(os.path.join(common.thumb_dir, file))
             total_size += file_info.st_size
     common.status_bar.push(0, common.lang['thumbnails_in_cache'].format(num_files, convert_bytes(total_size)))
-    
-    
+
+
 def clear_thumbnails(clear_all=False):
     files_in_use = os.listdir(common.settings.src_path)
     for i in range(len(files_in_use)):
         full_path = os.path.join(common.settings.src_path, files_in_use[i])
         files_in_use[i] = '{}.png'.format(hashlib.md5(full_path.encode()).hexdigest())
-    
+
     number = 0
     for file in os.listdir(common.thumb_dir):
         if file not in files_in_use or clear_all:
@@ -614,10 +615,11 @@ class Settings(object):
         self.copy_as = '#rgb'
         self.color_dictionary = False
         self.image_menu_button = False
+        self.track_files = True
 
         # Runtime config (json) location
         self.rc_file = os.path.join(common.azote_config_home, "azoterc")
-        
+
         self.load()
 
     def load(self):
@@ -652,12 +654,12 @@ class Settings(object):
             log('Old thumbnail width: {}'.format(self.old_thumb_width), common.INFO)
         except AttributeError:
             save_needed = True
-            
+
         try:
             self.copy_as = settings.copy_as
         except AttributeError:
             save_needed = True
-            
+
         try:
             self.color_dictionary = settings.color_dictionary
         except AttributeError:
@@ -665,6 +667,11 @@ class Settings(object):
 
         try:
             self.image_menu_button = settings.image_menu_button
+        except AttributeError:
+            save_needed = True
+
+        try:
+            self.track_files = settings.track_files
         except AttributeError:
             save_needed = True
 
@@ -682,7 +689,7 @@ class Settings(object):
     def save(self):
         with open(self.file, 'wb') as output:
             pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
-            
+
     def load_rc(self):
         save_needed = False
         try:
@@ -711,7 +718,7 @@ class Settings(object):
         self.thumb_height = int(self.thumb_width * 135 / 240)
         self.thumb_size = (self.thumb_width, self.thumb_height)
         log('Thumbnail size: {}'.format(self.thumb_size), common.INFO)
-            
+
         try:
             self.columns = int(rc['columns'])
         except KeyError:
@@ -742,7 +749,16 @@ class Settings(object):
         except KeyError:
             self.palette_quality = 10
             save_needed = True
-        log('Palette quality: {} (10 by default, the less, the better & slower)'.format(self.palette_quality), common.INFO)
+        log('Palette quality: {} (10 by default, the less, the better & slower)'.format(self.palette_quality),
+            common.INFO)
+
+        try:
+            self.tracking_interval_seconds = int(rc['tracking_interval_seconds'])
+        except KeyError:
+            self.tracking_interval_seconds = 5
+            save_needed = True
+        log('Files tracking interval: {} seconds'.format(self.tracking_interval_seconds),
+            common.INFO)
 
         if save_needed:
             self.save_rc()
@@ -755,14 +771,16 @@ class Settings(object):
             self.color_icon_h = 50
             self.clip_prev_size = 30
             self.palette_quality = 10
+            self.tracking_interval_seconds = 5
 
         rc = {'thumb_width': str(self.thumb_width),
               'columns': str(self.columns),
               'color_icon_w': str(self.color_icon_w),
               'color_icon_h': str(self.color_icon_h),
               'clip_prev_size': str(self.clip_prev_size),
-              'palette_quality': str(self.palette_quality)}
-        
+              'palette_quality': str(self.palette_quality),
+              'tracking_interval_seconds': str(self.tracking_interval_seconds)}
+
         with open(self.rc_file, 'w') as f:
             json.dump(rc, f, indent=2)
 

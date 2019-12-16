@@ -53,4 +53,5 @@ sorting_old = Alt an der Spitze
 split_selection_between_displays = Auswahl zwischen Bildschirmen aufteilen
 thumbnail_tooltip = Click to select, double to set, right for menu
 thumbnails_in_cache = {} Vorschaubilder im Zwischenspeicher ({})
+track_file_changes = Dateiänderungen verfolgen
 width = Breite
