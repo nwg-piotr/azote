@@ -25,6 +25,7 @@ dotfiles = .dotfiles
 dual_height = dual height
 dual_width = dual width
 exact = Exact: {}
+exit = Exit
 flip_image = Flip image
 flip_wallpaper_horizontally = Flip wallpaper horizontally
 grim_slurp_required = grim, slurp & imagemagick packages required

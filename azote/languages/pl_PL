@@ -24,6 +24,7 @@ display_mode = Tryb wyświetlania
 dual_height = podwójna wysokość
 dual_width = podwójna szerokość
 exact = Dokładny: {}
+exit = Zakończ
 flip_image = Odwróć obraz
 flip_wallpaper_horizontally = Odwróć tapetę w poziomie
 grim_slurp_required = Wymagane paczki grim, slurp i imagemagick

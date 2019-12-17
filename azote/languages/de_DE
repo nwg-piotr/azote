@@ -24,6 +24,7 @@ display_mode = Anzeigemodus
 dual_height = doppelte Höhe
 dual_width = doppelte Breite
 exact = Genau: {}
+exit= Beenden
 flip_image = Bild spiegeln
 flip_wallpaper_horizontally = Bild horizontal spiegeln
 grim_slurp_required = grim, slurp & imagemagick-Pakete erforderlich

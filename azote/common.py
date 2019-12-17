@@ -70,5 +70,6 @@ picker = False
 cpd = None              # ColorPaletteDialog object
 dotfile_window = None
 picker_window = None
+indicator = None
 
 color_names = None
