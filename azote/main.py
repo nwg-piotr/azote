@@ -1096,7 +1096,7 @@ def switch_tracking_files(item):
         common.settings.track_files = False
         common.settings.save()
     if common.indicator:
-        common.indicator.switch_tracking(item)
+        common.indicator.switch_indication(item)
 
 
 class ColorPaletteDialog(Gtk.Window):
@@ -1628,6 +1628,9 @@ def track_changes():
 class Indicator(object):
     def __init__(self):
         self.ind = AppIndicator3.Indicator.new('azote_status_icon', '', AppIndicator3.IndicatorCategory.APPLICATION_STATUS)
+        self.ind.set_icon_full('/usr/share/azote/indicator_active.png', 'Tracking off')
+        self.ind.set_attention_icon_full('/usr/share/azote/indicator_attention.png', 'Tracking on')
+
         if common.settings.track_files:
             self.ind.set_status(AppIndicator3.IndicatorStatus.ATTENTION)
             if common.sway:
@@ -1636,40 +1639,32 @@ class Indicator(object):
             self.ind.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
             if common.sway:
                 self.ind.set_icon_full('/usr/share/azote/indicator_active.png', 'Tracking off')
-        # self.ind.set_icon_full('/usr/share/azote/indicator_active.png', 'Tracking off')
-        self.ind.set_attention_icon_full('/usr/share/azote/indicator_attention.png', 'Tracking on')
 
         self.ind.set_menu(self.menu())
         
     def menu(self):
         menu = Gtk.Menu()
 
-        item = Gtk.CheckMenuItem.new_with_label(common.lang['track_file_changes'])
-        item.set_active(common.settings.track_files)
-        item.connect('activate', self.switch_tracking)
+        item = Gtk.MenuItem.new_with_label(common.lang['about_azote'])
+        item.connect('activate', on_about_button)
         menu.append(item)
-        
-        item2 = Gtk.MenuItem.new_with_label(common.lang['exit'])
-        item2.connect('activate', destroy)
-        menu.append(item2)
+
+        item = Gtk.MenuItem.new_with_label(common.lang['exit'])
+        item.connect('activate', destroy)
+        menu.append(item)
         
         menu.show_all()
         return menu
 
-    def switch_tracking(self, item):
+    def switch_indication(self, item):
         if item.get_active():
-            common.settings.track_files = True
-            common.settings.save()
             self.ind.set_status(AppIndicator3.IndicatorStatus.ATTENTION)
             if common.sway:
                 self.ind.set_icon_full('/usr/share/azote/indicator_attention.png', 'Tracking on')
-            GLib.timeout_add_seconds(common.settings.tracking_interval_seconds, track_changes)
         else:
-            common.settings.track_files = False
             if common.sway:
                 self.ind.set_icon_full('/usr/share/azote/indicator_active.png', 'Tracking off')
             self.ind.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
-            common.settings.save()
 
 
 def main():
