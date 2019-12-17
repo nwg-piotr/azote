@@ -39,13 +39,20 @@ except Exception as e:
 from colorthief import ColorThief
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, Gdk
+from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
 from gi.repository.GdkPixbuf import InterpType
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
     copy_backgrounds, create_pixbuf, split_selected_wallpaper, scale_and_crop, clear_thumbnails
 from color_tools import rgba_to_hex, hex_to_rgb, rgb_to_hex, rgb_to_rgba
 from plugins import Alacritty, Xresources
 from color_tools import WikiColours
+
+try:
+    gi.require_version('AppIndicator3', '0.1')
+    from gi.repository import AppIndicator3
+    common.env['app_indicator'] = True
+except:
+    common.env['app_indicator'] = False
 
 
 def get_files():
@@ -83,6 +90,7 @@ class Preview(Gtk.ScrolledWindow):
         self.grid.set_row_spacing(15)
 
         create_thumbnails(common.settings.src_path)
+        self.files_dict = dict([(f, None) for f in os.listdir(common.settings.src_path)])
 
         col, row = 0, 0
         src_pictures = get_files()
@@ -102,6 +110,8 @@ class Preview(Gtk.ScrolledWindow):
         self.add(self.grid)
 
     def refresh(self, create_thumbs=True):
+        self.files_dict = dict([(f, None) for f in os.listdir(common.settings.src_path)])
+
         if create_thumbs:
             create_thumbnails(common.settings.src_path)
 
@@ -956,6 +966,11 @@ def on_settings_button(button):
     item.connect('activate', switch_image_menu_button)
     menu.append(item)
 
+    item = Gtk.CheckMenuItem.new_with_label(common.lang['track_file_changes'])
+    item.set_active(common.settings.track_files)
+    item.connect('activate', switch_tracking_files)
+    menu.append(item)
+
     menu.show_all()
     menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
 
@@ -1070,6 +1085,18 @@ def switch_image_menu_button(item):
     else:
         common.settings.image_menu_button = False
         common.settings.save()
+
+
+def switch_tracking_files(item):
+    if item.get_active():
+        common.settings.track_files = True
+        common.settings.save()
+        GLib.timeout_add_seconds(common.settings.tracking_interval_seconds, track_changes)
+    else:
+        common.settings.track_files = False
+        common.settings.save()
+    if common.indicator:
+        common.indicator.switch_indication(item)
 
 
 class ColorPaletteDialog(Gtk.Window):
@@ -1590,6 +1617,56 @@ def print_help():
     print('[-a] | [--clear-all]\t\t Clear all thumbnails\n')
 
 
+def track_changes():
+    if common.preview and common.settings.src_path:
+        files_dict = dict([(f, None) for f in os.listdir(common.settings.src_path)])
+        if not files_dict == common.preview.files_dict:
+            common.preview.refresh()
+    return common.settings.track_files
+
+
+class Indicator(object):
+    def __init__(self):
+        self.ind = AppIndicator3.Indicator.new('azote_status_icon', '', AppIndicator3.IndicatorCategory.APPLICATION_STATUS)
+        self.ind.set_icon_full('/usr/share/azote/indicator_active.png', 'Tracking off')
+        self.ind.set_attention_icon_full('/usr/share/azote/indicator_attention.png', 'Tracking on')
+
+        if common.settings.track_files:
+            self.ind.set_status(AppIndicator3.IndicatorStatus.ATTENTION)
+            if common.sway:
+                self.ind.set_icon_full('/usr/share/azote/indicator_attention.png', 'Tracking on')
+        else:
+            self.ind.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+            if common.sway:
+                self.ind.set_icon_full('/usr/share/azote/indicator_active.png', 'Tracking off')
+
+        self.ind.set_menu(self.menu())
+        
+    def menu(self):
+        menu = Gtk.Menu()
+
+        item = Gtk.MenuItem.new_with_label(common.lang['about_azote'])
+        item.connect('activate', on_about_button)
+        menu.append(item)
+
+        item = Gtk.MenuItem.new_with_label(common.lang['exit'])
+        item.connect('activate', destroy)
+        menu.append(item)
+        
+        menu.show_all()
+        return menu
+
+    def switch_indication(self, item):
+        if item.get_active():
+            self.ind.set_status(AppIndicator3.IndicatorStatus.ATTENTION)
+            if common.sway:
+                self.ind.set_icon_full('/usr/share/azote/indicator_attention.png', 'Tracking on')
+        else:
+            if common.sway:
+                self.ind.set_icon_full('/usr/share/azote/indicator_active.png', 'Tracking off')
+            self.ind.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+
+
 def main():
     lang = None
     clear_thumbs, clear_all = False, False
@@ -1696,6 +1773,9 @@ def main():
 
     common.cols = len(common.displays) if len(common.displays) > common.settings.columns else common.settings.columns
     app = GUI()
+    if common.settings.track_files:
+        GLib.timeout_add_seconds(common.settings.tracking_interval_seconds, track_changes)
+    common.indicator = Indicator()
     Gtk.main()
 
 
