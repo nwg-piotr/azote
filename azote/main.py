@@ -1775,7 +1775,8 @@ def main():
     app = GUI()
     if common.settings.track_files:
         GLib.timeout_add_seconds(common.settings.tracking_interval_seconds, track_changes)
-    common.indicator = Indicator()
+    if common.env['app_indicator']:
+        common.indicator = Indicator()
     Gtk.main()
 
 
