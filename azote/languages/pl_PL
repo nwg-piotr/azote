@@ -8,6 +8,7 @@ apply_to_all = Zastosuj wybrany obraz do wszystkich ekranów
 background_color = Kolor tła
 cancel = Anuluj
 check_log = Sprawdź {}
+clear_unused_thumbnails = Usuń nieużywane miniatury
 clipboard_empty = Schowek pusty
 close = Zamknij
 closest = Najbliższy: {}
