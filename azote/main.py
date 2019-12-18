@@ -1645,8 +1645,15 @@ class Indicator(object):
     def menu(self):
         menu = Gtk.Menu()
 
+        item = Gtk.MenuItem.new_with_label(common.lang['clear_unused_thumbnails'])
+        item.connect('activate', self.clear_unused)
+        menu.append(item)
+        
         item = Gtk.MenuItem.new_with_label(common.lang['about_azote'])
         item.connect('activate', on_about_button)
+        menu.append(item)
+
+        item = Gtk.SeparatorMenuItem()
         menu.append(item)
 
         item = Gtk.MenuItem.new_with_label(common.lang['exit'])
@@ -1655,6 +1662,10 @@ class Indicator(object):
         
         menu.show_all()
         return menu
+    
+    def clear_unused(self, item):
+        clear_thumbnails()
+        common.preview.refresh()
 
     def switch_indication(self, item):
         if item.get_active():

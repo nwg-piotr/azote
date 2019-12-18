@@ -8,6 +8,7 @@ apply_to_all = Apply selected picture to all screens
 background_color = Background color
 cancel = Cancel
 check_log = Check {}
+clear_unused_thumbnails = Clear unused thumbnails
 clipboard_empty = Clipboard empty
 close = Close
 closest = Closest: {}

@@ -8,6 +8,7 @@ apply_to_all = Appliquer l'image sélectionnée à tous les écrans
 background_color = Couleur de fonds
 cancel = Annuler
 check_log = Vérifier {}
+clear_unused_thumbnails = Effacer les vignettes inutilisées
 clipboard_empty = Presse-papiers vide
 close = Fermer
 closest = Le plus proche: {}
