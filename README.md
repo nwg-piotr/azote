@@ -121,7 +121,7 @@ Binary package `azote` available in the Void repository.
 Packagers wanted! Personally I only maintain Arch (AUR) and Void Linux packages. Please do remember to copy the 
 LICENSE-COLORTHIEF file to `/usr/share/licenses/azote/`.
 
-### Dependencies(as used in the `azote` AUR package):
+### Dependencies (as used in the `azote` AUR package):
 
 - `python` (`python3`)
 - `python-setuptools`
