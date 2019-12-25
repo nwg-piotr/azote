@@ -104,15 +104,6 @@ Either download the .deb package or follow the instructions in [this link](https
 
 If the repository & key are added then the package will be updated with the usual `apt update && apt upgrade` commands.
 
-## openSUSE
-azote is available in jubalhs home [repository](https://build.opensuse.org/package/show/home:jubalh/azote) on OBS.
-
-```
-zypper ar obs://home:jubalh
-zypper ref
-zypper in azote
-```
-
 ## Void Linux
 
 Binary package `azote` available in the Void repository. 
