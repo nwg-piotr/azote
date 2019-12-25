@@ -2,16 +2,16 @@
 
 [![Build Status](https://travis-ci.com/nwg-piotr/azote.svg?branch=master)](https://travis-ci.com/nwg-piotr/azote)
 
-**Azote** is a GTK+3 - based picture browser and a wallpaper setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
-(Sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. It also includes several colour management 
+**Azote** is a GTK+3 - based picture browser and background setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
+(sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. It also includes several colour management 
 tools.
 
 The program is confirmed to work on sway, i3, Openbox, Fluxbox and dwm window managers, on Arch Linux, Void Linux and 
-Debian (Buster).
+Debian.
 
 ![screenshot](http://nwg.pl/Lychee/uploads/big/78510b1f9358767e8407d66e933f1d8c.png)
 
-*Pictures above come from https://wallhaven.cc*
+*Wallpapers above come from https://wallhaven.cc*
 
 ## Project assumptions
 
@@ -92,18 +92,18 @@ For changes see [CHANGELOG](https://github.com/nwg-piotr/azote/blob/master/CHANG
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
 
-### Arch Linux
+## Arch Linux
 
 Install [azote](https://aur.archlinux.org/packages/azote) from AUR. 
 For the development version install [azote-git](https://aur.archlinux.org/packages/azote-git).
 
-### Debian & Ubuntu
+## Debian & Ubuntu
 
 Either download the .deb package or follow the instructions in [this link](https://software.opensuse.org//download.html?project=home%3AHead_on_a_Stick%3Aazote&package=azote) to add the repository and APT key.
 
 If the repository & key are added then the package will be updated with the usual `apt update && apt upgrade` commands.
 
-### openSUSE
+## openSUSE
 azote is available in jubalhs home [repository](https://build.opensuse.org/package/show/home:jubalh/azote) on OBS.
 
 ```
@@ -112,33 +112,32 @@ zypper ref
 zypper in azote
 ```
 
-### Void Linux
+## Void Linux
 
 Binary package `azote` available in the Void repository. 
 
-### Other Linux distributions:
+## Other Linux distributions:
 
 Packagers wanted! Personally I only maintain Arch (AUR) and Void Linux packages. Please do remember to copy the 
 LICENSE-COLORTHIEF file to `/usr/share/licenses/azote/`.
 
-**Dependencies:**
+### Dependencies(as used in the `azote` AUR package):
 
-- python (python3)
-- python-setuptools
-- python-gobject
-- python-pillow
-- gtk3
-- feh
-- xorg-xrandr
+- `python` (`python3`)
+- `python-setuptools`
+- `python-gobject`
+- `python-pillow`
+- `gtk3`
+- `feh`
+- `xorg-xrandr`
+- `python-send2trash`
 
-**Optional dependencies:** 
+### Optional dependencies:
 
-- python-send2trash: for trash support
-- grim: for screen color picker on Sway
-- slurp: for screen color picker on Sway
-- maim: for screen color picker on X11
-- imagemagick: for screen color picker on both Sway and X11
-- python-yaml: (python3-yaml) for alacritty.yml toolbox
+- `grim`, `slurp`: for screen color picker on Sway
+- `maim`, `slop`: for screen color picker on X11
+- `imagemagick`: for screen color picker on both Sway and X11
+- `python-yaml`: (`python3-yaml`) for alacritty.yml toolbox
 
 Please use assets from the [latest release](https://github.com/nwg-piotr/azote/releases/latest).
 
@@ -153,7 +152,8 @@ Seeing Arch [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=az
   "color_icon_w": "100",
   "color_icon_h": "50",
   "clip_prev_size": "30",
-  "palette_quality": "10"
+  "palette_quality": "10",
+  "tracking_interval_seconds": "5"
 }
 ```
 
@@ -164,11 +164,10 @@ The runtime configuration file allows to redefine them:
 - `columns` - initial number of columns in thumbnails preview;
 - `color_icon_w`, `color_icon_h`, `clip_prev_size` - define dimensions of pictures which represent colors in the color 
 palette view;
-
-This may be useful to adjust settings to your machine performance:
-
-- `palette_quality` affects quality and time of generation of the colour palette on the basis of an image; the less - the
-better, but slower; default value is 10.
+- `palette_quality` - affects quality and time of generation of the colour palette on the basis of an image; the less - the
+better, but slower; default value is 10;
+- `tracking_interval_seconds` - determines how often the current wallpapers folder should be checked for file addition / 
+deletion.
 
 ## Command line arguments
 

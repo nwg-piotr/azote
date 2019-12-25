@@ -1,11 +1,11 @@
 # CHANGELOG
 
-## Development
+## v1.7.8 (2019-12-25)
 
-- styling clicked palette button with `button#color-btn-selected`;
+- styling clicked palette button with `button#color-btn-selected` added;
 - colour picker: colour image converted into the Gtk.ColorButton class, to allow the colour edition;
 - tracking the current wallpapers folder for file addition / deletion: switchable, configurable (every 5 sec by default);
-- tray status icon to indicate the tracking on/off state. 
+- tray status icon added, to indicate the tracking on/off state. 
 
 ## v1.7.7 (2019-12-07)
 
