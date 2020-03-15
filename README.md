@@ -108,6 +108,13 @@ If the repository & key are added then the package will be updated with the usua
 
 Binary package `azote` available in the Void repository. 
 
+## Fedora
+
+```
+sudo dnf copr enable wef/azote
+sudo dnf install azote
+```
+
 ## Other Linux distributions:
 
 Packagers wanted! Personally I only maintain Arch (AUR) and Void Linux packages. Please do remember to copy the 
