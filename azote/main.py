@@ -488,11 +488,11 @@ def on_split_button(button):
 def open_with(item, opener):
     # if feh selected as the opener, let's start it with options as below
     if opener == 'feh':
-        command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
+        command = 'feh --start-at "{}" --scale-down --no-fehbg -d --output-dir {}'.format(
             common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
     # elif could specify options for other certain programs here
     else:
-        command = '{} {}'.format(opener, common.selected_wallpaper.source_path)
+        command = '{} "{}"'.format(opener, common.selected_wallpaper.source_path)
     subprocess.Popen(command, shell=True)
 
 
