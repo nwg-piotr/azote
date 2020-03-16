@@ -6,8 +6,8 @@
 (sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. It also includes several colour management 
 tools.
 
-The program is confirmed to work on sway, i3, Openbox, Fluxbox and dwm window managers, on Arch Linux, Void Linux and 
-Debian.
+The program is confirmed to work on sway, i3, Openbox, Fluxbox and dwm window managers, on Arch Linux, Void Linux, 
+Debian and Fedora.
 
 ![screenshot](http://nwg.pl/Lychee/uploads/big/78510b1f9358767e8407d66e933f1d8c.png)
 
