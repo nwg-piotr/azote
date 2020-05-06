@@ -110,14 +110,8 @@ Binary package `azote` available in the Void repository.
 
 ## Fedora
 
-For fedora-31:
+For fedora-31+:
 ```
-sudo dnf install azote
-```
-
-For others:
-```
-sudo dnf copr enable wef/azote
 sudo dnf install azote
 ```
 
