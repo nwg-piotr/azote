@@ -629,6 +629,22 @@ def show_image_menu(widget, event=None, parent=None, from_toolbar=False):
             subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
             submenu.append(subitem)
 
+            # Scale and crop to triple width of the primary display
+            display = common.displays[0]
+            width, height = display['width'] * 3, display['height']
+            subitem = Gtk.MenuItem.new_with_label(
+                '{} x {} ({} {})'.format(width, height, display['name'], common.lang['triple_width']))
+            subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
+            submenu.append(subitem)
+
+            # Scale and crop to triple height of the primary display
+            display = common.displays[0]
+            width, height = display['width'], display['height'] * 3
+            subitem = Gtk.MenuItem.new_with_label(
+                '{} x {} ({} {})'.format(width, height, display['name'], common.lang['triple_height']))
+            subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
+            submenu.append(subitem)
+
             # Scale and crop to user-defined dimensions
             if common.settings.custom_display:
                 subitem = Gtk.MenuItem.new_with_label(
