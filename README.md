@@ -6,8 +6,8 @@
 (sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. It also includes several colour management 
 tools.
 
-The program is confirmed to work on sway, i3, Openbox, Fluxbox and dwm window managers, on Arch Linux, Void Linux and 
-Debian.
+The program is confirmed to work on sway, i3, Openbox, Fluxbox and dwm window managers, on Arch Linux, Void Linux, 
+Debian and Fedora.
 
 ![screenshot](http://nwg.pl/Lychee/uploads/big/78510b1f9358767e8407d66e933f1d8c.png)
 
@@ -21,7 +21,8 @@ In order not to limit the program usage to the single environment, Azote is also
 when running on i3, Openbox or other X11 window managers.
 
 *The description below takes into account the latest release. All the features may or may not be available in the
-package already prepared for a certain Linux distribution. Some features rely on optional dependencies.*
+package already prepared for a certain Linux distribution. Some features rely on 
+[optional dependencies](https://github.com/nwg-piotr/azote#dependencies-as-used-in-the-azote-aur-package).*
 
 ### Main features:
 
@@ -103,25 +104,23 @@ Either download the .deb package or follow the instructions in [this link](https
 
 If the repository & key are added then the package will be updated with the usual `apt update && apt upgrade` commands.
 
-## openSUSE
-azote is available in jubalhs home [repository](https://build.opensuse.org/package/show/home:jubalh/azote) on OBS.
-
-```
-zypper ar obs://home:jubalh
-zypper ref
-zypper in azote
-```
-
 ## Void Linux
 
 Binary package `azote` available in the Void repository. 
+
+## Fedora
+
+For fedora-31+:
+```
+sudo dnf install azote
+```
 
 ## Other Linux distributions:
 
 Packagers wanted! Personally I only maintain Arch (AUR) and Void Linux packages. Please do remember to copy the 
 LICENSE-COLORTHIEF file to `/usr/share/licenses/azote/`.
 
-### Dependencies(as used in the `azote` AUR package):
+### Dependencies (as used in the `azote` AUR package):
 
 - `python` (`python3`)
 - `python-setuptools`

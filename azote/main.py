@@ -488,11 +488,11 @@ def on_split_button(button):
 def open_with(item, opener):
     # if feh selected as the opener, let's start it with options as below
     if opener == 'feh':
-        command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
+        command = 'feh --start-at "{}" --scale-down --no-fehbg -d --output-dir {}'.format(
             common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
     # elif could specify options for other certain programs here
     else:
-        command = '{} {}'.format(opener, common.selected_wallpaper.source_path)
+        command = '{} "{}"'.format(opener, common.selected_wallpaper.source_path)
     subprocess.Popen(command, shell=True)
 
 
@@ -536,7 +536,7 @@ def on_about_button(button):
                         '- maim, slop (c) 2014 Dalton Nell and Contributors',
                         '- imagemagick (c) 1999-2019 ImageMagick Studio LLC',
                         '- PyYAML (c) 2017-2019 Ingy döt Net Copyright (c) 2006-2016 Kirill Simonov'])
-    dialog.set_translator_credits('xsme (de_DE), HumanG33k (fr_FR)')
+    dialog.set_translator_credits('xsme, Leon-Plickat (de_DE), HumanG33k (fr_FR)')
     dialog.set_artists(['edskeye'])
 
     dialog.show()
@@ -1786,7 +1786,8 @@ def main():
     app = GUI()
     if common.settings.track_files:
         GLib.timeout_add_seconds(common.settings.tracking_interval_seconds, track_changes)
-    common.indicator = Indicator()
+    if common.env['app_indicator']:
+        common.indicator = Indicator()
     Gtk.main()
 
 

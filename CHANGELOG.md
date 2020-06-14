@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v1.7.10 (2020-03-15)
+
+"Open with" issue [#82](https://github.com/nwg-piotr/azote/issues/82) fixed.
+
+## v1.7.9 (2020-02-10)
+
+- path to the config dir w/ XDG_CONFIG_HOME corrected.
+
 ## v1.7.8 (2019-12-25)
 
 - styling clicked palette button with `button#color-btn-selected` added;

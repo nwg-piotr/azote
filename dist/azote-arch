@@ -1,4 +1,0 @@
-#!/bin/sh
-
-cd /usr/lib/python3.8/site-packages/azote
-exec /usr/bin/python3 main.py "$@"
