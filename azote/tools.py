@@ -469,10 +469,19 @@ def split_selected_wallpaper(num_parts):
     try:
         img = Image.open(common.selected_wallpaper.source_path)
         width, height = img.size
-        part_width = width // num_parts
+        is_vertical = width >= height
+        if is_vertical:
+            part_width = width // num_parts
+            part_height = height
+        else:
+            part_width = width
+            part_height = height // num_parts
         paths_list = []
         for i in range(num_parts):
-            box = (i * part_width, 0, i * part_width + part_width, height)
+            if is_vertical:
+                box = (i * part_width, 0, i * part_width + part_width, part_height)
+            else:
+                box = (0, i * part_height, part_width, i * part_height + part_height)
             part = img.crop(box)
             img_path = os.path.join(common.bcg_dir, "part{}-{}".format(i, common.selected_wallpaper.filename))
             part.save(os.path.join(common.tmp_dir, "part{}-{}".format(i, common.selected_wallpaper.filename)), "PNG")
