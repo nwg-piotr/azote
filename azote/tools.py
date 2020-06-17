@@ -469,8 +469,8 @@ def split_selected_wallpaper(num_parts):
     try:
         img = Image.open(common.selected_wallpaper.source_path)
         width, height = img.size
-        is_vertical = width >= height
-        if is_vertical:
+        is_horizontal = width >= height
+        if is_horizontal:
             part_width = width // num_parts
             part_height = height
         else:
@@ -478,7 +478,7 @@ def split_selected_wallpaper(num_parts):
             part_height = height // num_parts
         paths_list = []
         for i in range(num_parts):
-            if is_vertical:
+            if is_horizontal:
                 box = (i * part_width, 0, i * part_width + part_width, part_height)
             else:
                 box = (0, i * part_height, part_width, i * part_height + part_height)
