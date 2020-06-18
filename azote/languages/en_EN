@@ -19,6 +19,7 @@ copy = Copy
 copy_as = Copy as:
 copy_paste_into = Copy & paste into {}
 create_palette = Create palette
+current = Current
 custom_display = Custom display
 delete = Delete
 display_mode = Display mode

@@ -19,6 +19,7 @@ copy = Kopieren
 copy_as = Kopieren als:
 copy_paste_into = Kopieren & Einfügen in {}
 create_palette = Farbpalette erstellen
+current = Aktuell
 custom_display = Benutzerdefinierter Bildschirm
 delete = Löschen
 display_mode = Anzeigemodus

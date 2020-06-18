@@ -42,7 +42,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
 from gi.repository.GdkPixbuf import InterpType
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, create_pixbuf, split_selected_wallpaper, scale_and_crop, clear_thumbnails
+    copy_backgrounds, create_pixbuf, split_selected_wallpaper, scale_and_crop, clear_thumbnails, current_display
 from color_tools import rgba_to_hex, hex_to_rgb, rgb_to_hex, rgb_to_rgba
 from plugins import Alacritty, Xresources
 from color_tools import WikiColours
@@ -53,6 +53,13 @@ try:
     common.env['app_indicator'] = True
 except:
     common.env['app_indicator'] = False
+
+mouse_pointer = None
+try:
+    from pynput.mouse import Controller
+    mouse_pointer = Controller()
+except Exception as e:
+    print('pynput module not found', e)
 
 
 def get_files():
@@ -555,6 +562,7 @@ def move_to_trash(widget):
 
 
 def show_image_menu(widget, event=None, parent=None, from_toolbar=False):
+    cd = current_display(mouse_pointer)
     if common.selected_wallpaper:
         if common.associations:  # not None if /usr/share/applications/mimeinfo.cache found and parse
             openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
@@ -614,34 +622,34 @@ def show_image_menu(widget, event=None, parent=None, from_toolbar=False):
                 submenu.append(subitem)
 
             # Scale and crop to double width of the primary display
-            display = common.displays[0]
+            display = common.displays[cd]
             width, height = display['width'] * 2, display['height']
             subitem = Gtk.MenuItem.new_with_label(
-                '{} x {} ({} {})'.format(width, height, display['name'], common.lang['dual_width']))
+                '{} x {} ({} {} {})'.format(width, height, common.lang['current'], display['name'], common.lang['dual_width']))
             subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
             submenu.append(subitem)
 
             # Scale and crop to double height of the primary display
-            display = common.displays[0]
+            display = common.displays[cd]
             width, height = display['width'], display['height'] * 2
             subitem = Gtk.MenuItem.new_with_label(
-                '{} x {} ({} {})'.format(width, height, display['name'], common.lang['dual_height']))
+                '{} x {} ({} {} {})'.format(width, height, common.lang['current'], display['name'], common.lang['dual_height']))
             subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
             submenu.append(subitem)
 
             # Scale and crop to triple width of the primary display
-            display = common.displays[0]
+            display = common.displays[cd]
             width, height = display['width'] * 3, display['height']
             subitem = Gtk.MenuItem.new_with_label(
-                '{} x {} ({} {})'.format(width, height, display['name'], common.lang['triple_width']))
+                '{} x {} ({} {} {})'.format(width, height, common.lang['current'], display['name'], common.lang['triple_width']))
             subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
             submenu.append(subitem)
 
             # Scale and crop to triple height of the primary display
-            display = common.displays[0]
+            display = common.displays[cd]
             width, height = display['width'], display['height'] * 3
             subitem = Gtk.MenuItem.new_with_label(
-                '{} x {} ({} {})'.format(width, height, display['name'], common.lang['triple_height']))
+                '{} x {} ({} {} {})'.format(width, height, common.lang['current'], display['name'], common.lang['triple_height']))
             subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
             submenu.append(subitem)
 

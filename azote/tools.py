@@ -129,6 +129,47 @@ def check_displays():
         exit(1)
 
 
+def current_display(mouse_pointer):
+    display_number = 0
+    x, y = 0, 0
+    if common.env['wm'] == "sway":
+        string = subprocess.getoutput("swaymsg -t get_outputs")
+        outputs = json.loads(string)
+        for i in range(len(outputs)):
+            if outputs[i]["focused"]:
+                rect = outputs[i]["rect"]
+                x, y = rect["x"], rect["y"]
+    elif common.env['wm'] == "i3":
+        # Unfortunately `i3-msg -t get_outputs` output does not have the "focused" key.
+        # Let's find the active workspace and its rectangle.
+        string = subprocess.getoutput("i3-msg -t get_workspaces")
+        workspaces = json.loads(string)
+        for i in range(len(workspaces)):
+            if workspaces[i]['focused']:
+                rect = workspaces[i]["rect"]
+                x, y = rect["x"], rect["y"]
+    else:
+        # For not sway nor i3. This rises deprecation warnings and won't work w/o `pynput` module.
+        screen = common.main_window.get_screen()
+        try:
+            if mouse_pointer:
+                x, y = mouse_pointer.position
+                display_number = screen.get_monitor_at_point(x, y)
+            else:
+                display_number = screen.get_monitor_at_window(screen.get_active_window())
+            rectangle = screen.get_monitor_geometry(display_number)
+            x, y = rectangle.x, rectangle.y
+        except:
+            pass
+
+    for i in range(len(common.displays)):
+        display = common.displays[i]
+        if display["x"] == x and display['y'] == y:
+            display_number = i
+            break
+    return display_number
+
+
 def set_env(language=None):
     xdg_config_home = os.getenv('XDG_CONFIG_HOME')
     common.config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config")
