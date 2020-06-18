@@ -19,6 +19,7 @@ copy = Copier
 copy_as = Copier en tant que:
 copy_paste_into = Copier et coller dans {}
 create_palette = Créer une palette
+current = Actuel
 custom_display = Écran personnalisé
 delete = Effacer
 display_mode = Mode d’affichage
