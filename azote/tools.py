@@ -111,17 +111,21 @@ def check_displays():
         names = subprocess.check_output("xrandr | awk '/ connected/{print $1}'", shell=True).decode(
             "utf-8").splitlines()
         res = subprocess.check_output("xrandr | awk '/*/{print $1}'", shell=True).decode("utf-8").splitlines()
+        coords = subprocess.check_output("xrandr --listmonitors | awk '{print $3}'", shell=True).decode("utf-8").splitlines()
         displays = []
         for i in range(len(names)):
             w_h = res[i].split('x')
+            try:
+                x_y = coords[i + 1].split('+')
+            except:
+                x_y = (0, 0, 0)
             display = {'name': names[i],
-                       'x': 0,
-                       'y': 0,
+                       'x': x_y[1],
+                       'y': x_y[2],
                        'width': int(w_h[0]),
                        'height': int(w_h[1])}
             displays.append(display)
             log("Output found: {}".format(display), common.INFO)
-
         return displays
 
     else:
@@ -159,8 +163,8 @@ def current_display(mouse_pointer):
                 display_number = screen.get_monitor_at_window(screen.get_active_window())
             rectangle = screen.get_monitor_geometry(display_number)
             x, y = rectangle.x, rectangle.y
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
     for i in range(len(common.displays)):
         display = common.displays[i]
