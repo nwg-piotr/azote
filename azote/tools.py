@@ -133,7 +133,7 @@ def check_displays():
         exit(1)
 
 
-def current_display(mouse_pointer):
+def current_display():
     display_number = 0
     x, y = 0, 0
     if common.env['wm'] == "sway":
@@ -156,11 +156,7 @@ def current_display(mouse_pointer):
         # For not sway nor i3. This rises deprecation warnings and won't work w/o `pynput` module.
         screen = common.main_window.get_screen()
         try:
-            if mouse_pointer:
-                x, y = mouse_pointer.position
-                display_number = screen.get_monitor_at_point(x, y)
-            else:
-                display_number = screen.get_monitor_at_window(screen.get_active_window())
+            display_number = screen.get_monitor_at_window(screen.get_active_window())
             rectangle = screen.get_monitor_geometry(display_number)
             x, y = rectangle.x, rectangle.y
         except Exception as e:
