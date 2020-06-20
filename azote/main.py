@@ -54,13 +54,6 @@ try:
 except:
     common.env['app_indicator'] = False
 
-mouse_pointer = None
-try:
-    from pynput.mouse import Controller
-    mouse_pointer = Controller()
-except Exception as e:
-    print('pynput module not found', e)
-
 
 def get_files():
     try:
@@ -562,7 +555,7 @@ def move_to_trash(widget):
 
 
 def show_image_menu(widget, event=None, parent=None, from_toolbar=False):
-    cd = current_display(mouse_pointer)
+    cd = current_display()
     if common.selected_wallpaper:
         if common.associations:  # not None if /usr/share/applications/mimeinfo.cache found and parse
             openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
