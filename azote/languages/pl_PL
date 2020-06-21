@@ -38,6 +38,7 @@ maim_slop_required = Wymagane paczki maim & slop
 move = Do kosza
 move_to_trash = Przenieś wybrany do kosza
 name = Nazwa
+no_colour_definitions = Brak definicji kolorów w {}
 no_picture_selected = Nie wybrano obrazu
 ok = OK
 open_another_folder = Wybierz inny folder

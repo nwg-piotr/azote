@@ -38,6 +38,7 @@ maim_slop_required = maim & slop-Pakete erforderlich
 move = In den Papierkorb verschieben
 move_to_trash = Auswahl in den Papierkorb verschieben
 name = Name
+no_colour_definitions = Keine Farbdefinitionen in {}
 no_picture_selected = Kein Bild ausgewählt
 ok = OK
 open_another_folder = Anderen Ordner öffnen

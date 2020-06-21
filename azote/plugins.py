@@ -44,7 +44,10 @@ class Alacritty(Gtk.Window):
         
         f = open(common.alacritty_config, "rb")
         self.data = load(f, Loader=Loader)
-        output = dump(self.data['colors'], Dumper=Dumper, default_flow_style=False, sort_keys=False)
+        try:
+            output = dump(self.data['colors'], Dumper=Dumper, default_flow_style=False, sort_keys=False)
+        except KeyError:
+            output = None
 
         scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -55,53 +58,61 @@ class Alacritty(Gtk.Window):
         self.textview.set_editable(False)
 
         self.textbuffer = self.textview.get_buffer()
-        self.textbuffer.set_text(output)
+        if output:
+            self.textbuffer.set_text(output)
+        else:
+            self.textbuffer.set_text("No color definitions found")
         scrolled_window.add(self.textview)
-
-        hbox0.add(scrolled_window)
-
-        vbox = Gtk.VBox()
-        vbox.set_spacing(3)
-        vbox.set_border_width(5)
-
-        for key in self.data['colors']:
-            label = Gtk.Label()
-            label.set_property("name", "dotfiles-header")
-            label.set_text(key.upper())
-            vbox.add(label)
-            for key1 in self.data['colors'][key]:
-                hbox = Gtk.HBox()
+        
+        if output:
+            hbox0.add(scrolled_window)
+    
+            vbox = Gtk.VBox()
+            vbox.set_spacing(3)
+            vbox.set_border_width(5)
+    
+            for key in self.data['colors']:
                 label = Gtk.Label()
-                label.set_property("name", "dotfiles")
-                label.set_text(key1)
-                hbox.pack_start(label, True, False, 0)
-                label = Gtk.Label()
-                label.set_property("name", "dotfiles")
-                hex_color = self.data['colors'][key][key1].replace('0x', '#')
-                label.set_text(hex_color)
-                hbox.pack_start(label, True, False, 0)
-
-                preview_box = ColorPreviewBox(hex_color)
-                preview_box.connect('button-press-event', self.on_box_press, label, key, key1)
-
-                hbox.pack_start(preview_box, False, False, 0)
-
-                vbox.pack_start(hbox, False, False, 0)
-
-        hbox0.add(vbox)
-
-        vbox0.add(hbox0)
+                label.set_property("name", "dotfiles-header")
+                label.set_text(key.upper())
+                vbox.add(label)
+                for key1 in self.data['colors'][key]:
+                    hbox = Gtk.HBox()
+                    label = Gtk.Label()
+                    label.set_property("name", "dotfiles")
+                    label.set_text(key1)
+                    hbox.pack_start(label, True, False, 0)
+                    label = Gtk.Label()
+                    label.set_property("name", "dotfiles")
+                    hex_color = self.data['colors'][key][key1].replace('0x', '#')
+                    label.set_text(hex_color)
+                    hbox.pack_start(label, True, False, 0)
+    
+                    preview_box = ColorPreviewBox(hex_color)
+                    preview_box.connect('button-press-event', self.on_box_press, label, key, key1)
+    
+                    hbox.pack_start(preview_box, False, False, 0)
+    
+                    vbox.pack_start(hbox, False, False, 0)
+    
+            hbox0.add(vbox)
+    
+            vbox0.add(hbox0)
 
         hbox = Gtk.HBox()
         hbox.set_spacing(5)
         hbox.set_border_width(5)
-        label = Gtk.Label(common.lang['copy_paste_into'].format(common.alacritty_config))
+        label = Gtk.Label()
+        if output:
+            label.set_text(common.lang['copy_paste_into'].format(common.alacritty_config))
+        else:
+            label.set_text(common.lang['no_colour_definitions'].format(common.alacritty_config))
         label.set_property('name', 'dotfiles')
         hbox.add(label)
         button = Gtk.Button.new_with_label(common.lang['close'])
         button.connect_after('clicked', self.close_window)
         hbox.pack_start(button, False, False, 0)
-        
+
         vbox0.pack_start(hbox, False, False, 0)
 
         self.add(vbox0)

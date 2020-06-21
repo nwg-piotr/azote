@@ -39,6 +39,7 @@ maim_slop_required = maim & slop packages required
 move = To trash
 move_to_trash = Move selected to trash
 name = Name
+no_colour_definitions = No colour definitions in {}
 no_picture_selected = No picture selected
 ok = OK
 open_another_folder = Open another folder

@@ -38,6 +38,7 @@ maim_slop_required = paquets maim et slop requis
 move = Vers la corbeille
 move_to_trash = Déplacer la sélection vers la corbeille
 name = Nom
+no_colour_definitions = Aucune définition de couleur dans {}
 no_picture_selected =  Aucune image sélectionnée
 ok = OK
 open_another_folder =  Ouvrir un autre dossier
