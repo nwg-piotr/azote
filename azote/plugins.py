@@ -71,29 +71,33 @@ class Alacritty(Gtk.Window):
             vbox.set_spacing(3)
             vbox.set_border_width(5)
     
-            for key in self.data['colors']:
-                label = Gtk.Label()
-                label.set_property("name", "dotfiles-header")
-                label.set_text(key.upper())
-                vbox.add(label)
-                for key1 in self.data['colors'][key]:
-                    hbox = Gtk.HBox()
+            if self.data['colors']:
+                for key in self.data['colors']:
                     label = Gtk.Label()
-                    label.set_property("name", "dotfiles")
-                    label.set_text(key1)
-                    hbox.pack_start(label, True, False, 0)
-                    label = Gtk.Label()
-                    label.set_property("name", "dotfiles")
-                    hex_color = self.data['colors'][key][key1].replace('0x', '#')
-                    label.set_text(hex_color)
-                    hbox.pack_start(label, True, False, 0)
-    
-                    preview_box = ColorPreviewBox(hex_color)
-                    preview_box.connect('button-press-event', self.on_box_press, label, key, key1)
-    
-                    hbox.pack_start(preview_box, False, False, 0)
-    
-                    vbox.pack_start(hbox, False, False, 0)
+                    label.set_property("name", "dotfiles-header")
+                    label.set_text(key.upper())
+                    vbox.add(label)
+                    try:
+                        for key1 in self.data['colors'][key]:
+                            hbox = Gtk.HBox()
+                            label = Gtk.Label()
+                            label.set_property("name", "dotfiles")
+                            label.set_text(key1)
+                            hbox.pack_start(label, True, False, 0)
+                            label = Gtk.Label()
+                            label.set_property("name", "dotfiles")
+                            hex_color = self.data['colors'][key][key1].replace('0x', '#')
+                            label.set_text(hex_color)
+                            hbox.pack_start(label, True, False, 0)
+
+                            preview_box = ColorPreviewBox(hex_color)
+                            preview_box.connect('button-press-event', self.on_box_press, label, key, key1)
+
+                            hbox.pack_start(preview_box, False, False, 0)
+
+                            vbox.pack_start(hbox, False, False, 0)
+                    except:
+                        pass
     
             hbox0.add(vbox)
     
