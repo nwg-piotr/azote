@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v1.7.12 (2020-06-22)
+- scale and crop to triple display with / height;
+- split vertical images vertically (is_horizontal = width >= height);
+- detect which screen Azote window is displayed on; the screen dimensions will be used as the base of the 
+`Scale and crop to double/triple screen width/height` option. This may be useful if you use multiple-headed setup with 
+various screen resolutions.
+- added some error handling on colour definitions missing from the `allacritty.yml` file.
+
+## v1.7.11 (2020-06-03)
+Python version-independent launcher script
+
 ## v1.7.10 (2020-03-15)
 
 "Open with" issue [#82](https://github.com/nwg-piotr/azote/issues/82) fixed.
