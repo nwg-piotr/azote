@@ -491,6 +491,8 @@ def open_with(item, opener):
         command = 'feh --start-at "{}" --scale-down --no-fehbg -d --output-dir {}'.format(
             common.selected_wallpaper.source_path, common.selected_wallpaper.folder)
     # elif could specify options for other certain programs here
+    elif opener == 'swappy':
+        command = 'swappy -f {}'.format(common.selected_wallpaper.source_path)
     else:
         command = '{} "{}"'.format(opener, common.selected_wallpaper.source_path)
     subprocess.Popen(command, shell=True)
