@@ -27,7 +27,7 @@ If applicable, add screenshots to help explain your problem.
  - Linux distribution: [e.g. Arch, Void]
  - WM: [e.g. sway, i3]
 
-**Azote version:**
+**Azote version (please state it clearly if you use -git version):**
  - version number from the "About" window
 
 **Additional context**
