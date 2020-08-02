@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Development
+- added possibility to open images with [swappy](https://github.com/jtheoof/swappy) (.png only)
+- fixed crash on the stored wallpaper folder path not found [#102](https://github.com/nwg-piotr/azote/issues/102)
+
 ## v1.7.12 (2020-06-22)
 - scale and crop to triple display with / height;
 - split vertical images vertically (is_horizontal = width >= height);
