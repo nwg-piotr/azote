@@ -686,6 +686,11 @@ class Settings(object):
             self.src_path = settings.src_path
         else:
             save_needed = True
+            
+        # In case the stored wallpapers directory no longer existed
+        if not os.path.isdir(self.src_path):
+            self.src_path = common.sample_dir
+            save_needed = True
 
         try:
             self.sorting = settings.sorting  # 'new' 'old' 'az' 'za'
