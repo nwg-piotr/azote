@@ -119,7 +119,7 @@ def check_displays():
             log("Failed checking displays: {}".format(e), common.ERROR)
             exit(1)
 
-        name, w, h, x, y = "", "", "", "", ""
+        name, w, h, x, y = None, None, None, None, None
         displays = []
         for line in lines:
             if not line.startswith(" "):
@@ -132,7 +132,8 @@ def check_displays():
                 x_y = line.split()[1].split(',')
                 x = int(x_y[0])
                 y = int(x_y[1])
-                if name and w and h and x and y:
+                print(name, w, h, x, y)
+                if name is not None and w is not None and h is not None and x is not None and y is not None:
                     display = {'name': name,
                                'x': x,
                                'y': y,
@@ -142,7 +143,7 @@ def check_displays():
                     log("Output found: {}".format(display), common.INFO)
 
         displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
-
+        print(">>>", len(displays))
         return displays
 
     # On i3 we could use i3-msg here, but xrandr should also return what we need. If not on Sway - let's use xrandr
