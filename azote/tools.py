@@ -307,7 +307,7 @@ def set_env(language=None):
         log("Removed {}".format(path), common.INFO)
 
     # backgrounds folder
-    name = 'backgrounds-sway' if common.sway else 'backgrounds-feh'
+    name = 'backgrounds-sway' if common.sway or common.env['wayland'] else 'backgrounds-feh'
     common.bcg_dir = os.path.join(common.data_home, name)
     if not os.path.isdir(common.bcg_dir):
         os.mkdir(common.bcg_dir)
@@ -399,7 +399,7 @@ def set_env(language=None):
     av = 'found' if magick else 'not found'
     log("imagemagick library {}".format(av), common.INFO)
 
-    if common.sway:
+    if common.sway or common.env['wayland']:
         try:
             grim = subprocess.run(['grim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
         except FileNotFoundError:
