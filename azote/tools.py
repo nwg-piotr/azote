@@ -70,6 +70,10 @@ def check_displays():
         else:
             common.env['wm'] = 'not sway'
 
+    # sway or not, we may be on Wayland anyway
+    if not common.sway:
+        common.env['wayland'] = os.getenv('WAYLAND_DISPLAY')
+
     fnull = open(os.devnull, 'w')
     common.env['xrandr'] = subprocess.call(["which", "xrandr"], stdout=fnull, stderr=subprocess.STDOUT) == 0
 
@@ -105,6 +109,41 @@ def check_displays():
 
         except Exception as e:
             log("Failed checking displays: {}".format(e), common.ERROR)
+
+    elif common.env['wayland']:
+        lines = None
+        try:
+            lines = subprocess.check_output("wlr-randr", shell=True).decode("utf-8").strip().splitlines()
+        except Exception as e:
+            print("Wayland, but not sway. Optional wlr-randr package required.")
+            log("Failed checking displays: {}".format(e), common.ERROR)
+            exit(1)
+
+        name, w, h, x, y = "", "", "", "", ""
+        displays = []
+        for line in lines:
+            if not line.startswith(" "):
+                name = line.split()[0]
+            elif "current" in line:
+                w_h = line.split()[0].split('x')
+                w = int(w_h[0])
+                h = int(w_h[1])
+            elif "Position" in line:
+                x_y = line.split()[1].split(',')
+                x = int(x_y[0])
+                y = int(x_y[1])
+                if name and w and h and x and y:
+                    display = {'name': name,
+                               'x': x,
+                               'y': y,
+                               'width': w,
+                               'height': h}
+                    displays.append(display)
+                    log("Output found: {}".format(display), common.INFO)
+
+        displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
+
+        return displays
 
     # On i3 we could use i3-msg here, but xrandr should also return what we need. If not on Sway - let's use xrandr
     elif common.env['xrandr']:

@@ -442,7 +442,7 @@ def on_apply_button(button):
     # Copy modified wallpapers (if any) from temporary to backgrounds folder
     copy_backgrounds()
 
-    if common.sway:
+    if common.sway or common.env['wayland']:
         # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
         batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
         for box in common.display_boxes_list:
@@ -1580,7 +1580,7 @@ def on_thumb_double_click(button):
     """
     As the function above, but mode 'fill' will always be used
     """
-    if common.sway:
+    if common.sway or common.env['wayland']:
         apply_to_all_swaybg(button, 'fill')
     else:
         apply_to_all_feh(button, 'fill')
