@@ -252,7 +252,7 @@ class DisplayBox(Gtk.Box):
         # Values to assigned to corresponding display when apply button pressed
         self.display_name = name
         self.wallpaper_path = None
-        self.mode = 'fill' if common.sway else 'scale'
+        self.mode = 'fill' if common.sway or common.env['wayland'] else 'scale'
         self.color = None
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file('images/empty.png')
@@ -275,7 +275,7 @@ class DisplayBox(Gtk.Box):
         # Combo box to choose a mode to use for the image
         mode_selector = Gtk.ListStore(str)
 
-        if common.sway:
+        if common.sway or common.env['wayland']:
             for mode in common.modes_swaybg:
                 mode_selector.append([mode])
         else:
@@ -298,7 +298,7 @@ class DisplayBox(Gtk.Box):
         self.mode_combo.set_tooltip_text(common.lang['display_mode'])
         options_box.add(self.mode_combo)
 
-        if common.sway:
+        if common.sway or common.env['wayland']:
             # Color button
             self.color_button = Gtk.ColorButton()
             color = Gdk.RGBA()
@@ -324,7 +324,7 @@ class DisplayBox(Gtk.Box):
 
     def clear_color_selection(self):
         # If not on sway / swaybg, we have no color_button in UI
-        if common.sway:
+        if common.sway or common.env['wayland']:
             # clear color selection: image will be used
             color = Gdk.RGBA()
             color.red = 0.0
@@ -354,7 +354,7 @@ class DisplayBox(Gtk.Box):
 
         # If our backend is feh, not swaybg, we can not set mode for each wallpaper separately.
         # Let's copy the same selection to all displays.
-        if not common.sway and common.display_boxes_list:
+        if not common.sway and common.env['wayland'] and common.display_boxes_list:
             selection = combo.get_active()
             for box in common.display_boxes_list:
                 box.mode_combo.set_active(selection)
@@ -442,7 +442,7 @@ def on_apply_button(button):
     # Copy modified wallpapers (if any) from temporary to backgrounds folder
     copy_backgrounds()
 
-    if common.sway:
+    if common.sway or common.env['wayland']:
         # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
         batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
         for box in common.display_boxes_list:
@@ -899,7 +899,7 @@ class GUI:
         img.set_from_file('images/icon_picker.svg')
         picker_button.set_image(img)
         picker_button.set_sensitive(common.picker)
-        if common.sway:
+        if common.sway or common.env['wayland']:
             tt = common.lang['screen_color_picker'] if common.picker else common.lang['grim_slurp_required']
         else:
             tt = common.lang['screen_color_picker'] if common.picker else common.lang['maim_slop_required']
@@ -952,7 +952,7 @@ def on_apply_to_all_button(button):
     Menu for modes needs to differ for swaybg and feh.
     """
     menu = Gtk.Menu()
-    if common.sway:
+    if common.sway or common.env['wayland']:
         for mode in common.modes_swaybg:
             item = Gtk.MenuItem.new_with_label(mode)
             item.connect('activate', apply_to_all_swaybg, mode)
@@ -1003,7 +1003,7 @@ def pick_color():
     :return: tuple (rrr, ggg, bbb)
     """
     color = (255, 255, 255)
-    if common.sway:
+    if common.sway or common.env['wayland']:
         try:
             color = hex_to_rgb(subprocess.check_output(
                 'grim -g "$(slurp -p)" -t ppm - | convert - -format \'%[pixel:p{0,0}]\' txt:- | awk \'NR==2 {print $3}\'',
@@ -1034,7 +1034,7 @@ def get_dominant_from_area():
     :return: tuple (r, g, b) or (255, 255, 255) if nothing selected
     """
     dominant = (255, 255, 255)
-    if common.sway:
+    if common.sway or common.env['wayland']:
         cmd = 'grim -g "$(slurp)" {}'.format(os.path.join(common.tmp_dir, 'area.png'))
     else:
         cmd = 'maim -s {}'.format(os.path.join(common.tmp_dir, 'area.png'))
@@ -1580,7 +1580,7 @@ def on_thumb_double_click(button):
     """
     As the function above, but mode 'fill' will always be used
     """
-    if common.sway:
+    if common.sway or common.env['wayland']:
         apply_to_all_swaybg(button, 'fill')
     else:
         apply_to_all_feh(button, 'fill')
@@ -1652,11 +1652,11 @@ class Indicator(object):
 
         if common.settings.track_files:
             self.ind.set_status(AppIndicator3.IndicatorStatus.ATTENTION)
-            if common.sway:
+            if common.sway or common.env['wayland']:
                 self.ind.set_icon_full('/usr/share/azote/indicator_attention.png', 'Tracking on')
         else:
             self.ind.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
-            if common.sway:
+            if common.sway or common.env['wayland']:
                 self.ind.set_icon_full('/usr/share/azote/indicator_active.png', 'Tracking off')
 
         self.ind.set_menu(self.menu())
@@ -1689,10 +1689,10 @@ class Indicator(object):
     def switch_indication(self, item):
         if item.get_active():
             self.ind.set_status(AppIndicator3.IndicatorStatus.ATTENTION)
-            if common.sway:
+            if common.sway or common.env['wayland']:
                 self.ind.set_icon_full('/usr/share/azote/indicator_attention.png', 'Tracking on')
         else:
-            if common.sway:
+            if common.sway or common.env['wayland']:
                 self.ind.set_icon_full('/usr/share/azote/indicator_active.png', 'Tracking off')
             self.ind.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
 
