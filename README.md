@@ -3,11 +3,11 @@
 [![Build Status](https://travis-ci.com/nwg-piotr/azote.svg?branch=master)](https://travis-ci.com/nwg-piotr/azote)
 
 **Azote** is a GTK+3 - based picture browser and background setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
-(sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. It also includes several colour management 
-tools.
+(sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. The user interface is being developed with
+multi-headed setups in mind. Azote also includes several colour management tools.
 
-The program is confirmed to work on sway, i3, Openbox, Fluxbox and dwm window managers, on Arch Linux, Void Linux, 
-Debian and Fedora.
+The program is confirmed to work on sway, Wayfire, i3, Openbox, Fluxbox and dwm window managers. Wayland support is
+limited to wlroots-based compositors.
 
 ![screenshot](http://nwg.pl/Lychee/uploads/big/78510b1f9358767e8407d66e933f1d8c.png)
 
@@ -62,6 +62,13 @@ with:
 ```bash
 exec ~/.azotebg
 ```
+
+### Wayfire
+
+In `~/.config/wayfire.ini` set `autostart_wf_shell = false`, and replace `background = wf-background` with 
+`background = ~/.azotebg`. 
+
+**Important:** optional `wlr-randr` / `wlr-randr-git` and `swaybg` packages are necessary.
 
 ### X window managers (i3, Openbox, dwm etc.)
 

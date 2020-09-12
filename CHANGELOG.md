@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Development
+## v1.7.14 (2020-09-12)
 - Added possibility to open images with [swappy](https://github.com/jtheoof/swappy) (.png only);
 - fixed crash on the stored wallpaper folder path not found [#102](https://github.com/nwg-piotr/azote/issues/102);
 - support for [Wayfire](https://github.com/WayfireWM/wayfire) (possibly also for other wlroots-based Wayland 
