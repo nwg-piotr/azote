@@ -151,7 +151,7 @@ def check_displays():
         res = subprocess.check_output("xrandr | awk '/*/{print $1}'", shell=True).decode("utf-8").splitlines()
         coords = subprocess.check_output("xrandr --listmonitors | awk '{print $3}'", shell=True).decode("utf-8").splitlines()
         displays = []
-        for i in range(len(names)):
+        for i in range(len(res)):
             w_h = res[i].split('x')
             try:
                 x_y = coords[i + 1].split('+')
