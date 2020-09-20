@@ -526,13 +526,14 @@ def on_about_button(button):
     dialog.set_website('https://github.com/nwg-piotr/azote')
     dialog.set_comments(common.lang['app_desc'])
     dialog.set_license_type(Gtk.License.GPL_3_0)
-    dialog.set_authors(['Piotr Miller (nwg)', 'Head-on-a-Stick', 'Libraries and dependencies:',
+    dialog.set_authors(['Piotr Miller (nwg) and Contributors', 'Libraries and dependencies:',
                         '- colorthief python module (c) 2015 Shipeng Feng',
                         '- python-pillow (c) 1995-2011, Fredrik Lundh, 2010-2019 Alex Clark and Contributors',
                         '- pygobject (c) 2005-2019 The GNOME Project',
                         '- GTK+ (c) 2007-2019 The GTK Team',
                         '- feh (c) 1999,2000 Tom Gilbert, 2010-2018 Daniel Friesel',
                         '- swaybg (c) 2016-2019 Drew DeVault',
+                        '- wlr-randr (c) 2019 Purism SPC and Contributors',
                         '- send2trash python module (c) 2017 Virgil Dupras',
                         '- grim, slurp (c) 2018 emersion',
                         '- maim, slop (c) 2014 Dalton Nell and Contributors',
