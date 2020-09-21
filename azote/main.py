@@ -522,7 +522,7 @@ def on_about_button(button):
 
     dialog.set_keep_above(True)
     dialog.set_logo(logo)
-    dialog.set_copyright('(c) 2019 Piotr Miller')
+    dialog.set_copyright('(c) 2019-2020 Piotr Miller')
     dialog.set_website('https://github.com/nwg-piotr/azote')
     dialog.set_comments(common.lang['app_desc'])
     dialog.set_license_type(Gtk.License.GPL_3_0)
