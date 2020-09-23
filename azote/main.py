@@ -4,19 +4,12 @@
 """
 Wallpaper and colour manager for Sway, i3 and some other WMs, as a frontend to swaybg and feh
 
-Author: Piotr Miller
+Author: Piotr Miller & Contributors
 e-mail: nwg.piotr@gmail.com
 Website: http://nwg.pl
 Project: https://github.com/nwg-piotr/azote
 License: GPL3
 
-depends=('python' 'python-setuptools' 'python-gobject' 'python-pillow' 'gtk3' 'feh' 'xorg-xrandr')
-optdepends=('python-send2trash: for trash support'
-            'grim: for screen color picker on Sway'
-            'slurp: for screen color picker on Sway'
-            'maim: for screen color picker on X11'
-            'imagemagick: for screen color picker on both Sway and X11'
-            'python-pyaml: (python3-yaml) for alacritty.yml toolbox')
 """
 import os
 import sys
@@ -32,9 +25,9 @@ try:
     from send2trash import send2trash
 
     common.env['send2trash'] = True
-except Exception as e:
+except Exception:
     common.env['send2trash'] = False
-    print('Deleting pictures unavailable: ', e)
+    print('python-send2trash package not found - deleting pictures unavailable')
 
 from colorthief import ColorThief
 
@@ -53,6 +46,7 @@ try:
     common.env['app_indicator'] = True
 except:
     common.env['app_indicator'] = False
+    print('libappindicator-gtk3 package not found - tray icon unavailable')
 
 
 def get_files():
