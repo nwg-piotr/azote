@@ -34,7 +34,7 @@ try:
     common.env['send2trash'] = True
 except Exception as e:
     common.env['send2trash'] = False
-    print('send2trash module not found', e)
+    print('Deleting pictures unavailable: ', e)
 
 from colorthief import ColorThief
 
