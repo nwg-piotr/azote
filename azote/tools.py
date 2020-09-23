@@ -66,13 +66,14 @@ def check_displays():
         elif os.getenv('DESKTOP_SESSION'):
             common.env['wm'] = os.getenv('DESKTOP_SESSION')
         else:
-            common.env['wm'] = 'not sway'
+            common.env['wm'] = 'undetected'
 
     # sway or not, we may be on Wayland anyway
     if not common.sway:
         common.env['wayland'] = os.getenv('WAYLAND_DISPLAY')
 
     if common.sway:
+        print("Running on sway")
         # We need swaymsg to check outputs on Sway
         try:
             displays = []
@@ -99,6 +100,7 @@ def check_displays():
             exit(1)
 
     elif common.env['wayland']:
+        print("Running on Wayland, but not sway")
         lines = None
         try:
             lines = subprocess.check_output("wlr-randr", shell=True).decode("utf-8").strip().splitlines()
@@ -147,6 +149,7 @@ def check_displays():
 
     # On i3 we could use i3-msg here, but xrandr should also return what we need. If not on Sway - let's use xrandr
     else:
+        print("Running on X11")
         fnull = open(os.devnull, 'w')
         try:
             common.env['xrandr'] = subprocess.call(["xrandr", "-v"], stdout=fnull, stderr=subprocess.STDOUT) == 0
@@ -348,8 +351,6 @@ def set_env(language=None):
         clear_thumbnails(clear_all=True)
         common.settings.clear_thumbnails = False
 
-    log("Environment: {}".format(common.env), common.INFO)
-
     # check programs capable of opening files of allowed extensions
     if os.path.isfile('/usr/share/applications/mimeinfo.cache'):
         common.associations = {}  # Will stay None if the mimeinfo.cache file not found
@@ -415,6 +416,7 @@ def set_env(language=None):
         magick = subprocess.run(['convert', '-version'], stdout=subprocess.DEVNULL).returncode == 0
     except FileNotFoundError:
         magick = False
+        print('imagemagick package not found - color picked disabled')
     av = 'found' if magick else 'not found'
     log("Color picker: imagemagick library {}".format(av), common.INFO)
 
@@ -423,6 +425,7 @@ def set_env(language=None):
             grim = subprocess.run(['grim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
         except FileNotFoundError:
             grim = False
+            print('grim package not found - color picked disabled')
         av = 'found' if grim else 'not found'
         log("Color picker/Wayland: grim package {}".format(av), common.INFO)
 
@@ -430,6 +433,7 @@ def set_env(language=None):
             slurp = subprocess.run(['slurp', '-h'], stdout=subprocess.DEVNULL).returncode == 0
         except FileNotFoundError:
             slurp = False
+            print('slurp package not found - color picked disabled')
         av = 'found' if slurp else 'not found'
         log("Color picker/Wayland: slurp package {}".format(av), common.INFO)
 
@@ -440,16 +444,18 @@ def set_env(language=None):
             log("Pick color from screen feature needs imagemagick, grim and slurp packages packages", common.WARNING)
     else:
         try:
-            maim = subprocess.run(['maim', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+            maim = subprocess.run(['maim', '-v'], stdout=subprocess.DEVNULL).returncode == 0
         except FileNotFoundError:
             maim = False
+            print('maim package not found - color picked disabled')
         av = 'found' if maim else 'not found'
         log("Color picker/X11: maim package {}".format(av), common.INFO)
 
         try:
-            slop = subprocess.run(['slop', '-h'], stdout=subprocess.DEVNULL).returncode == 0
+            slop = subprocess.run(['slop', '-v'], stdout=subprocess.DEVNULL).returncode == 0
         except FileNotFoundError:
             slop = False
+            print('slop package not found - color picked disabled')
         av = 'found' if slop else 'not found'
         log("Color picker/X11: slurp package {}".format(av), common.INFO)
 
@@ -458,6 +464,8 @@ def set_env(language=None):
             common.picker = True
         else:
             log("Pick color from screen feature needs imagemagick, maim and slop packages installed", common.WARNING)
+
+    log("Environment: {}".format(common.env), common.INFO)
 
     # Find dotfiles
     if os.path.isfile(os.path.join(common.config_home, 'alacritty/alacritty.yml')):
@@ -469,6 +477,7 @@ def set_env(language=None):
     log('Alacritty config file: {}'.format(msg), common.INFO)
     if common.alacritty_config and not common.env['yaml']:
         log("python yaml module not found - alacritty.yml toolbox disabled", common.WARNING)
+        print('python-yaml module not found - alacritty.yml toolbox disabled')
 
     if os.path.isfile(os.path.join(os.getenv('HOME'), '.Xresources')):
         common.xresources = os.path.join(os.getenv('HOME'), '.Xresources')
