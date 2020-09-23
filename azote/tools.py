@@ -54,12 +54,8 @@ def str_to_bool(s):
 
 
 def check_displays():
-    # Sway or not Sway? If so, the `swaymsg -t get_seats` command should return exit code 0
-    try:
-        result = subprocess.run(['swaymsg', '-t', 'get_seats'], stdout=subprocess.DEVNULL)
-        common.sway = result.returncode == 0
-    except:
-        common.sway = False
+    # Sway or not Sway?
+    common.sway = os.getenv('SWAYSOCK')
     if common.sway:
         common.env['wm'] = 'sway'
         var = subprocess.run(['swaymsg', 'for_window', '[title=\"Azote~*\"]', 'floating', 'enable'],
@@ -75,9 +71,6 @@ def check_displays():
     # sway or not, we may be on Wayland anyway
     if not common.sway:
         common.env['wayland'] = os.getenv('WAYLAND_DISPLAY')
-
-    fnull = open(os.devnull, 'w')
-    common.env['xrandr'] = subprocess.call(["which", "xrandr"], stdout=fnull, stderr=subprocess.STDOUT) == 0
 
     if common.sway:
         # We need swaymsg to check outputs on Sway
@@ -95,22 +88,15 @@ def check_displays():
                     displays.append(display)
                     log("Output found: {}".format(display), common.INFO)
 
-            # Dummy display for testing
-            """display = {'name': 'HDMI-A-2',
-                       'x': 1920,
-                       'y': 0,
-                       'width': 1920,
-                       'height': 1080}
-            displays.append(display)
-            log("Output: {}".format(display), common.INFO)"""
-
             # sort displays list by x, y: from left to right, then from bottom to top
             displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
 
             return displays
 
         except Exception as e:
+            print("Failed checking displays: {}".format(e), common.ERROR)
             log("Failed checking displays: {}".format(e), common.ERROR)
+            exit(1)
 
     elif common.env['wayland']:
         lines = None
@@ -121,56 +107,87 @@ def check_displays():
             log("Failed checking displays: {}".format(e), common.ERROR)
             exit(1)
 
-        name, w, h, x, y = None, None, None, None, None
-        displays = []
-        for line in lines:
-            if not line.startswith(" "):
-                name = line.split()[0]
-            elif "current" in line:
-                w_h = line.split()[0].split('x')
-                w = int(w_h[0])
-                h = int(w_h[1])
-            elif "Position" in line:
-                x_y = line.split()[1].split(',')
-                x = int(x_y[0])
-                y = int(x_y[1])
-                if name is not None and w is not None and h is not None and x is not None and y is not None:
-                    display = {'name': name,
-                               'x': x,
-                               'y': y,
-                               'width': w,
-                               'height': h}
-                    displays.append(display)
-                    log("Output found: {}".format(display), common.INFO)
+        if lines:
+            name, w, h, x, y = None, None, None, None, None
+            displays = []
+            for line in lines:
+                if not line.startswith(" "):
+                    name = line.split()[0]
+                elif "current" in line:
+                    w_h = line.split()[0].split('x')
+                    w = int(w_h[0])
+                    h = int(w_h[1])
+                elif "Position" in line:
+                    x_y = line.split()[1].split(',')
+                    x = int(x_y[0])
+                    y = int(x_y[1])
+                    if name is not None and w is not None and h is not None and x is not None and y is not None:
+                        display = {'name': name,
+                                   'x': x,
+                                   'y': y,
+                                   'width': w,
+                                   'height': h}
+                        displays.append(display)
+                        log("Output found: {}".format(display), common.INFO)
+            displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
+            return displays
 
-        displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
-        return displays
+        else:
+            print("Failed parsing wlr-ranrd output")
+            log("Failed parsing wlr-ranrd output", common.ERROR)
+            exit(1)
+
+        fnull = open(os.devnull, 'w')
+        try:
+            common.env['swaybg'] = subprocess.call(["swaybg", "-v"], stdout=fnull, stderr=subprocess.STDOUT) == 0
+        except Exception as e:
+            print("swaybg package required: {}".format(e))
+            log("swaybg package not found", common.ERROR)
+            exit(1)
 
     # On i3 we could use i3-msg here, but xrandr should also return what we need. If not on Sway - let's use xrandr
-    elif common.env['xrandr']:
-        names = subprocess.check_output("xrandr | awk '/ connected/{print $1}'", shell=True).decode(
-            "utf-8").splitlines()
-        res = subprocess.check_output("xrandr | awk '/*/{print $1}'", shell=True).decode("utf-8").splitlines()
-        coords = subprocess.check_output("xrandr --listmonitors | awk '{print $3}'", shell=True).decode("utf-8").splitlines()
-        displays = []
-        for i in range(len(res)):
-            w_h = res[i].split('x')
-            try:
-                x_y = coords[i + 1].split('+')
-            except:
-                x_y = (0, 0, 0)
-            display = {'name': names[i],
-                       'x': x_y[1],
-                       'y': x_y[2],
-                       'width': int(w_h[0]),
-                       'height': int(w_h[1])}
-            displays.append(display)
-            log("Output found: {}".format(display), common.INFO)
-        return displays
-
     else:
-        log("Couldn't check displays", common.ERROR)
-        exit(1)
+        fnull = open(os.devnull, 'w')
+        try:
+            common.env['xrandr'] = subprocess.call(["xrandr", "-v"], stdout=fnull, stderr=subprocess.STDOUT) == 0
+        except Exception as e:
+            print("xorg-xrandr package required: {}".format(e))
+            log("xorg-xrandr package not found", common.ERROR)
+            exit(1)
+
+        try:
+            common.env['feh'] = subprocess.call(["feh", "-v"], stdout=fnull, stderr=subprocess.STDOUT) == 0
+        except Exception as e:
+            print("feh package required: {}".format(e))
+            log("feh package not found", common.ERROR)
+            exit(1)
+
+        try:
+            names = subprocess.check_output("xrandr | awk '/ connected/{print $1}'", shell=True).decode(
+                "utf-8").splitlines()
+            res = subprocess.check_output("xrandr | awk '/*/{print $1}'", shell=True).decode("utf-8").splitlines()
+            coords = subprocess.check_output("xrandr --listmonitors | awk '{print $3}'", shell=True).decode(
+                "utf-8").splitlines()
+            displays = []
+            for i in range(len(res)):
+                w_h = res[i].split('x')
+                try:
+                    x_y = coords[i + 1].split('+')
+                except:
+                    x_y = (0, 0, 0)
+                display = {'name': names[i],
+                           'x': x_y[1],
+                           'y': x_y[2],
+                           'width': int(w_h[0]),
+                           'height': int(w_h[1])}
+                displays.append(display)
+                log("Output found: {}".format(display), common.INFO)
+            return displays
+
+        except Exception as e:
+            print("Failed checking displays: {}".format(e), common.ERROR)
+            log("Failed checking displays: {}".format(e), common.ERROR)
+            exit(1)
 
 
 def current_display():
@@ -399,7 +416,7 @@ def set_env(language=None):
     except FileNotFoundError:
         magick = False
     av = 'found' if magick else 'not found'
-    log("imagemagick library {}".format(av), common.INFO)
+    log("Color picker: imagemagick library {}".format(av), common.INFO)
 
     if common.sway or common.env['wayland']:
         try:
@@ -407,14 +424,14 @@ def set_env(language=None):
         except FileNotFoundError:
             grim = False
         av = 'found' if grim else 'not found'
-        log("grim package {}".format(av), common.INFO)
+        log("Color picker/Wayland: grim package {}".format(av), common.INFO)
 
         try:
             slurp = subprocess.run(['slurp', '-h'], stdout=subprocess.DEVNULL).returncode == 0
         except FileNotFoundError:
             slurp = False
         av = 'found' if slurp else 'not found'
-        log("slurp package {}".format(av), common.INFO)
+        log("Color picker/Wayland: slurp package {}".format(av), common.INFO)
 
         if magick and grim and slurp:
             log("Pick color from screen feature enabled", common.INFO)
@@ -427,14 +444,14 @@ def set_env(language=None):
         except FileNotFoundError:
             maim = False
         av = 'found' if maim else 'not found'
-        log("maim package {}".format(av), common.INFO)
+        log("Color picker/X11: maim package {}".format(av), common.INFO)
 
         try:
             slop = subprocess.run(['slop', '-h'], stdout=subprocess.DEVNULL).returncode == 0
         except FileNotFoundError:
             slop = False
         av = 'found' if slop else 'not found'
-        log("slurp package {}".format(av), common.INFO)
+        log("Color picker/X11: slurp package {}".format(av), common.INFO)
 
         if magick and maim and slop:
             log("Pick color from screen - feature available", common.INFO)
@@ -791,13 +808,13 @@ class Settings(object):
             with open(self.rc_file, 'r') as f:
                 rc = json.load(f)
         except FileNotFoundError:
-            log('rc file not found, creating...', common.INFO)
+            log('{} file not found, creating...'.format(self.rc_file), common.INFO)
             self.save_rc(set_defaults=True)
 
         try:
             with open(self.rc_file, 'r') as f:
                 rc = json.load(f)
-            log('rc file loaded', common.INFO)
+            log('{} file loaded'.format(self.rc_file), common.INFO)
         except Exception as e:
             log('rc file error: {}'.format(e), common.ERROR)
 
