@@ -76,7 +76,7 @@ class Preview(Gtk.ScrolledWindow):
 
         self.set_border_width(10)
         self.set_propagate_natural_height(True)
-        self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS)
+        self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
 
         common.thumbnails_list = []
         self.grid = Gtk.FlowBox()
