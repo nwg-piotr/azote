@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## Development
+
+**Available for testing as azote-git (AUR)**
+
+- added fix to avoid crashes on X11, when a display is connected, but turned off 
+[#110](https://github.com/nwg-piotr/azote/issues/110);
+- added CLI messages on missing optional dependencies [#101](https://github.com/nwg-piotr/azote/issues/101):
+
+*There were several request to get Azote rid of dependencies unused in a certain environment. That's why I added some CLI messages. 
+If lack of a package won't allow Azote to work in detected environment, (e.g. `xorg-xrandr` on X11, `wlr-randr` or 
+`swaybg` on Wayfire), the program will display a message and terminate with exit code 1. If missing dependency just
+stops some feature from working, Azote displays a message and starts normally. This attitude has pros and cons: 
+no more unwanted dependencies installed by default, but - apart from sway - users must take care of dependencies on their own. 
+Finally it's up to packagers how to deal with dependencies.*
+
+- in wallpapers preview, the `Gtk.Grid` container has been replaced with `Gtk.FlowBox`. This allows to maximize and/or
+scale the Azote window on-the-fly without freezing its width.
+
 ## v1.7.14 (2020-09-12)
 - Added possibility to open images with [swappy](https://github.com/jtheoof/swappy) (.png only);
 - fixed crash on the stored wallpaper folder path not found [#102](https://github.com/nwg-piotr/azote/issues/102);
