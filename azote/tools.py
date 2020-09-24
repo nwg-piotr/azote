@@ -58,8 +58,7 @@ def check_displays():
     common.sway = os.getenv('SWAYSOCK')
     if common.sway:
         common.env['wm'] = 'sway'
-        var = subprocess.run(['swaymsg', 'for_window', '[title=\"Azote~*\"]', 'floating', 'enable'],
-                             stdout=subprocess.DEVNULL).returncode == 0
+
     else:
         if os.getenv('XDG_SESSION_DESKTOP'):
             common.env['wm'] = os.getenv('XDG_SESSION_DESKTOP')

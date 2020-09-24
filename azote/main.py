@@ -76,30 +76,24 @@ class Preview(Gtk.ScrolledWindow):
 
         self.set_border_width(10)
         self.set_propagate_natural_height(True)
-        self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
+        self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS)
 
         common.thumbnails_list = []
-        self.grid = Gtk.Grid()
-        self.grid.set_column_spacing(25)
-        self.grid.set_row_spacing(15)
+        self.grid = Gtk.FlowBox()
+        self.grid.set_valign(Gtk.Align.START)
+        #self.grid.set_max_children_per_line(30)
+        self.grid.set_selection_mode(Gtk.SelectionMode.NONE)
 
         create_thumbnails(common.settings.src_path)
         self.files_dict = dict([(f, None) for f in os.listdir(common.settings.src_path)])
 
-        col, row = 0, 0
         src_pictures = get_files()
 
         for file in src_pictures:
             if file_allowed(file):
                 thumbnail = Thumbnail(common.settings.src_path, file)
-                thumbnail.column = col
                 common.thumbnails_list.append(thumbnail)
-                self.grid.attach(thumbnail, col, row, 1, 1)
-                if col < common.cols - 1:
-                    col += 1
-                else:
-                    col = 0
-                    row += 1
+                self.grid.add(thumbnail)
 
         self.add(self.grid)
 
@@ -113,20 +107,14 @@ class Preview(Gtk.ScrolledWindow):
             self.grid.remove(thumbnail)
             thumbnail.destroy()
 
-        col, row = 0, 0
         src_pictures = get_files()
 
         for file in src_pictures:
             if file_allowed(file):
                 thumbnail = Thumbnail(common.settings.src_path, file)
-                thumbnail.column = col
                 common.thumbnails_list.append(thumbnail)
-                self.grid.attach(thumbnail, col, row, 1, 1)
-                if col < common.cols - 1:
-                    col += 1
-                else:
-                    col = 0
-                    row += 1
+                self.grid.add(thumbnail)
+
                 thumbnail.show_all()
                 thumbnail.toolbar.hide()
 
@@ -154,10 +142,6 @@ class Thumbnail(Gtk.VBox):
         self.image_button.set_image(self.img)
         self.image_button.set_image_position(2)  # TOP
         self.image_button.set_tooltip_text(common.lang['thumbnail_tooltip'])
-
-        # Workaround: column is a helper value to identify thumbnails placed in column 0. 
-        # They need different context menu gravity in Sway
-        self.column = 0
 
         if len(filename) > 30:
             filename = '…{}'.format(filename[-28::])
@@ -668,22 +652,8 @@ def show_image_menu(widget, event=None, parent=None, from_toolbar=False):
             menu.show_all()
             # We don't want the menu to stick out of the window on Sway, as it may be partially not clickable
 
-            if widget.column:
-                if widget.column == 0:
-                    if not from_toolbar:
-                        menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
-                    else:
-                        menu.popup_at_widget(widget.toolbar, Gdk.Gravity.WEST, Gdk.Gravity.NORTH_WEST, None)
-                else:
-                    if not from_toolbar:
-                        menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_EAST, None)
-                    else:
-                        menu.popup_at_widget(widget.toolbar, Gdk.Gravity.EAST, Gdk.Gravity.NORTH_EAST, None)
-            else:
-                if not from_toolbar:
-                    menu.popup_at_widget(widget, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH, None)
-                else:
-                    menu.popup_at_widget(widget.toolbar, Gdk.Gravity.EAST, Gdk.Gravity.NORTH, None)
+            menu.popup_at_pointer(None)
+
         else:  # fallback in case mimeinfo.cache not found
             print("No registered program found. Does the /usr/share/applications/mimeinfo.cache file exist?")
             command = 'feh --start-at {} --scale-down --no-fehbg -d --output-dir {}'.format(
@@ -740,7 +710,7 @@ class GUI:
         screen = window.get_screen()
         h = screen.height()
 
-        window.set_default_size(common.settings.thumb_width * common.settings.columns + 160, h * 0.95)
+        window.set_default_size(common.settings.thumb_width * (common.settings.columns + 1), h * 0.95)
         common.main_window = window
 
         window.set_title("Azote~")
@@ -765,7 +735,6 @@ class GUI:
 
         # This contains a Gtk.ScrolledWindow with Gtk.Grid() inside, filled with ThumbButton(Gtk.Button) instances
         common.preview = Preview()
-        window.connect('configure-event', on_configure_event)
 
         main_box.pack_start(common.preview, False, False, 0)
 
@@ -929,16 +898,6 @@ class GUI:
         deselect_all()
 
         common.progress_bar.hide()
-
-
-def on_configure_event(window, e):
-    cols = e.width // (common.settings.thumb_width + 40)
-    if cols != common.cols:
-        common.preview.hide()
-        if cols != common.cols:
-            common.cols = cols
-            common.preview.refresh(create_thumbs=False)
-        common.preview.show()
 
 
 def on_apply_to_all_button(button):
