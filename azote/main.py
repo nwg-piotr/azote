@@ -717,6 +717,7 @@ class TransparentWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self)
         self.connect('draw', self.draw)
+        self.set_title("Checking...")
         # Credits for transparency go to KurtJacobson:
         # https://gist.github.com/KurtJacobson/374c8cb83aee4851d39981b9c7e2c22c
         screen = self.get_screen()
