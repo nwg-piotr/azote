@@ -18,6 +18,7 @@ import stat
 import common
 import gi
 import pkg_resources
+import cairo
 from PIL import Image
 
 # send2trash module may or may not be available
@@ -703,14 +704,41 @@ def destroy(self):
     Gtk.main_quit()
 
 
-class GUI:
+def check_height_and_start(window):
+    w, h = window.get_size()
+    window.destroy()
+    if common.sway or common.env['wm'] == "i3":
+        h = h * 0.95
+    print("Available screen height: {} px; measurement delay: {} ms".format(h, common.settings.screen_measurement_delay))
+    app = GUI(h)
+
+
+class TransparentWindow(Gtk.Window):
     def __init__(self):
+        Gtk.Window.__init__(self)
+        self.connect('draw', self.draw)
+        # Credits for transparency go to KurtJacobson:
+        # https://gist.github.com/KurtJacobson/374c8cb83aee4851d39981b9c7e2c22c
+        screen = self.get_screen()
+        visual = screen.get_rgba_visual()
+        if visual and screen.is_composited():
+            self.set_visual(visual)
+        self.set_app_paintable(True)
+    
+    def draw(self, widget, context):
+        context.set_source_rgba(0, 0, 0, 0.0)
+        context.set_operator(cairo.OPERATOR_SOURCE)
+        context.paint()
+        context.set_operator(cairo.OPERATOR_OVER)
+
+
+class GUI:
+    def __init__(self, height):
 
         window = Gtk.Window()
-        screen = window.get_screen()
-        h = screen.height()
+        h = height
 
-        window.set_default_size(common.settings.thumb_width * (common.settings.columns + 1), h * 0.95)
+        window.set_default_size(common.settings.thumb_width * (common.settings.columns + 1), h)
         common.main_window = window
 
         window.set_title("Azote~")
@@ -1756,11 +1784,21 @@ def main():
         exit()
 
     common.cols = len(common.displays) if len(common.displays) > common.settings.columns else common.settings.columns
-    app = GUI()
+
+    # We want Azote to take all the possible screen height. Since Gdk.Screen.height is deprecated, we need to measure
+    # the current screen height in another way. `w` is a temporary window.
+    w = TransparentWindow()
+    if common.sway or common.env['wm'] == "i3":
+        w.fullscreen()  # .maximize() doesn't work as expected on sway
+    else:
+        w.maximize()
+    w.present()
+
     if common.settings.track_files:
         GLib.timeout_add_seconds(common.settings.tracking_interval_seconds, track_changes)
     if common.env['app_indicator']:
         common.indicator = Indicator()
+    GLib.timeout_add(common.settings.screen_measurement_delay, check_height_and_start, w)
     Gtk.main()
 
 
