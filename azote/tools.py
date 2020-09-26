@@ -148,9 +148,11 @@ def check_displays():
             log("swaybg package not found", common.ERROR)
             exit(1)
 
-    # On i3 we could use i3-msg here, but xrandr should also return what we need. If not on Sway - let's use xrandr
     else:
-        print("Running on X11")
+        if common.env['i3']:
+            print("Running on i3")
+        else:
+            print("Running on X11")
         fnull = open(os.devnull, 'w')
         try:
             common.env['xrandr'] = subprocess.call(["xrandr", "-v"], stdout=fnull, stderr=subprocess.STDOUT) == 0
