@@ -149,7 +149,7 @@ def check_displays():
             exit(1)
 
     else:
-        if common.env['i3']:
+        if common.env['wm'] == "i3":
             print("Running on i3")
         else:
             print("Running on X11")
