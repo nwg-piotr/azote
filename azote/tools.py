@@ -64,6 +64,8 @@ def check_displays():
             common.env['wm'] = os.getenv('XDG_SESSION_DESKTOP')
         elif os.getenv('DESKTOP_SESSION'):
             common.env['wm'] = os.getenv('DESKTOP_SESSION')
+        elif os.getenv('I3SOCK'):
+            common.env['wm'] = "i3"
         else:
             common.env['wm'] = 'undetected'
 
