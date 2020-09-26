@@ -159,7 +159,8 @@ Seeing Arch [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=az
   "color_icon_h": "50",
   "clip_prev_size": "30",
   "palette_quality": "10",
-  "tracking_interval_seconds": "5"
+  "tracking_interval_seconds": "5",
+  "screen_measurement_delay": "300"
 }
 ```
 
@@ -173,7 +174,12 @@ palette view;
 - `palette_quality` - affects quality and time of generation of the colour palette on the basis of an image; the less - the
 better, but slower; default value is 10;
 - `tracking_interval_seconds` - determines how often the current wallpapers folder should be checked for file addition / 
-deletion.
+deletion;
+- `screen_measurement_delay` (ms) - introduced to resolve [#108](https://github.com/nwg-piotr/azote/issues/108).
+Since `Gdk.Screen.height` has been deprecated, there's no reasonable way to determine the screen dimensions. 
+We need to open a temporary window and measure its height to open the Azote window with maximum allowed vertical dimension.
+Different hardware and window managers need different time to accomplish the task. Increase the value if the (floating) 
+window does not scale to the screen height. Decrease as much as possible to speed up launching Azote.
 
 ## Command line arguments
 
