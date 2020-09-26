@@ -18,6 +18,14 @@ Finally it's up to packagers how to deal with dependencies.*
 - in wallpapers preview, the `Gtk.Grid` container has been replaced with `Gtk.FlowBox`. This allows to maximize and/or
 scale the Azote window on-the-fly without freezing its width.
 
+- Screen height is deprecated #108 fixed in slightly tricky way.
+
+*Since Gdk.Screen.height has been deprecated, there's no reasonable way to determine the screen dimensions. We need to 
+open a temporary window and measure its height to open the Azote window with maximum allowed vertical dimension.
+In `~/.config/azote/azoterc` you'll find the `"screen_measurement_delay": "300"` value. Different hardware and window 
+managers need different time to open the temporary window. Increase the value if the (floating) window does not scale 
+to the screen height. Decrease as much as possible to speed up launching Azote.*
+
 ## v1.7.14 (2020-09-12)
 - Added possibility to open images with [swappy](https://github.com/jtheoof/swappy) (.png only);
 - fixed crash on the stored wallpaper folder path not found [#102](https://github.com/nwg-piotr/azote/issues/102);
