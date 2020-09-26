@@ -880,6 +880,14 @@ class Settings(object):
         log('Files tracking interval: {} seconds'.format(self.tracking_interval_seconds),
             common.INFO)
 
+        try:
+            self.screen_measurement_delay = int(rc['screen_measurement_delay'])
+        except KeyError:
+            self.screen_measurement_delay = 300
+            save_needed = True
+        log('Screen measurement delay: {} ms'.format(self.screen_measurement_delay),
+            common.INFO)
+
         if save_needed:
             self.save_rc()
 
@@ -892,6 +900,7 @@ class Settings(object):
             self.clip_prev_size = 30
             self.palette_quality = 10
             self.tracking_interval_seconds = 5
+            self.screen_measurement_delay = 300
 
         rc = {'thumb_width': str(self.thumb_width),
               'columns': str(self.columns),
@@ -899,7 +908,8 @@ class Settings(object):
               'color_icon_h': str(self.color_icon_h),
               'clip_prev_size': str(self.clip_prev_size),
               'palette_quality': str(self.palette_quality),
-              'tracking_interval_seconds': str(self.tracking_interval_seconds)}
+              'tracking_interval_seconds': str(self.tracking_interval_seconds),
+              'screen_measurement_delay': str(self.screen_measurement_delay)}
 
         with open(self.rc_file, 'w') as f:
             json.dump(rc, f, indent=2)
