@@ -29,7 +29,7 @@ wlroots-based composers. Since the `swaybg` command does everything we may need,
 In order not to limit the program usage to the single environment, Azote is also capable of using feh 
 when running on i3, Openbox or other X11 window managers.
 
-*The description below takes into the current `master` branch. All the features may or may not be available in the
+*The description below takes into account the current `master` branch. All the features may or may not be available in the
 package already released for a certain Linux distribution. Some features rely on 
 [optional dependencies](https://github.com/nwg-piotr/azote#dependencies-as-used-in-the-azote-aur-package).*
 
