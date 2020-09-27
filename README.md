@@ -82,13 +82,16 @@ exec ~/.azotebg
 ### Wayfire
 
 In `~/.config/wayfire.ini` set `autostart_wf_shell = false`, and replace `background = wf-background` with 
-`background = ~/.azotebg`. 
+`background = ~/.azotebg`.
 
 **Important:** optional `wlr-randr` / `wlr-randr-git` and `swaybg` packages are necessary.
 
 ### X window managers (i3, Openbox, dwm etc.)
 
 You need to execute `~/.fehbg` from your window manager’s startup file.
+You'll also need optional `feh` and `xorg-xrandr` packages.
+
+**Important:** optional `xorg-xrandr` and `feh` packages are necessary.
 
 **dwm note:**
 
