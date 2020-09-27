@@ -150,16 +150,20 @@ LICENSE-COLORTHIEF file to `/usr/share/licenses/azote/`.
 - `python-gobject`
 - `python-pillow`
 - `gtk3`
-- `feh`
-- `xorg-xrandr`
+- `python-cairo`
 - `python-send2trash`
 
 ### Optional dependencies:
 
-- `grim`, `slurp`: for screen color picker on Sway
+- `imagemagick`: for screen color picker in every environment
+- `grim`, `slurp`: for screen color picker on sway / wlroots
 - `maim`, `slop`: for screen color picker on X11
-- `imagemagick`: for screen color picker on both Sway and X11
-- `python-yaml`: (`python3-yaml`) for alacritty.yml toolbox
+- `libappindicator-gtk3`: for tray status icon
+- `python-yaml`: for alacritty.yml toolbox
+- `swaybg`: for setting background on wlroots-based compositors other than sway
+- `feh`: for setting background on X11-based WMs
+- `xorg-xrandr`: for checking outputs on X11-based WMs
+- `wlr-randr` (`wlr-randr-git`): for checking outputs on wlroots-based compositors other than sway
 
 Please use assets from the [latest release](https://github.com/nwg-piotr/azote/releases/latest).
 
