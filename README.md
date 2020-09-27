@@ -9,6 +9,15 @@ multi-headed setups in mind. Azote also includes several colour management tools
 The program is confirmed to work on sway, Wayfire, i3, Openbox, Fluxbox and dwm window managers. Wayland support is
 limited to wlroots-based compositors.
 
+Azote relies on numerous external packages. Some of them determine if the program is capable of working in a certain
+environment (sway / another wlroots-based compositor / X11). It's **up to the packager** which of them come preinstalled.
+It's recommendable to first run `azote` from terminal:
+
+- if one of missing packages disallows Azote to work at all (e.g. `xorg-xrandr` or `feh` on X11, `wlr-randr` or 
+`swaybg` on Wayfire), the program will display a message and terminate with exit code 1.
+
+- If a missing dependency just stops some feature from working, Azote will display a message and start normally.
+
 ![screenshot](http://nwg.pl/Lychee/uploads/big/78510b1f9358767e8407d66e933f1d8c.png)
 
 *Wallpapers above come from https://wallhaven.cc*
