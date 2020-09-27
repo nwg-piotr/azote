@@ -1,8 +1,6 @@
 # CHANGELOG
 
-## Development
-
-**Available for testing as azote-git (AUR)**
+## v1.8.0 (2020.09.27)
 
 - added fix to avoid crashes on X11, when a display is connected, but turned off 
 [#110](https://github.com/nwg-piotr/azote/issues/110);
