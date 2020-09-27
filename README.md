@@ -18,6 +18,13 @@ It's recommendable to first run `azote` from terminal:
 
 - If a missing dependency just stops some feature from working, Azote will display a message and start normally.
 
+```text
+$ azote
+python-send2trash package not found - deleting pictures unavailable
+Running on Wayland, but not sway
+Available screen height: 1030 px; measurement delay: 5 ms
+```
+
 ![screenshot](http://nwg.pl/Lychee/uploads/big/78510b1f9358767e8407d66e933f1d8c.png)
 
 *Wallpapers above come from https://wallhaven.cc*
