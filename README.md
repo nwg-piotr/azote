@@ -246,7 +246,23 @@ $ sudo update-desktop-database
 
 See https://specifications.freedesktop.org/desktop-entry-spec/0.9.5/ar01s07.html
 
-### X11 / feh notice
+### Floating Azote window does not scale to the screen height
+
+or
+
+### Screens goes black before the Azote window appears
+
+Since `Gdk.Screen.height` has been deprecated, there's no reasonable way to determine the screen dimensions. 
+We need to open a temporary window (maximized or fullscreened on sway) and measure its height to open the Azote 
+window with maximum allowed vertical dimension. It's transparent on every WM except for sway, where fullscreened
+windows are always opaque.
+
+In `~/.config/azote/azoterc` you'll find the `"screen_measurement_delay": "300"` value. Different hardware 
+and window managers need different time to open the temporary window. Increase the value if the (floating) 
+window does not scale to the screen height. Decrease as much as possible to speed up launching Azote (and not to 
+see the black screen on sway).
+
+## X11 / feh notice
 
 The background color picker won't be available. You'll also be unable to select different modes 
 *("scale", "max", "fill", "center", "tile")* for certain displays. The list of modes varies from what you see in Sway 
