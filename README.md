@@ -260,7 +260,7 @@ windows are always opaque.
 In `~/.config/azote/azoterc` you'll find the `"screen_measurement_delay": "300"` value. Different hardware 
 and window managers need different time to open the temporary window. Increase the value if the (floating) 
 window does not scale to the screen height. Decrease as much as possible to speed up launching Azote (and not to 
-see the black screen on sway).
+see the black screen on sway). On my development machine the minimum value is 30 ms on sway and 5 ms on Wayfire.
 
 ## X11 / feh notice
 
