@@ -708,7 +708,7 @@ def check_height_and_start(window):
     w, h = window.get_size()
     window.destroy()
     if common.sway or common.env['wm'] == "i3":
-        h = h * 0.95
+        h = int(h * 0.95)
     print("Available screen height: {} px; measurement delay: {} ms".format(h, common.settings.screen_measurement_delay))
     app = GUI(h)
 
@@ -748,6 +748,7 @@ class GUI:
         window.set_role("azote")
 
         window.connect_after('destroy', destroy)
+        window.connect("key-release-event", self.handle_keyboard)
 
         main_box = Gtk.Box()
         main_box.set_spacing(5)
@@ -927,6 +928,11 @@ class GUI:
         deselect_all()
 
         common.progress_bar.hide()
+
+    def handle_keyboard(self, item, event):
+        if event.type == Gdk.EventType.KEY_RELEASE and event.keyval == Gdk.KEY_Escape:
+            Gtk.main_quit()
+        return True
 
 
 def on_apply_to_all_button(button):
@@ -1804,7 +1810,7 @@ def main():
 
         GLib.timeout_add(common.settings.screen_measurement_delay, check_height_and_start, w)
     else:
-        app = GUI(common.screen_h * 0.95)
+        app = GUI(int(common.screen_h * 0.95))
 
     Gtk.main()
 
