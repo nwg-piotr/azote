@@ -748,6 +748,7 @@ class GUI:
         window.set_role("azote")
 
         window.connect_after('destroy', destroy)
+        window.connect("key-release-event", self.handle_keyboard)
 
         main_box = Gtk.Box()
         main_box.set_spacing(5)
@@ -927,6 +928,11 @@ class GUI:
         deselect_all()
 
         common.progress_bar.hide()
+
+    def handle_keyboard(self, item, event):
+        if event.type == Gdk.EventType.KEY_RELEASE and event.keyval == Gdk.KEY_Escape:
+            Gtk.main_quit()
+        return True
 
 
 def on_apply_to_all_button(button):
