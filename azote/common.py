@@ -20,6 +20,7 @@ DEBUG = 'debug'
 
 env = {}
 sway = False
+screen_h = None
 
 lang = None             # dictionary "name": lang_string
 
