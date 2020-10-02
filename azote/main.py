@@ -708,7 +708,7 @@ def check_height_and_start(window):
     w, h = window.get_size()
     window.destroy()
     if common.sway or common.env['wm'] == "i3":
-        h = h * 0.95
+        h = int(h * 0.95)
     print("Available screen height: {} px; measurement delay: {} ms".format(h, common.settings.screen_measurement_delay))
     app = GUI(h)
 
@@ -1804,7 +1804,7 @@ def main():
 
         GLib.timeout_add(common.settings.screen_measurement_delay, check_height_and_start, w)
     else:
-        app = GUI(common.screen_h * 0.95)
+        app = GUI(int(common.screen_h * 0.95))
 
     Gtk.main()
 
