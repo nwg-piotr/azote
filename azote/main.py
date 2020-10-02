@@ -1456,10 +1456,9 @@ class CustomDisplayDialog(Gtk.Window):
         self.set_role("toolbox")
         self.set_resizable(False)
         self.set_type_hint(Gdk.WindowTypeHint.DIALOG)
-        self.set_modal(True)
         self.set_decorated(False)
         # self.set_transient_for(common.main_window)
-        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+        self.set_position(Gtk.WindowPosition.MOUSE)
         self.set_keep_above(True)
 
         self.name_label = Gtk.Label()
