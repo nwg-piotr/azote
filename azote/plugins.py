@@ -4,7 +4,7 @@
 import gi
 import common
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 from tools import create_pixbuf
 from color_tools import hex_to_rgb
 
@@ -27,10 +27,8 @@ class Alacritty(Gtk.Window):
         super().__init__()
 
         self.set_title('alacritty.yml')
-        self.set_role("toolbox")
         self.set_resizable(False)
-        self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        self.set_transient_for(common.main_window)
+        self.set_type_hint(Gdk.WindowTypeHint.DIALOG)
         self.set_position(Gtk.WindowPosition.NONE)
         self.set_keep_above(True)
 
@@ -142,11 +140,9 @@ class Xresources(Gtk.Window):
         super().__init__()
 
         self.set_title('.Xresources')
-        self.set_role("toolbox")
         self.set_resizable(False)
-        self.set_type_hint(Gtk.WindowType.TOPLEVEL)
-        self.set_transient_for(common.main_window)
-        self.set_position(Gtk.WindowPosition.MOUSE)
+        self.set_type_hint(Gdk.WindowTypeHint.DIALOG)
+        self.set_position(Gtk.WindowPosition.NONE)
         self.set_keep_above(True)
 
         vbox0 = Gtk.VBox()
