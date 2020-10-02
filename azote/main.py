@@ -1453,7 +1453,8 @@ class CustomDisplayDialog(Gtk.Window):
         self.properties = common.settings.custom_display
 
         self.set_title("Azote custom display")
-        self.set_role("pop-up")
+        self.set_role("toolbox")
+        self.set_resizable(False)
         self.set_type_hint(Gdk.WindowTypeHint.DIALOG)
         self.set_modal(True)
         self.set_decorated(False)
