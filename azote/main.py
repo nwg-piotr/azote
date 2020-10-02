@@ -1786,20 +1786,26 @@ def main():
 
     common.cols = len(common.displays) if len(common.displays) > common.settings.columns else common.settings.columns
 
-    # We want Azote to take all the possible screen height. Since Gdk.Screen.height is deprecated, we need to measure
-    # the current screen height in another way. `w` is a temporary window.
-    w = TransparentWindow()
-    if common.sway or common.env['wm'] == "i3":
-        w.fullscreen()  # .maximize() doesn't work as expected on sway
-    else:
-        w.maximize()
-    w.present()
-
     if common.settings.track_files:
         GLib.timeout_add_seconds(common.settings.tracking_interval_seconds, track_changes)
     if common.env['app_indicator']:
         common.indicator = Indicator()
-    GLib.timeout_add(common.settings.screen_measurement_delay, check_height_and_start, w)
+
+    # We want Azote to take all the possible screen height. Since Gdk.Screen.height is deprecated, we need to measure
+    # the current screen height in another way. `w` is a temporary window.
+    # If on sway, we've already detected the screen height in tools/check_displays() and stored it in common.screen_h
+    if not common.screen_h:
+        w = TransparentWindow()
+        if common.sway or common.env['wm'] == "i3":
+            w.fullscreen()  # .maximize() doesn't work as expected on sway
+        else:
+            w.maximize()
+        w.present()
+
+        GLib.timeout_add(common.settings.screen_measurement_delay, check_height_and_start, w)
+    else:
+        app = GUI(common.screen_h * 0.95)
+
     Gtk.main()
 
 
