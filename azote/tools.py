@@ -89,9 +89,12 @@ def check_displays():
                                'height': output['rect']['height']}
                     displays.append(display)
                     log("Output found: {}".format(display), common.INFO)
-                if output['focused']:
-                    common.screen_h = output['rect']['height']
-                    print("Available screen height: {} px".format(int(common.screen_h * 0.95)))
+                try:
+                    if output['focused']:
+                        common.screen_h = output['rect']['height']
+                        print("Available screen height: {} px".format(int(common.screen_h * 0.95)))
+                except:
+                    pass
 
             # sort displays list by x, y: from left to right, then from bottom to top
             displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
