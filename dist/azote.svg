@@ -23,9 +23,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="16.39241"
-     inkscape:cx="23.9754"
-     inkscape:cy="22.861647"
+     inkscape:zoom="11.515127"
+     inkscape:cx="29.918791"
+     inkscape:cy="28.696377"
      inkscape:document-units="px"
      inkscape:current-layer="g1103"
      showgrid="false"
@@ -36,7 +36,7 @@
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:document-rotation="0"
-     showguides="true"
+     showguides="false"
      inkscape:guide-bbox="true"
      inkscape:snap-global="false">
     <sodipodi:guide
@@ -102,14 +102,18 @@
       <path
          inkscape:connector-curvature="0"
          id="text4527-5"
-         d="m 5.6087673,285.56227 -4.2144011,10.4228 h 2.1767731 l 0.9595383,-2.30451 h 3.7802698 l 0.9244726,2.30451 h 2.167313 l -4.241672,-10.4228 z m 0.7758681,2.85927 1.1354159,3.31879 h -2.270833 z"
-         style="font-style:normal;font-weight:normal;font-size:13.3444px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.454907" />
+         d="m 5.6087673,285.81502 -4.2144011,10.17005 h 2.1767731 l 0.9595383,-2.24863 h 3.7802698 l 0.9244726,2.24863 h 2.167313 L 7.161061,285.81502 Z m 0.7758681,2.78993 1.1354159,3.23831 h -2.270833 z"
+         style="font-style:normal;font-weight:normal;font-size:13.3444px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.449358" />
       <circle
          r="1.1252092"
-         cy="286.68747"
+         cy="286.94022"
          cx="10.277524"
          id="path4529-2"
          style="fill:#ffdd55;stroke:none;stroke-width:1.05833;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         id="rect4709-5-3"
+         style="fill:#000000;fill-opacity:0.14981273;stroke:none;stroke-width:1.41111;stroke-miterlimit:4;stroke-dasharray:none"
+         d="m 1.1933899,284.94331 c -0.364235,0 -0.615053,0.25648 -0.615053,0.56503 v 0.19327 c 0,-0.30855 0.250818,-0.56503 0.615053,-0.56503 H 11.603814 c 0.364234,0 0.61619,0.25648 0.61619,0.56503 v -0.19327 c 0,-0.30855 -0.251956,-0.56503 -0.61619,-0.56503 z" />
     </g>
   </g>
 </svg>
