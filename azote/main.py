@@ -743,8 +743,7 @@ class GUI:
         common.main_window = window
 
         window.set_title("Azote~")
-        logo = GdkPixbuf.Pixbuf.new_from_file('images/icon.svg')
-        window.set_default_icon(logo)
+        window.set_default_icon_name("azote")
         window.set_role("azote")
 
         window.connect_after('destroy', destroy)
