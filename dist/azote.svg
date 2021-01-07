@@ -76,7 +76,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -102,12 +102,12 @@
       <path
          inkscape:connector-curvature="0"
          id="text4527-5"
-         d="m 5.6087673,285.50656 -4.2144011,11.09747 h 2.1767731 l 0.9595383,-2.45368 h 3.7802698 l 0.9244726,2.45368 h 2.167313 L 7.161061,285.50656 Z m 0.7758681,3.04436 1.1354159,3.53361 h -2.270833 z"
-         style="font-style:normal;font-weight:normal;font-size:13.3444px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.469399" />
+         d="m 5.6087673,285.56227 -4.2144011,10.4228 h 2.1767731 l 0.9595383,-2.30451 h 3.7802698 l 0.9244726,2.30451 h 2.167313 l -4.241672,-10.4228 z m 0.7758681,2.85927 1.1354159,3.31879 h -2.270833 z"
+         style="font-style:normal;font-weight:normal;font-size:13.3444px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.454907" />
       <circle
          r="1.1252092"
-         cy="286.63177"
-         cx="10.272206"
+         cy="286.68747"
+         cx="10.277524"
          id="path4529-2"
          style="fill:#ffdd55;stroke:none;stroke-width:1.05833;stroke-miterlimit:4;stroke-dasharray:none" />
     </g>
