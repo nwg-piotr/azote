@@ -736,6 +736,9 @@ class TransparentWindow(Gtk.Window):
 class GUI:
     def __init__(self, height):
 
+        # set app_id for Wayland
+        GLib.set_prgname('azote')
+
         window = Gtk.Window()
         h = height
 
@@ -743,7 +746,7 @@ class GUI:
         common.main_window = window
 
         window.set_title("Azote~")
-        window.set_default_icon_name("azote")
+        window.set_icon_name("azote")
         window.set_role("azote")
 
         window.connect_after('destroy', destroy)
