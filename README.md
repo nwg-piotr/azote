@@ -7,7 +7,7 @@
 multi-headed setups in mind. Azote also includes several colour management tools.
 
 The program is confirmed to work on sway, Wayfire, i3, Openbox, Fluxbox and dwm window managers. Wayland support is
-limited to wlroots-based compositors.
+limited to wlroots-based compositors. GNOME is not supported.
 
 Azote relies on numerous external packages. Some of them determine if the program is capable of working in a certain
 environment (sway / another wlroots-based compositor / X11). It's **up to the packager** which of them come preinstalled.

@@ -1,9 +1,19 @@
 # CHANGELOG
 
+## v1.8.2 (2020.01.11)
+
+- sway: fixed crash on display connected, but turned off [#110](https://github.com/nwg-piotr/azote/issues/110)
+- app icon rescaled, moved to /usr/share/pixmaps
+- set icon name for X11 and app_id for Wayland
+
+## v1.8.1 (2020.10.03)
+
+- screen height measurement on sway simplified
+- Esc key closes the Azote window
+- dialog windows' behaviour unified
+
 ## v1.8.0 (2020.09.27)
 
-- added fix to avoid crashes on X11, when a display is connected, but turned off 
-[#110](https://github.com/nwg-piotr/azote/issues/110);
 - added CLI messages on missing optional dependencies [#101](https://github.com/nwg-piotr/azote/issues/101):
 
 *There were several request to get Azote rid of dependencies unused in a certain environment. That's why I added some CLI messages. 
