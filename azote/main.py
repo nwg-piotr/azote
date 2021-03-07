@@ -849,7 +849,6 @@ class GUI:
         # Buttons below represent displays preview
         common.display_boxes_list = []
         for display in common.displays:
-            print(display.get('x'))
             name = display.get('name')
             # Check if we have stored values
             path, thumb = None, None
