@@ -761,7 +761,7 @@ class Settings(object):
             self.src_path = settings.src_path
         else:
             save_needed = True
-            
+
         # In case the stored wallpapers directory no longer existed
         if not os.path.isdir(self.src_path):
             self.src_path = common.sample_dir
@@ -923,6 +923,19 @@ class Settings(object):
 
         with open(self.rc_file, 'w') as f:
             json.dump(rc, f, indent=2)
+
+
+def save_json(src_dict, path):
+    with open(path, 'w') as f:
+        json.dump(src_dict, f, indent=2)
+
+
+def load_json(path):
+    try:
+        with open(path, 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        print(e)
 
 
 class Language(dict):
