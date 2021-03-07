@@ -36,7 +36,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
 from gi.repository.GdkPixbuf import InterpType
 from tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, create_pixbuf, split_selected_wallpaper, scale_and_crop, clear_thumbnails, current_display
+    copy_backgrounds, create_pixbuf, split_selected_wallpaper, scale_and_crop, clear_thumbnails, current_display, \
+    save_json, load_json
 from color_tools import rgba_to_hex, hex_to_rgb, rgb_to_hex, rgb_to_rgba
 from plugins import Alacritty, Xresources
 from color_tools import WikiColours
@@ -44,6 +45,7 @@ from color_tools import WikiColours
 try:
     gi.require_version('AppIndicator3', '0.1')
     from gi.repository import AppIndicator3
+
     common.env['app_indicator'] = True
 except:
     common.env['app_indicator'] = False
@@ -82,7 +84,7 @@ class Preview(Gtk.ScrolledWindow):
         common.thumbnails_list = []
         self.grid = Gtk.FlowBox()
         self.grid.set_valign(Gtk.Align.START)
-        #self.grid.set_max_children_per_line(30)
+        # self.grid.set_max_children_per_line(30)
         self.grid.set_selection_mode(Gtk.SelectionMode.NONE)
 
         create_thumbnails(common.settings.src_path)
@@ -127,7 +129,7 @@ class Thumbnail(Gtk.VBox):
         super().__init__()
         self.toolbar = ImageToolbar(self)
         self.add(self.toolbar)
-        
+
         self.image_button = Gtk.Button()
         self.image_button.set_property("name", "thumb-btn")
         self.image_button.set_always_show_image(True)
@@ -162,10 +164,10 @@ class Thumbnail(Gtk.VBox):
             on_thumb_double_click(button)
         if event.button == 3:
             show_image_menu(self)
-            
+
     def on_menu_button_press(self, button):
         show_image_menu(self)
-        
+
     def select(self, thumbnail):
         if common.split_button:
             common.split_button.set_sensitive(True)
@@ -184,18 +186,18 @@ class Thumbnail(Gtk.VBox):
             if len(filename) > 30:
                 filename = '…{}'.format(filename[-28::])
             common.selected_picture_label.set_text("{} ({} x {})".format(filename, img.size[0], img.size[1]))
-    
+
     def deselect(self, thumbnail):
         self.selected = False
         self.toolbar.hide()
         thumbnail.image_button.set_property("name", "thumb-btn")
-        
+
 
 def deselect_all():
     for thumbnail in common.thumbnails_list:
         thumbnail.deselect(thumbnail)
-        
-        
+
+
 class ImageToolbar(Gtk.HBox):
     def __init__(self, thumbnail):
         super().__init__()
@@ -216,25 +218,29 @@ class ImageToolbar(Gtk.HBox):
 
     def on_menu_button_press(self, button, event):
         show_image_menu(self.parent_thumbnail, from_toolbar=True)
-    
+
 
 class DisplayBox(Gtk.Box):
     """
     The box contains elements to preview certain displays and assign wallpapers to them
     """
 
-    def __init__(self, name, width, height):
+    def __init__(self, name, width, height, path=None, thumb=None):
         super().__init__()
+        print(path, thumb)
 
         self.set_orientation(Gtk.Orientation.VERTICAL)
 
         # Values to assigned to corresponding display when apply button pressed
         self.display_name = name
-        self.wallpaper_path = None
+        self.wallpaper_path = path
         self.mode = 'fill' if common.sway or common.env['wayland'] else 'scale'
         self.color = None
 
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file('images/empty.png')
+        if thumb and os.path.isfile(thumb):
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(thumb)
+        else:
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file('images/empty.png')
         pixbuf = pixbuf.scale_simple(common.settings.thumb_size[0], common.settings.thumb_size[1], InterpType.BILINEAR)
 
         self.img = Gtk.Image.new_from_pixbuf(pixbuf)
@@ -422,6 +428,11 @@ def on_apply_button(button):
     copy_backgrounds()
 
     if common.sway or common.env['wayland']:
+        # On next startup we'll want to restore what we're setting here. Let's save it to json files
+        # instead of parsing .azoteb / .fehbg. We only save pictures.
+        restore_from_file = os.path.join(common.data_home, "swaybg.json")
+        restore_from = []
+
         # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
         batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
         for box in common.display_boxes_list:
@@ -432,6 +443,23 @@ def on_apply_button(button):
                 batch_content.append(
                     "swaybg -o {} -i '{}' -m {} &".format(box.display_name, box.wallpaper_path, box.mode))
 
+                # build the json file content
+                if box.wallpaper_path.startswith("{}/backgrounds-sway/flipped-".format(common.data_home)):
+                    thumb = "thumbnail-{}".format(box.wallpaper_path.split("flipped-")[1])
+                    thumb = os.path.join(common.data_home, "backgrounds-sway", thumb)
+
+                elif box.wallpaper_path.startswith("{}/backgrounds-sway/part".format(common.data_home)):
+                    thumb = "thumb-part{}".format(box.wallpaper_path.split("part")[1])
+                    thumb = os.path.join(common.data_home, "backgrounds-sway", thumb)
+
+                else:
+                    thumb = "{}.png".format(hash_name(box.wallpaper_path))
+                    thumb = os.path.join(common.data_home, "thumbnails", thumb)
+
+                entry = {"name": box.display_name, "path": box.wallpaper_path,
+                         "thumb": thumb}
+                restore_from.append(entry)
+
         # save to ~/.azotebg
         with open(common.cmd_file, 'w') as f:
             for item in batch_content:
@@ -441,13 +469,27 @@ def on_apply_button(button):
         os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
 
         subprocess.call(common.cmd_file, shell=True)
+
+        save_json(restore_from, restore_from_file)
+
     else:
+        # As above
+        restore_from_file = os.path.join(common.data_home, "feh.json")
+        restore_from = []
+
         # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
         mode = common.display_boxes_list[0].mode  # They are all the same, just check the 1st one
         command = "feh --bg-{}".format(mode)
         for box in common.display_boxes_list:
             command += " '{}'".format(box.wallpaper_path)
+
+            entry = {"name": box.display_name, "path": box.wallpaper_path,
+                     "thumb": "{}.png".format(hash_name(box.wallpaper_path))}
+            restore_from.append(entry)
+
         subprocess.call(command, shell=True)
+
+        save_json(restore_from, restore_from_file)
 
 
 def on_split_button(button):
@@ -600,7 +642,8 @@ def show_image_menu(widget, event=None, parent=None, from_toolbar=False):
             display = common.displays[cd]
             width, height = display['width'] * 2, display['height']
             subitem = Gtk.MenuItem.new_with_label(
-                '{} x {} ({} {} {})'.format(width, height, common.lang['current'], display['name'], common.lang['dual_width']))
+                '{} x {} ({} {} {})'.format(width, height, common.lang['current'], display['name'],
+                                            common.lang['dual_width']))
             subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
             submenu.append(subitem)
 
@@ -608,7 +651,8 @@ def show_image_menu(widget, event=None, parent=None, from_toolbar=False):
             display = common.displays[cd]
             width, height = display['width'], display['height'] * 2
             subitem = Gtk.MenuItem.new_with_label(
-                '{} x {} ({} {} {})'.format(width, height, common.lang['current'], display['name'], common.lang['dual_height']))
+                '{} x {} ({} {} {})'.format(width, height, common.lang['current'], display['name'],
+                                            common.lang['dual_height']))
             subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
             submenu.append(subitem)
 
@@ -616,7 +660,8 @@ def show_image_menu(widget, event=None, parent=None, from_toolbar=False):
             display = common.displays[cd]
             width, height = display['width'] * 3, display['height']
             subitem = Gtk.MenuItem.new_with_label(
-                '{} x {} ({} {} {})'.format(width, height, common.lang['current'], display['name'], common.lang['triple_width']))
+                '{} x {} ({} {} {})'.format(width, height, common.lang['current'], display['name'],
+                                            common.lang['triple_width']))
             subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
             submenu.append(subitem)
 
@@ -624,7 +669,8 @@ def show_image_menu(widget, event=None, parent=None, from_toolbar=False):
             display = common.displays[cd]
             width, height = display['width'], display['height'] * 3
             subitem = Gtk.MenuItem.new_with_label(
-                '{} x {} ({} {} {})'.format(width, height, common.lang['current'], display['name'], common.lang['triple_height']))
+                '{} x {} ({} {} {})'.format(width, height, common.lang['current'], display['name'],
+                                            common.lang['triple_height']))
             subitem.connect('activate', scale_and_crop, common.selected_wallpaper.source_path, width, height)
             submenu.append(subitem)
 
@@ -709,7 +755,8 @@ def check_height_and_start(window):
     window.destroy()
     if common.sway or common.env['wm'] == "i3":
         h = int(h * 0.95)
-    print("Available screen height: {} px; measurement delay: {} ms".format(h, common.settings.screen_measurement_delay))
+    print(
+        "Available screen height: {} px; measurement delay: {} ms".format(h, common.settings.screen_measurement_delay))
     app = GUI(h)
 
 
@@ -725,7 +772,7 @@ class TransparentWindow(Gtk.Window):
         if visual and screen.is_composited():
             self.set_visual(visual)
         self.set_app_paintable(True)
-    
+
     def draw(self, widget, context):
         context.set_source_rgba(0, 0, 0, 0.0)
         context.set_operator(cairo.OPERATOR_SOURCE)
@@ -775,11 +822,29 @@ class GUI:
         displays_box.set_spacing(15)
         displays_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
+        # Restore saved wallpapers if any
+        f_name = "swaybg.json" if common.sway else "feh.json"
+        f_path = os.path.join(common.data_home, f_name)
+        
+        if os.path.isfile(f_path):
+            restore_from = load_json(f_path)
+        else:
+            restore_from = None
+        
         # Buttons below represent displays preview
         common.display_boxes_list = []
         for display in common.displays:
+            name = display.get('name')
+            # Check if we have stored values
+            path, thumb = None, None
+            if restore_from:
+                for item in restore_from:
+                    if item["name"] == name:
+                        path = item["path"]
+                        thumb = item["thumb"]
+
             # Label format: name (width x height)
-            display_box = DisplayBox(display.get('name'), display.get('width'), display.get('height'))
+            display_box = DisplayBox(name, display.get('width'), display.get('height'), path, thumb)
             common.display_boxes_list.append(display_box)
             displays_box.pack_start(display_box, True, False, 0)
 
@@ -1122,7 +1187,7 @@ class ColorPaletteDialog(Gtk.Window):
         self.set_role("toolbox")
         self.set_resizable(False)
         self.set_type_hint(Gdk.WindowTypeHint.DIALOG)
-        #self.set_transient_for(common.main_window)
+        # self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.MOUSE)
         self.set_keep_above(True)
         self.all_buttons = []
@@ -1163,7 +1228,7 @@ class ColorPaletteDialog(Gtk.Window):
                 button.set_tooltip_text('{}'.format(name))
             else:
                 button.set_tooltip_text(common.lang['copy'])
-            
+
             button.connect_after('clicked', self.to_clipboard)
             self.all_buttons.append(button)
 
@@ -1238,7 +1303,7 @@ class ColorPaletteDialog(Gtk.Window):
             button.set_property("name", "color-btn")
         # mark selected
         widget.set_property("name", "color-btn-selected")
-        
+
         common.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
         if common.settings.copy_as == 'r, g, b':
@@ -1307,7 +1372,7 @@ class ColorPickerDialog(Gtk.Window):
         self.set_role("toolbox")
         self.set_resizable(False)
         self.set_type_hint(Gdk.WindowTypeHint.DIALOG)
-        #self.set_transient_for(common.main_window)
+        # self.set_transient_for(common.main_window)
         self.set_position(Gtk.WindowPosition.MOUSE)
         self.set_keep_above(True)
 
@@ -1319,7 +1384,7 @@ class ColorPickerDialog(Gtk.Window):
         self.vbox = Gtk.VBox()
         self.vbox.set_spacing(5)
         self.vbox.set_border_width(5)
-        
+
         rgba = rgb_to_rgba(color)
 
         self.color_button = Gtk.ColorButton()
@@ -1336,7 +1401,7 @@ class ColorPickerDialog(Gtk.Window):
         self.label = Gtk.Label()
         self.label.set_text(rgb_to_hex(color))
         self.vbox.add(self.label)
-        
+
         if common.settings.color_dictionary:
             self.closest_label = Gtk.Label()
             self.closest_label.set_property('name', 'closest')
@@ -1636,7 +1701,8 @@ def track_changes():
 
 class Indicator(object):
     def __init__(self):
-        self.ind = AppIndicator3.Indicator.new('azote_status_icon', '', AppIndicator3.IndicatorCategory.APPLICATION_STATUS)
+        self.ind = AppIndicator3.Indicator.new('azote_status_icon', '',
+                                               AppIndicator3.IndicatorCategory.APPLICATION_STATUS)
         self.ind.set_icon_full('/usr/share/azote/indicator_active.png', 'Tracking off')
         self.ind.set_attention_icon_full('/usr/share/azote/indicator_attention.png', 'Tracking on')
 
@@ -1650,14 +1716,14 @@ class Indicator(object):
                 self.ind.set_icon_full('/usr/share/azote/indicator_active.png', 'Tracking off')
 
         self.ind.set_menu(self.menu())
-        
+
     def menu(self):
         menu = Gtk.Menu()
 
         item = Gtk.MenuItem.new_with_label(common.lang['clear_unused_thumbnails'])
         item.connect('activate', self.clear_unused)
         menu.append(item)
-        
+
         item = Gtk.MenuItem.new_with_label(common.lang['about_azote'])
         item.connect('activate', on_about_button)
         menu.append(item)
@@ -1668,10 +1734,10 @@ class Indicator(object):
         item = Gtk.MenuItem.new_with_label(common.lang['exit'])
         item.connect('activate', destroy)
         menu.append(item)
-        
+
         menu.show_all()
         return menu
-    
+
     def clear_unused(self, item):
         clear_thumbnails()
         common.preview.refresh()
@@ -1740,7 +1806,7 @@ def main():
                 border-bottom: 1px solid #333;
                 border-right: 1px solid #333;
             }
-            
+
             button#display-btn {
                 font-weight: normal;
                 font-size: 12px;
