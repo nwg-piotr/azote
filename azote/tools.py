@@ -191,9 +191,12 @@ def check_displays():
                            'x': x_y[1],
                            'y': x_y[2],
                            'width': int(w_h[0]),
-                           'height': int(w_h[1])}
+                           'height': int(w_h[1]),
+                           'xrandr-idx': i}
                 displays.append(display)
                 log("Output found: {}".format(display), common.INFO)
+
+            displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
             return displays
 
         except Exception as e:
@@ -496,9 +499,17 @@ def set_env(language=None):
 
 
 def copy_backgrounds():
+    f_name = "swaybg.json" if common.sway else "feh.json"
+    used: list = load_json(os.path.join(common.data_home, f_name))
+
     # Clear current folder content
     for file in os.listdir(common.bcg_dir):
-        os.remove(os.path.join(common.bcg_dir, file))
+        f2delete = os.path.join(common.bcg_dir, file)
+        in_use = False
+        for item in used:
+            in_use = item["path"] == f2delete or item["thumb"] == f2delete
+        if not in_use:
+            os.remove(os.path.join(f2delete))
     # Copy manipulated (flip, split) files from the temporary folder
     for file in os.listdir(common.tmp_dir):
         shutil.copyfile(os.path.join(common.tmp_dir, file), os.path.join(common.bcg_dir, file))

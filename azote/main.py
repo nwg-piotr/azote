@@ -225,9 +225,8 @@ class DisplayBox(Gtk.Box):
     The box contains elements to preview certain displays and assign wallpapers to them
     """
 
-    def __init__(self, name, width, height, path=None, thumb=None):
+    def __init__(self, name, width, height, path=None, thumb=None, xrandr_idx=None):
         super().__init__()
-        print(path, thumb)
 
         self.set_orientation(Gtk.Orientation.VERTICAL)
 
@@ -236,6 +235,7 @@ class DisplayBox(Gtk.Box):
         self.wallpaper_path = path
         self.mode = 'fill' if common.sway or common.env['wayland'] else 'scale'
         self.color = None
+        self.xrandr_idx = xrandr_idx
 
         if thumb and os.path.isfile(thumb):
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(thumb)
@@ -480,11 +480,26 @@ def on_apply_button(button):
         # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
         mode = common.display_boxes_list[0].mode  # They are all the same, just check the 1st one
         command = "feh --bg-{}".format(mode)
-        for box in common.display_boxes_list:
+        c = common.display_boxes_list.copy()
+        c = sorted(c, key=lambda x: x.xrandr_idx)
+        for box in c:
             command += " '{}'".format(box.wallpaper_path)
 
+            # build the json file content
+            if box.wallpaper_path.startswith("{}/backgrounds-feh/flipped-".format(common.data_home)):
+                thumb = "thumbnail-{}".format(box.wallpaper_path.split("flipped-")[1])
+                thumb = os.path.join(common.data_home, "backgrounds-feh", thumb)
+
+            elif box.wallpaper_path.startswith("{}/backgrounds-feh/part".format(common.data_home)):
+                thumb = "thumb-part{}".format(box.wallpaper_path.split("part")[1])
+                thumb = os.path.join(common.data_home, "backgrounds-feh", thumb)
+
+            else:
+                thumb = "{}.png".format(hash_name(box.wallpaper_path))
+                thumb = os.path.join(common.data_home, "thumbnails", thumb)
+
             entry = {"name": box.display_name, "path": box.wallpaper_path,
-                     "thumb": "{}.png".format(hash_name(box.wallpaper_path))}
+                     "thumb": thumb}
             restore_from.append(entry)
 
         subprocess.call(command, shell=True)
@@ -834,6 +849,7 @@ class GUI:
         # Buttons below represent displays preview
         common.display_boxes_list = []
         for display in common.displays:
+            print(display.get('x'))
             name = display.get('name')
             # Check if we have stored values
             path, thumb = None, None
@@ -844,7 +860,11 @@ class GUI:
                         thumb = item["thumb"]
 
             # Label format: name (width x height)
-            display_box = DisplayBox(name, display.get('width'), display.get('height'), path, thumb)
+            try:
+                xrandr_idx = display.get('xrandr-idx')
+            except KeyError:
+                xrandr_idx = None
+            display_box = DisplayBox(name, display.get('width'), display.get('height'), path, thumb, xrandr_idx)
             common.display_boxes_list.append(display_box)
             displays_box.pack_start(display_box, True, False, 0)
 
