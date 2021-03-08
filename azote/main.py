@@ -1666,21 +1666,7 @@ def apply_to_all_swaybg(item, mode):
         box.img.set_from_file(common.selected_wallpaper.thumb_file)
         box.wallpaper_path = common.selected_wallpaper.source_path
 
-    common.apply_button.set_sensitive(False)
-
-    # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
-    batch_content = ['#!/usr/bin/env bash', 'pkill swaybg',
-                     "swaybg -o* -i '{}' -m {} &".format(common.selected_wallpaper.source_path, mode)]
-
-    # save to ~/.azotebg
-    with open(common.cmd_file, 'w') as f:
-        for item in batch_content:
-            f.write("%s\n" % item)
-    # make the file executable
-    st = os.stat(common.cmd_file)
-    os.chmod(common.cmd_file, st.st_mode | stat.S_IEXEC)
-
-    subprocess.call(common.cmd_file, shell=True)
+    common.apply_button.set_sensitive(True)
 
 
 def apply_to_all_feh(item, mode):
@@ -1689,13 +1675,7 @@ def apply_to_all_feh(item, mode):
         box.img.set_from_file(common.selected_wallpaper.thumb_file)
         box.wallpaper_path = common.selected_wallpaper.source_path
 
-    common.apply_button.set_sensitive(False)
-
-    # Prepare and execute the feh command. It's being saved automagically to ~/.fehbg
-    command = "feh --bg-{}".format(mode)
-    command += " '{}'".format(common.selected_wallpaper.source_path)
-
-    subprocess.call(command, shell=True)
+    common.apply_button.set_sensitive(True)
 
 
 def print_help():
