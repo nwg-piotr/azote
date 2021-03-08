@@ -456,8 +456,7 @@ def on_apply_button(button):
                     thumb = "{}.png".format(hash_name(box.wallpaper_path))
                     thumb = os.path.join(common.data_home, "thumbnails", thumb)
 
-                entry = {"name": box.display_name, "path": box.wallpaper_path,
-                         "thumb": thumb}
+                entry = {"name": box.display_name, "path": box.wallpaper_path, "thumb": thumb}
                 restore_from.append(entry)
 
         # save to ~/.azotebg
