@@ -34,6 +34,7 @@ flip_wallpaper_horizontally = Bild horizontal spiegeln
 grim_slurp_required = grim, slurp & imagemagick-Pakete erforderlich
 height = Höhe
 image_menu_button = Bildmenütaste
+include_when_splitting = beim Teilen einschließen
 maim_slop_required = maim & slop-Pakete erforderlich
 move = In den Papierkorb verschieben
 move_to_trash = Auswahl in den Papierkorb verschieben

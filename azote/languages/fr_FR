@@ -34,6 +34,7 @@ flip_wallpaper_horizontally = Retourner le fond d’écran horizontalement
 grim_slurp_required = paquets grim, slurp et imagemagick requis
 height = La taille
 image_menu_button = Bouton de menu Image
+include_when_splitting = inclure lors du fractionnement
 maim_slop_required = paquets maim et slop requis
 move = Vers la corbeille
 move_to_trash = Déplacer la sélection vers la corbeille

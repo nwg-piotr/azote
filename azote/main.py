@@ -237,6 +237,7 @@ class DisplayBox(Gtk.Box):
         self.mode = 'fill' if common.sway or common.env['wayland'] else 'scale'
         self.color = None
         self.xrandr_idx = xrandr_idx
+        self.include = True
 
         if thumb and os.path.isfile(thumb):
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(thumb)
@@ -274,6 +275,12 @@ class DisplayBox(Gtk.Box):
         options_box.set_border_width(0)
         options_box.set_orientation(Gtk.Orientation.HORIZONTAL)
         self.pack_start(options_box, True, False, 0)
+        
+        check_button = Gtk.CheckButton()
+        check_button.set_active(self.include)
+        check_button.set_tooltip_text(common.lang["include_when_splitting"])
+        check_button.connect("toggled", self.switch_included)
+        options_box.pack_start(check_button, False, False, 0)
 
         self.mode_combo = Gtk.ComboBox.new_with_model(mode_selector)
         self.mode_combo.set_active(2)
@@ -308,6 +315,9 @@ class DisplayBox(Gtk.Box):
         self.flip_button.set_tooltip_text(common.lang['flip_wallpaper_horizontally'])
         options_box.pack_start(self.flip_button, True, True, 0)
 
+    def switch_included(self, ckb):
+        self.include = ckb.get_active()
+    
     def clear_color_selection(self):
         # If not on sway / swaybg, we have no color_button in UI
         if common.sway or common.env['wayland']:
@@ -512,12 +522,18 @@ def on_apply_button(button):
 def on_split_button(button):
     if common.selected_wallpaper:
         common.apply_button.set_sensitive(True)
-        paths = split_selected_wallpaper(len(common.displays))
-        for i in range(len(paths)):
-            box = common.display_boxes_list[i]
-            box.wallpaper_path = paths[i][0]
-            box.img.set_from_file(paths[i][1])
-            box.thumbnail_path = paths[i][1]
+        num_parts = 0
+        for item in common.display_boxes_list:
+            if item.include:
+                num_parts += 1
+        paths = split_selected_wallpaper(num_parts)
+        i = 0
+        for box in common.display_boxes_list:
+            if box.include:
+                box.wallpaper_path = paths[i][0]
+                box.img.set_from_file(paths[i][1])
+                box.thumbnail_path = paths[i][1]
+                i += 1
 
     if common.display_boxes_list:
         for box in common.display_boxes_list:

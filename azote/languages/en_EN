@@ -35,6 +35,7 @@ flip_wallpaper_horizontally = Flip wallpaper horizontally
 grim_slurp_required = grim, slurp & imagemagick packages required
 height = Height
 image_menu_button = Image menu button
+include_when_splitting = Include when splitting
 maim_slop_required = maim & slop packages required
 move = To trash
 move_to_trash = Move selected to trash
