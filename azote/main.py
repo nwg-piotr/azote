@@ -233,6 +233,7 @@ class DisplayBox(Gtk.Box):
         # Values to assigned to corresponding display when apply button pressed
         self.display_name = name
         self.wallpaper_path = path
+        self.thumbnail_path = thumb
         self.mode = 'fill' if common.sway or common.env['wayland'] else 'scale'
         self.color = None
         self.xrandr_idx = xrandr_idx
@@ -323,6 +324,7 @@ class DisplayBox(Gtk.Box):
         if common.selected_wallpaper:
             self.img.set_from_file(common.selected_wallpaper.thumb_file)
             self.wallpaper_path = common.selected_wallpaper.source_path
+            self.thumbnail_path = common.selected_wallpaper.thumb_file
             button.set_property("name", "display-btn-selected")
             self.flip_button.set_sensitive(True)
 
@@ -355,6 +357,7 @@ class DisplayBox(Gtk.Box):
         images = flip_selected_wallpaper()
         self.img.set_from_file(images[0])
         self.wallpaper_path = images[1]
+        self.thumbnail_path = images[0]
         self.flip_button.set_sensitive(False)
 
 
@@ -514,6 +517,7 @@ def on_split_button(button):
             box = common.display_boxes_list[i]
             box.wallpaper_path = paths[i][0]
             box.img.set_from_file(paths[i][1])
+            box.thumbnail_path = paths[i][1]
 
     if common.display_boxes_list:
         for box in common.display_boxes_list:
@@ -1664,6 +1668,7 @@ def apply_to_all_swaybg(item, mode):
     for box in common.display_boxes_list:
         box.img.set_from_file(common.selected_wallpaper.thumb_file)
         box.wallpaper_path = common.selected_wallpaper.source_path
+        box.thumbnail_path = common.selected_wallpaper.thumb_file
 
     common.apply_button.set_sensitive(True)
 
@@ -1673,6 +1678,7 @@ def apply_to_all_feh(item, mode):
     for box in common.display_boxes_list:
         box.img.set_from_file(common.selected_wallpaper.thumb_file)
         box.wallpaper_path = common.selected_wallpaper.source_path
+        box.thumbnail_path = common.selected_wallpaper.thumb_file
 
     common.apply_button.set_sensitive(True)
 
