@@ -25,7 +25,7 @@ Running on Wayland, but not sway
 Available screen height: 1030 px; measurement delay: 5 ms
 ```
 
-![screenshot](http://nwg.pl/Lychee/uploads/big/78510b1f9358767e8407d66e933f1d8c.png)
+![azote-1.9.0.png](https://scrot.cloud/images/2021/03/13/azote-1.9.0.png)
 
 *Wallpapers above come from https://wallhaven.cc*
 
