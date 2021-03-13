@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v1.9.0 (2021.03.13)
+
+- Restore wallpapers in use on startup;
+- some tricky fixes to xrandr/fehbg support on multi-headed setups;
+- double click no longer applies the selected wallpaper to outputs, just to displays preview;
+ -added check buttons to split current image between selected outputs only.
+
 ## v1.8.2 (2020.01.11)
 
 - sway: fixed crash on display connected, but turned off [#110](https://github.com/nwg-piotr/azote/issues/110)
