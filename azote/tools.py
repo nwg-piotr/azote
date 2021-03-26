@@ -86,7 +86,8 @@ def check_displays():
                                'x': output['rect']['x'],
                                'y': output['rect']['y'],
                                'width': output['rect']['width'],
-                               'height': output['rect']['height']}
+                               'height': output['rect']['height'],
+                               'generic-name': "{} {} {}".format(output["make"], output["model"], output["serial"])}
                     displays.append(display)
                     log("Output found: {}".format(display), common.INFO)
                 try:

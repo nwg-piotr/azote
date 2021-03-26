@@ -453,8 +453,12 @@ def on_apply_button(button):
                 # if a color chosen, the wallpaper won't appear
                 batch_content.append("swaybg -o {} -c{} &".format(box.display_name, box.color))
             elif box.wallpaper_path:
+                generic_name = ""
+                for item in common.displays:
+                    if item["name"] == box.display_name:
+                        generic_name = item["generic-name"]
                 batch_content.append(
-                    "swaybg -o {} -i '{}' -m {} &".format(box.display_name, box.wallpaper_path, box.mode))
+                    "swaybg -o '{}' -i '{}' -m {} &".format(generic_name, box.wallpaper_path, box.mode))
 
                 # build the json file content
                 if box.wallpaper_path.startswith("{}/backgrounds-sway/flipped-".format(common.data_home)):
