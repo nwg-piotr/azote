@@ -61,4 +61,5 @@ split_selection_between_displays = Podziel wybrany obraz pomiędzy ekrany
 thumbnail_tooltip = Kliknij by wybrać, podwójnie by ustawić, prawym dla menu
 thumbnails_in_cache = {} miniatur w cache ({})
 track_file_changes = Śledź zmiany w plikach
+use_display_names = Używaj ogólnych nazw wyświetlaczy
 width = Szerokość

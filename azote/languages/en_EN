@@ -62,4 +62,5 @@ split_selection_between_displays = Split selection between displays
 thumbnail_tooltip = Click to select, double to set, right for menu
 thumbnails_in_cache = {} thumbnails in cache ({})
 track_file_changes = Track file changes
+use_display_names = Use generic display names
 width = Width

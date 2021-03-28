@@ -755,6 +755,7 @@ class Settings(object):
         self.color_dictionary = False
         self.image_menu_button = False
         self.track_files = True
+        self.generic_display_names = False
 
         # Runtime config (json) location
         self.rc_file = os.path.join(common.azote_config_home, "azoterc")
@@ -816,6 +817,11 @@ class Settings(object):
 
         try:
             self.track_files = settings.track_files
+        except AttributeError:
+            save_needed = True
+
+        try:
+            self.generic_display_names = settings.generic_display_names
         except AttributeError:
             save_needed = True
 

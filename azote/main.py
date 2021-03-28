@@ -453,12 +453,17 @@ def on_apply_button(button):
                 # if a color chosen, the wallpaper won't appear
                 batch_content.append("swaybg -o {} -c{} &".format(box.display_name, box.color))
             elif box.wallpaper_path:
-                generic_name = ""
-                for item in common.displays:
-                    if item["name"] == box.display_name:
-                        generic_name = item["generic-name"]
+                # see: https://github.com/nwg-piotr/azote/issues/143
+                if common.settings.generic_display_names:
+                    display_name = ""
+                    for item in common.displays:
+                        if item["name"] == box.display_name:
+                            display_name = item["generic-name"]
+                else:
+                    display_name = box.display_name
+
                 batch_content.append(
-                    "swaybg -o '{}' -i '{}' -m {} &".format(generic_name, box.wallpaper_path, box.mode))
+                    "swaybg -o '{}' -i '{}' -m {} &".format(display_name, box.wallpaper_path, box.mode))
 
                 # build the json file content
                 if box.wallpaper_path.startswith("{}/backgrounds-sway/flipped-".format(common.data_home)):
@@ -1088,6 +1093,11 @@ def on_settings_button(button):
     item.connect('activate', switch_tracking_files)
     menu.append(item)
 
+    item = Gtk.CheckMenuItem.new_with_label(common.lang['use_display_names'])
+    item.set_active(common.settings.generic_display_names)
+    item.connect('activate', switch_generic_display_names)
+    menu.append(item)
+
     menu.show_all()
     menu.popup_at_widget(button, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
 
@@ -1214,6 +1224,15 @@ def switch_tracking_files(item):
         common.settings.save()
     if common.indicator:
         common.indicator.switch_indication(item)
+
+
+def switch_generic_display_names(item):
+    if item.get_active():
+        common.settings.generic_display_names = True
+        common.settings.save()
+    else:
+        common.settings.generic_display_names = False
+        common.settings.save()
 
 
 class ColorPaletteDialog(Gtk.Window):
