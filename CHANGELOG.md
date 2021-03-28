@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v1.9.1 (2021.03.28)
+
+- Added the "Use generic display names" preferences switch.
+See [#143](https://github.com/nwg-piotr/azote/issues/143).
+
 ## v1.9.0 (2021.03.13)
 
 - Restore wallpapers in use on startup;

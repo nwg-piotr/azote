@@ -219,6 +219,11 @@ Azote wallpaper manager version 1.x.y
 
 ## Troubleshooting
 
+### [sway] My outputs use random names, wallpapers get lost after restart
+
+Turn the "Use generic display names" preferences switch on (since v1.9.1).
+See [#143](https://github.com/nwg-piotr/azote/issues/143).
+
 ### No pictures in thumbnails / display preview
 
 As well thumbnails, as displays preview inherit from the Gtk.Button class. In case you don't see images inside them,
