@@ -61,4 +61,5 @@ split_selection_between_displays = Répartition de la sélection entre les écra
 thumbnail_tooltip = Click to select, double to set, right for menu
 thumbnails_in_cache = {} miniatures en cache ({})
 track_file_changes = Suivre les modifications du fichier
+use_display_names = Utiliser des noms d'affichage génériques
 width = Largeur

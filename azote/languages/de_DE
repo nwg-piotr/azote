@@ -61,4 +61,5 @@ split_selection_between_displays = Auswahl zwischen Bildschirmen aufteilen
 thumbnail_tooltip = Einfach-Klicken zum Auswählen, Doppel-Klicken zum sofortigen Verwenden, Rechts-Klick für mehr Optionen
 thumbnails_in_cache = {} Vorschaubilder im Zwischenspeicher ({})
 track_file_changes = Dateiänderungen überwachen
+use_display_names = Verwend generische Anzeigenamen
 width = Breite
