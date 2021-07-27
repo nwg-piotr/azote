@@ -14,7 +14,7 @@ import os
 import glob
 import hashlib
 import logging
-from PIL import Image, ImageOps
+from PIL import Image
 import common
 import pickle
 import subprocess
@@ -27,7 +27,7 @@ import json
 import gi
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
+from gi.repository import Gtk, GdkPixbuf, GLib
 
 
 def log(message, level=None):
