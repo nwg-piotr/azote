@@ -462,8 +462,11 @@ def on_apply_button(button):
                 else:
                     display_name = box.display_name
 
+                # Escape some special characters which would mess up the script
+                wallpaper_path=box.wallpaper_path.replace('\\', '\\\\').replace("$", "\$").replace("`", "\\`").replace('"', '\\"')
+
                 batch_content.append(
-                    "swaybg -o '{}' -i '{}' -m {} &".format(display_name, box.wallpaper_path, box.mode))
+                    "swaybg -o '{}' -i \"{}\" -m {} &".format(display_name, wallpaper_path, box.mode))
 
                 # build the json file content
                 if box.wallpaper_path.startswith("{}/backgrounds-sway/flipped-".format(common.data_home)):
