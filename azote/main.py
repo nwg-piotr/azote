@@ -869,7 +869,7 @@ class GUI:
         displays_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
         # Restore saved wallpapers if any
-        f_name = "swaybg.json" if common.sway else "feh.json"
+        f_name = "swaybg.json" if common.sway or common.env['wayland'] else "feh.json"
         f_path = os.path.join(common.data_home, f_name)
         
         if os.path.isfile(f_path):
