@@ -358,6 +358,9 @@ def set_env(language=None):
     # Sway comes with some sample wallpapers
     if common.sway and os.path.isdir('/usr/share/backgrounds/sway'):
         common.sample_dir = '/usr/share/backgrounds/sway'
+        
+    if os.path.isdir('/usr/share/backgrounds/archlabs'):
+        common.sample_dir = '/usr/share/backgrounds/archlabs'
 
     common.settings = Settings()
     if common.settings.clear_thumbnails:
