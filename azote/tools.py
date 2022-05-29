@@ -118,11 +118,13 @@ def check_displays():
             exit(1)
 
         if lines:
-            name, w, h, x, y = None, None, None, None, None
+            name, w, h, x, y, generic_name = None, None, None, None, None, None
             displays = []
             for line in lines:
                 if not line.startswith(" "):
                     name = line.split()[0]
+                    # very tricky way to obtain this value...
+                    generic_name = line.replace(name, "")[2:-4]
                 elif "current" in line:
                     w_h = line.split()[0].split('x')
                     w = int(w_h[0])
@@ -136,10 +138,12 @@ def check_displays():
                                    'x': x,
                                    'y': y,
                                    'width': w,
-                                   'height': h}
+                                   'height': h,
+                                   'generic-name': generic_name}
                         displays.append(display)
                         log("Output found: {}".format(display), common.INFO)
             displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
+            print(displays)
             return displays
 
         else:
