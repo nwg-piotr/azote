@@ -110,11 +110,6 @@ done &
 exec dwm
 ```
 
-## Versioning
-
-Azote uses [Semantic Versioning 2.0.0](https://semver.org). 
-For changes see [CHANGELOG](https://github.com/nwg-piotr/azote/blob/master/CHANGELOG.md).
-
 ## Installation
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
