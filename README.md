@@ -1,10 +1,10 @@
 # Azote
 
-[![Build Status](https://travis-ci.com/nwg-piotr/azote.svg?branch=master)](https://travis-ci.com/nwg-piotr/azote)
-
 **Azote** is a GTK+3 - based picture browser and background setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
 (sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. The user interface is being developed with
 multi-headed setups in mind. Azote also includes several colour management tools.
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
 
 The program is confirmed to work on sway, Wayfire, i3, Openbox, Fluxbox and dwm window managers. Wayland support is
 limited to wlroots-based compositors. GNOME is not supported.
@@ -25,9 +25,7 @@ Running on Wayland, but not sway
 Available screen height: 1030 px; measurement delay: 5 ms
 ```
 
-![azote-1.9.0.png](https://scrot.cloud/images/2021/03/13/azote-1.9.0.png)
-
-*Wallpapers above come from https://wallhaven.cc*
+![2022-05-29-125823_screenshot](https://user-images.githubusercontent.com/20579136/170864580-840e1c27-702d-40f4-a98c-a460826b805c.png)
 
 ## Project assumptions
 
@@ -109,37 +107,6 @@ done &
 
 exec dwm
 ```
-
-## Installation
-
-[![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
-
-## Arch Linux
-
-Install [azote](https://aur.archlinux.org/packages/azote) from AUR. 
-For the development version install [azote-git](https://aur.archlinux.org/packages/azote-git).
-
-## Debian & Ubuntu
-
-Either download the .deb package or follow the instructions in [this link](https://software.opensuse.org//download.html?project=home%3AHead_on_a_Stick%3Aazote&package=azote) to add the repository and APT key.
-
-If the repository & key are added then the package will be updated with the usual `apt update && apt upgrade` commands.
-
-## Void Linux
-
-Binary package `azote` available in the Void repository. 
-
-## Fedora
-
-For fedora-31+:
-```
-sudo dnf install azote
-```
-
-## Other Linux distributions:
-
-Packagers wanted! Personally I only maintain Arch (AUR) and Void Linux packages. Please do remember to copy the 
-LICENSE-COLORTHIEF file to `/usr/share/licenses/azote/`.
 
 ### Dependencies (as used in the `azote` AUR package):
 
