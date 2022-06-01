@@ -1,5 +1,5 @@
 #!/bin/sh
 
-LIB=$(python3 -Ic "from sysconfig import get_path; print(get_path('platlib'))")
+LIB=$(python3 -Ic "from sysconfig import get_path; print(get_path('purelib'))")
 cd $LIB/azote
 exec /usr/bin/python3 main.py "$@"
