@@ -448,6 +448,7 @@ def on_apply_button(button):
 
         # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
         batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
+        outputs=[]
         for box in common.display_boxes_list:
             if box.color:
                 # if a color chosen, the wallpaper won't appear
@@ -461,10 +462,12 @@ def on_apply_button(button):
                             display_name = item["generic-name"]
                 else:
                     display_name = box.display_name
+                
+                outputs.append(display_name)
 
                 # Escape some special characters which would mess up the script
                 wallpaper_path=box.wallpaper_path.replace('\\', '\\\\').replace("$", "\$").replace("`", "\\`").replace('"', '\\"')
-
+                
                 batch_content.append(
                     "swaybg -o '{}' -i \"{}\" -m {} &".format(display_name, wallpaper_path, box.mode))
 
@@ -483,9 +486,21 @@ def on_apply_button(button):
 
                 entry = {"name": box.display_name, "path": box.wallpaper_path, "thumb": thumb}
                 restore_from.append(entry)
+        print(outputs)
+        #save to ~/.azotebg
+        if os.path.isfile(common.cmd_file):
+            with open(common.cmd_file, 'r') as f:
+                oldazotebg = f.readlines()
+                oldazotebg = [line.rstrip() for line in oldazotebg]
+            for item in oldazotebg.copy():
+                for output in outputs:
+                    if output in item:
+                        oldazotebg.remove(item)
 
-        # save to ~/.azotebg
+            batch_content = list(dict.fromkeys(batch_content + oldazotebg))
+
         with open(common.cmd_file, 'w') as f:
+            #print(batch_content)
             for item in batch_content:
                 f.write("%s\n" % item)
         # make the file executable
