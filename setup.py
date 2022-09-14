@@ -16,6 +16,6 @@ setup(
     license='GPL3',
     author='Piotr Miller',
     author_email='nwg.piotr@gmail.com',
-    python_requires='>=3.4.0',
+    python_requires='>=3.8.0',
     install_requires=[]
 )
