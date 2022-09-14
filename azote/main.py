@@ -275,7 +275,7 @@ class DisplayBox(Gtk.Box):
         options_box.set_border_width(0)
         options_box.set_orientation(Gtk.Orientation.HORIZONTAL)
         self.pack_start(options_box, True, False, 0)
-        
+
         check_button = Gtk.CheckButton()
         check_button.set_active(self.include)
         check_button.set_tooltip_text(common.lang["include_when_splitting"])
@@ -317,7 +317,7 @@ class DisplayBox(Gtk.Box):
 
     def switch_included(self, ckb):
         self.include = ckb.get_active()
-    
+
     def clear_color_selection(self):
         # If not on sway / swaybg, we have no color_button in UI
         if common.sway or common.env['wayland']:
@@ -448,7 +448,7 @@ def on_apply_button(button):
 
         # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
         batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
-        outputs=[]
+        outputs = []
         for box in common.display_boxes_list:
             if box.color:
                 # if a color chosen, the wallpaper won't appear
@@ -462,12 +462,14 @@ def on_apply_button(button):
                             display_name = item["generic-name"]
                 else:
                     display_name = box.display_name
-                
+
                 outputs.append(display_name)
 
                 # Escape some special characters which would mess up the script
-                wallpaper_path=box.wallpaper_path.replace('\\', '\\\\').replace("$", "\$").replace("`", "\\`").replace('"', '\\"')
-                
+                wallpaper_path = box.wallpaper_path.replace('\\', '\\\\').replace("$", "\$").replace("`",
+                                                                                                     "\\`").replace('"',
+                                                                                                                    '\\"')
+
                 batch_content.append(
                     "swaybg -o '{}' -i \"{}\" -m {} &".format(display_name, wallpaper_path, box.mode))
 
@@ -486,8 +488,8 @@ def on_apply_button(button):
 
                 entry = {"name": box.display_name, "path": box.wallpaper_path, "thumb": thumb}
                 restore_from.append(entry)
-        print(outputs)
-        #save to ~/.azotebg
+
+        # save to ~/.azotebg
         if os.path.isfile(common.cmd_file):
             with open(common.cmd_file, 'r') as f:
                 oldazotebg = f.readlines()
@@ -500,7 +502,7 @@ def on_apply_button(button):
             batch_content = list(dict.fromkeys(batch_content + oldazotebg))
 
         with open(common.cmd_file, 'w') as f:
-            #print(batch_content)
+            # print(batch_content)
             for item in batch_content:
                 f.write("%s\n" % item)
         # make the file executable
@@ -886,12 +888,12 @@ class GUI:
         # Restore saved wallpapers if any
         f_name = "swaybg.json" if common.sway or common.env['wayland'] else "feh.json"
         f_path = os.path.join(common.data_home, f_name)
-        
+
         if os.path.isfile(f_path):
             restore_from = load_json(f_path)
         else:
             restore_from = None
-        
+
         # Buttons below represent displays preview
         common.display_boxes_list = []
         for display in common.displays:
