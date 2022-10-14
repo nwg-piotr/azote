@@ -247,6 +247,11 @@ class DisplayBox(Gtk.Box):
 
         self.img = Gtk.Image.new_from_pixbuf(pixbuf)
 
+        if path is None:
+            self.img_selected = False
+        else:
+            self.img_selected = True
+
         self.select_button = Gtk.Button()
         self.select_button.set_always_show_image(True)
         self.select_button.set_label("{} ({} x {})".format(name, width, height))  # label on top: name (with x height)
@@ -275,6 +280,13 @@ class DisplayBox(Gtk.Box):
         options_box.set_border_width(0)
         options_box.set_orientation(Gtk.Orientation.HORIZONTAL)
         self.pack_start(options_box, True, False, 0)
+
+        self.not_wallpaper_button = Gtk.Button()
+        img = Gtk.Image()
+        img.set_from_file('images/empty_btn.png')
+        self.not_wallpaper_button.set_image(img)
+        self.not_wallpaper_button.connect("clicked", self.on_not_wallpaper_button)
+        options_box.pack_start(self.not_wallpaper_button, False, False, 0)
 
         check_button = Gtk.CheckButton()
         check_button.set_active(self.include)
@@ -333,12 +345,14 @@ class DisplayBox(Gtk.Box):
     def on_select_button(self, button):
         if common.selected_wallpaper:
             self.img.set_from_file(common.selected_wallpaper.thumb_file)
+            self.img_selected = True
             self.wallpaper_path = common.selected_wallpaper.source_path
             self.thumbnail_path = common.selected_wallpaper.thumb_file
             button.set_property("name", "display-btn-selected")
             self.flip_button.set_sensitive(True)
 
-            self.clear_color_selection()
+            # When select a new wallpaper, not clear color selection
+            #self.clear_color_selection()
 
             common.apply_button.set_sensitive(True)
 
@@ -359,7 +373,8 @@ class DisplayBox(Gtk.Box):
     def on_color_chosen(self, user_data, button):
         self.color = rgba_to_hex(button.get_rgba())
         # clear selected image to indicate it won't be used
-        self.img.set_from_file("images/empty.png")
+        # self.img.set_from_file("images/empty.png")
+        # self.img_selected = False
         common.apply_button.set_sensitive(True)
 
     def on_flip_button(self, button):
@@ -369,6 +384,13 @@ class DisplayBox(Gtk.Box):
         self.wallpaper_path = images[1]
         self.thumbnail_path = images[0]
         self.flip_button.set_sensitive(False)
+
+    def on_not_wallpaper_button(self, button):
+        self.img.set_from_file("images/empty.png")
+        self.img_selected = False
+        self.wallpaper_path = None
+        self.thumbnail_path = None
+        common.apply_button.set_sensitive(True)
 
 
 class SortingButton(Gtk.Button):
@@ -449,26 +471,26 @@ def on_apply_button(button):
         # Prepare, save and execute the shell script for swaybg. It'll be placed in ~/.azotebg for further use.
         batch_content = ['#!/usr/bin/env bash', 'pkill swaybg']
         for box in common.display_boxes_list:
-            if box.color:
-                # if a color chosen, the wallpaper won't appear
-                batch_content.append("swaybg -o {} -c{} &".format(box.display_name, box.color))
-            elif box.wallpaper_path:
-                # see: https://github.com/nwg-piotr/azote/issues/143
-                if common.settings.generic_display_names:
-                    display_name = ""
-                    for item in common.displays:
-                        if item["name"] == box.display_name:
-                            display_name = item["generic-name"]
-                else:
-                    display_name = box.display_name
+            if common.settings.generic_display_names:
+                display_name = ""
+                for item in common.displays:
+                    if item["name"] == box.display_name:
+                        display_name = item["generic-name"]
+            else:
+                display_name = box.display_name
 
+            if box.img_selected:
+                # see: https://github.com/nwg-piotr/azote/issues/143
                 # Escape some special characters which would mess up the script
                 wallpaper_path = box.wallpaper_path.replace('\\', '\\\\').replace("$", "\$").replace("`",
                                                                                                      "\\`").replace('"',
                                                                                                                     '\\"')
-
-                batch_content.append(
-                    "swaybg -o '{}' -i \"{}\" -m {} &".format(display_name, wallpaper_path, box.mode))
+                if box.color:
+                    batch_content.append(
+                        "swaybg -o '{}' -c '{}' -i \"{}\" -m {} &".format(display_name, box.color, wallpaper_path, box.mode))
+                else:
+                    batch_content.append(
+                        "swaybg -o '{}' -i \"{}\" -m {} &".format(display_name, wallpaper_path, box.mode))
 
                 # build the json file content
                 if box.wallpaper_path.startswith("{}/backgrounds-sway/flipped-".format(common.data_home)):
@@ -483,8 +505,11 @@ def on_apply_button(button):
                     thumb = "{}.png".format(hash_name(box.wallpaper_path))
                     thumb = os.path.join(common.data_home, "thumbnails", thumb)
 
-                entry = {"name": box.display_name, "path": box.wallpaper_path, "thumb": thumb}
+                entry = {"name": display_name, "path": box.wallpaper_path, "thumb": thumb}
                 restore_from.append(entry)
+            elif box.color:
+                # if a color chosen, the wallpaper won't appear
+                batch_content.append("swaybg -o '{}' -c '{}' &".format(display_name, box.color))
 
         with open(common.cmd_file, 'w') as f:
             # print(batch_content)
@@ -546,6 +571,7 @@ def on_split_button(button):
             if box.include:
                 box.wallpaper_path = paths[i][0]
                 box.img.set_from_file(paths[i][1])
+                box.img_selected = True
                 box.thumbnail_path = paths[i][1]
                 i += 1
 
@@ -882,12 +908,15 @@ class GUI:
         # Buttons below represent displays preview
         common.display_boxes_list = []
         for display in common.displays:
-            name = display.get('name')
+            if common.settings.generic_display_names:
+                display_name = display.get('generic-name')
+            else:
+                display_name = display.get('name')
             # Check if we have stored values
             path, thumb = None, None
             if restore_from:
                 for item in restore_from:
-                    if item["name"] == name:
+                    if item["name"] == display_name:
                         path = item["path"]
                         thumb = item["thumb"]
 
@@ -896,7 +925,7 @@ class GUI:
                 xrandr_idx = display.get('xrandr-idx')
             except KeyError:
                 xrandr_idx = None
-            display_box = DisplayBox(name, display.get('width'), display.get('height'), path, thumb, xrandr_idx)
+            display_box = DisplayBox(display.get('name'), display.get('width'), display.get('height'), path, thumb, xrandr_idx)
             common.display_boxes_list.append(display_box)
             displays_box.pack_start(display_box, True, False, 0)
 
