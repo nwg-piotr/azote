@@ -366,6 +366,9 @@ def set_env(language=None):
     if os.path.isdir('/usr/share/backgrounds/archlabs'):
         common.sample_dir = '/usr/share/backgrounds/archlabs'
 
+    if os.path.isdir('/usr/share/backgrounds/nwg-shell'):
+        common.sample_dir = '/usr/share/backgrounds/nwg-shell'
+
     common.settings = Settings()
     if common.settings.clear_thumbnails:
         clear_thumbnails(clear_all=True)
