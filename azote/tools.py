@@ -362,7 +362,7 @@ def set_env(language=None):
     # Sway comes with some sample wallpapers
     if common.sway and os.path.isdir('/usr/share/backgrounds/sway'):
         common.sample_dir = '/usr/share/backgrounds/sway'
-        
+
     if os.path.isdir('/usr/share/backgrounds/archlabs'):
         common.sample_dir = '/usr/share/backgrounds/archlabs'
 
@@ -512,11 +512,13 @@ def set_env(language=None):
 def copy_backgrounds():
     used = []
     for item in common.display_boxes_list:
-        fn = item.wallpaper_path.split("/")[-1]
-        used.append(fn)
-        fn = item.thumbnail_path.split("/")[-1]
-        used.append(fn)
-    
+        if item.wallpaper_path is not None:
+            fn = item.wallpaper_path.split("/")[-1]
+            used.append(fn)
+        if item.thumbnail_path is not None:
+            fn = item.thumbnail_path.split("/")[-1]
+            used.append(fn)
+
     # Clear unused files
     for file in os.listdir(common.bcg_dir):
         f2delete = os.path.join(common.bcg_dir, file)
