@@ -955,9 +955,9 @@ class Settings(object):
             json.dump(rc, f, indent=2)
 
 
-def save_json(src_dict, path):
+def save_json(src_dict, path, en_ascii=False):
     with open(path, 'w') as f:
-        json.dump(src_dict, f, indent=2)
+        json.dump(src_dict, f, indent=2, ensure_ascii=en_ascii)
 
 
 def load_json(path):
