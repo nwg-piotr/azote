@@ -487,7 +487,6 @@ def on_apply_button(button):
                 restore_from.append(entry)
 
         with open(common.cmd_file, 'w') as f:
-            # print(batch_content)
             for item in batch_content:
                 f.write("%s\n" % item)
         # make the file executable
@@ -1040,6 +1039,11 @@ class GUI:
         common.status_bar.set_halign(Gtk.Align.CENTER)
         status_box.pack_start(common.status_bar, True, True, 0)
         update_status_bar()
+
+        btn = Gtk.Button.new_with_label(common.lang["close"])
+        btn.connect("clicked", Gtk.main_quit)
+        btn.set_property("valign", Gtk.Align.CENTER)
+        status_box.pack_end(btn, False, False, 0)
 
         main_box.add(status_box)
 

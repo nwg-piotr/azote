@@ -980,7 +980,6 @@ class Language(dict):
 
         if self.lang != "en_US":
             user_dict = load_json(os.path.join(self.dir_name, "langs", "{}.json".format(self.lang)))
-            print(user_dict, len(user_dict))
             if len(user_dict) == 0:
                 log("No translations found for '{}'".format(self.lang), common.INFO)
             else:
