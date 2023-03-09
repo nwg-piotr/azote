@@ -487,7 +487,6 @@ def on_apply_button(button):
                 restore_from.append(entry)
 
         with open(common.cmd_file, 'w') as f:
-            # print(batch_content)
             for item in batch_content:
                 f.write("%s\n" % item)
         # make the file executable
@@ -1040,6 +1039,11 @@ class GUI:
         common.status_bar.set_halign(Gtk.Align.CENTER)
         status_box.pack_start(common.status_bar, True, True, 0)
         update_status_bar()
+
+        btn = Gtk.Button.new_with_label(common.lang["close"])
+        btn.connect("clicked", Gtk.main_quit)
+        btn.set_property("valign", Gtk.Align.CENTER)
+        status_box.pack_end(btn, False, False, 0)
 
         main_box.add(status_box)
 
@@ -1802,7 +1806,7 @@ class Indicator(object):
 
 
 def main():
-    lang = None
+    lang_from_args = None
     clear_thumbs, clear_all = False, False
     common.color_names = WikiColours()
     for i in range(1, len(sys.argv)):
@@ -1812,7 +1816,7 @@ def main():
 
         if sys.argv[i].upper() == '-L' or sys.argv[i].upper() == '--LANG':
             try:
-                lang = sys.argv[i + 1]
+                lang_from_args = sys.argv[i + 1]
             except:
                 pass
 
@@ -1900,7 +1904,7 @@ def main():
             """
     provider.load_from_data(css)
 
-    set_env(lang)  # detect displays, check installed modules, set paths and stuff
+    set_env(lang_from_args)  # detect displays, check installed modules, set paths and stuff
     if clear_thumbs:
         clear_thumbnails(clear_all)
         exit()
