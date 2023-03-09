@@ -1,2 +1,2 @@
 recursive-include azote/images *
-recursive-include azote/languages *
+recursive-include azote/langs *
