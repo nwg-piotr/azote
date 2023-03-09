@@ -12,6 +12,9 @@ setup(
     description='Wallpaper manager for Sway, i3 and some other WMs',
     packages=['azote'],
     include_package_data=True,
+    package_data={
+        "": ["images/*", "langs/*"]
+    },
     url='https://github.com/nwg-piotr/azote',
     license='GPL3',
     author='Piotr Miller',
