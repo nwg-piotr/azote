@@ -247,7 +247,7 @@ def current_display():
     return display_number
 
 
-def set_env(language=None):
+def set_env(lang_from_args=None):
     xdg_config_home = os.getenv('XDG_CONFIG_HOME')
     common.config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config")
     common.azote_config_home = os.path.join(xdg_config_home, "azote") if xdg_config_home else os.path.join(
@@ -313,17 +313,7 @@ def set_env(language=None):
     if migration_error:
         log('Data migration error: {}'.format(migration_error), common.ERROR)
 
-    # We will preload the en_EN dictionary as default values
-    common.lang = Language()
-
-    if not language:
-        # Lets check locale value
-        # If running with LC_ALL=C, we'll get (None, None) here. Let's use en_EN in such case.
-        lang = locale.getlocale()[0] if locale.getlocale()[0] is not None else 'en_EN'
-    else:
-        lang = language
-
-    common.lang.load(lang)
+    common.lang = Language(lang_from_args)
 
     common.displays = check_displays()
 
@@ -362,7 +352,7 @@ def set_env(language=None):
     # Sway comes with some sample wallpapers
     if common.sway and os.path.isdir('/usr/share/backgrounds/sway'):
         common.sample_dir = '/usr/share/backgrounds/sway'
-        
+
     if os.path.isdir('/usr/share/backgrounds/archlabs'):
         common.sample_dir = '/usr/share/backgrounds/archlabs'
 
@@ -516,7 +506,7 @@ def copy_backgrounds():
         used.append(fn)
         fn = item.thumbnail_path.split("/")[-1]
         used.append(fn)
-    
+
     # Clear unused files
     for file in os.listdir(common.bcg_dir):
         f2delete = os.path.join(common.bcg_dir, file)
@@ -966,33 +956,63 @@ def load_json(path):
             return json.load(f)
     except Exception as e:
         print(e)
+        return {}
 
 
 class Language(dict):
-    def __init__(self):
+    def __init__(self, lang_from_args):
         super().__init__()
-        self.lang = 'en_EN'
-        # We'll initialize with values from en_EN
-        with open(os.path.join('languages', 'en_EN')) as f:
-            lines = f.read().splitlines()
-            for line in lines:
-                if line and not line.startswith('#'):
-                    pair = line.split('=')
-                    key, value = pair[0].strip(), pair[1].strip()
-                    self[key] = value
+        self.dir_name = os.path.dirname(__file__)
+        shell_data = load_shell_data()
 
-    def load(self, lang):
-        try:
-            # Overwrite initial values if translation found
-            with open(os.path.join('languages', lang)) as f:
-                lines = f.read().splitlines()
-                for line in lines:
-                    if line and not line.startswith('#'):
-                        pair = line.split('=')
-                        key, value = pair[0].strip(), pair[1].strip()
-                        self[key] = value
-            self.lang = lang
-            log("Loaded lang: {}".format(lang), common.INFO)
+        self.lang = os.getenv("LANG").split(".")[0] if not shell_data["interface-locale"] else shell_data[
+            "interface-locale"]
 
-        except FileNotFoundError:
-            log("Couldn't load lang: {}".format(lang), common.WARNING)
+        if lang_from_args:
+            self.lang = lang_from_args
+            log("Lang: '{}' (from args)".format(self.lang), common.INFO)
+        else:
+            log("Lang: '{}'".format(self.lang), common.INFO)
+
+        base_dict = load_json(os.path.join(self.dir_name, "langs", "en_US.json".format(self.lang)))
+        for key in base_dict:
+            self[key] = base_dict[key]
+
+        if self.lang != "en_US":
+            user_dict = load_json(os.path.join(self.dir_name, "langs", "{}.json".format(self.lang)))
+            print(user_dict, len(user_dict))
+            if len(user_dict) == 0:
+                log("No translations found for '{}'".format(self.lang), common.INFO)
+            else:
+                log("{} translation phrases found in '{}'".format(len(user_dict), self.lang), common.INFO)
+                for key in user_dict:
+                    self[key] = user_dict[key]
+
+
+def get_shell_data_dir():
+    data_dir = ""
+    home = os.getenv("HOME")
+    xdg_data_home = os.getenv("XDG_DATA_HOME")
+
+    if xdg_data_home:
+        data_dir = os.path.join(xdg_data_home, "nwg-shell/")
+    else:
+        if home:
+            data_dir = os.path.join(home, ".local/share/nwg-shell/")
+
+    return data_dir
+
+
+def load_shell_data():
+    shell_data_file = os.path.join(get_shell_data_dir(), "data")
+    shell_data = load_json(shell_data_file) if os.path.isfile(shell_data_file) else {}
+
+    defaults = {
+        "interface-locale": ""
+    }
+
+    for key in defaults:
+        if key not in shell_data:
+            shell_data[key] = defaults[key]
+
+    return shell_data

@@ -1802,7 +1802,7 @@ class Indicator(object):
 
 
 def main():
-    lang = None
+    lang_from_args = None
     clear_thumbs, clear_all = False, False
     common.color_names = WikiColours()
     for i in range(1, len(sys.argv)):
@@ -1812,7 +1812,7 @@ def main():
 
         if sys.argv[i].upper() == '-L' or sys.argv[i].upper() == '--LANG':
             try:
-                lang = sys.argv[i + 1]
+                lang_from_args = sys.argv[i + 1]
             except:
                 pass
 
@@ -1900,7 +1900,7 @@ def main():
             """
     provider.load_from_data(css)
 
-    set_env(lang)  # detect displays, check installed modules, set paths and stuff
+    set_env(lang_from_args)  # detect displays, check installed modules, set paths and stuff
     if clear_thumbs:
         clear_thumbnails(clear_all)
         exit()
