@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 def read(f_name):
@@ -10,7 +10,7 @@ setup(
     name='azote',
     version='1.10.1',
     description='Wallpaper manager for Sway, i3 and some other WMs',
-    packages=['azote'],
+    packages=find_packages(),
     include_package_data=True,
     package_data={
         "": ["images/*", "langs/*"]
