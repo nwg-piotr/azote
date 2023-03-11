@@ -1,6 +1,8 @@
 # Azote
 
-This application is a part of the [nwg-shell](https://github.com/nwg-piotr/nwg-shell) project.
+This application is a part of the [nwg-shell](https://nwg-piotr.github.io/nwg-shell) project.
+
+**Contributing:** please read the [general contributing rules for the nwg-shell project](https://nwg-piotr.github.io/nwg-shell/contribution).
 
 **Azote** is a GTK+3 - based picture browser and background setter, as the frontend to the [swaybg](https://github.com/swaywm/swaybg) 
 (sway/Wayland) and [feh](https://feh.finalrewind.org) (X windows) commands. The user interface is being developed with
