@@ -7,6 +7,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 from tools import create_pixbuf
 from color_tools import hex_to_rgb
+from azote import common
 
 # Check if python yaml module available
 try:

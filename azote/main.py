@@ -15,10 +15,10 @@ import os
 import sys
 import subprocess
 import stat
-import common
 import gi
 import cairo
 from PIL import Image
+from azote import common
 
 # send2trash module may or may not be available
 try:

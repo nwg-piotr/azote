@@ -15,7 +15,6 @@ import glob
 import hashlib
 import logging
 from PIL import Image
-import common
 import pickle
 import subprocess
 import sys
@@ -29,7 +28,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GLib
 
 from azote.__about__ import __version__
-
+from azote import common
 
 def log(message, level=None):
     if common.logging_enabled:
