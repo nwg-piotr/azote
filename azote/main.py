@@ -17,7 +17,6 @@ import subprocess
 import stat
 import common
 import gi
-import pkg_resources
 import cairo
 from PIL import Image
 
@@ -51,6 +50,7 @@ except:
     common.env['app_indicator'] = False
     print('libappindicator-gtk3 package not found - tray icon unavailable')
 
+from azote.__about__ import __version__
 
 def get_files():
     try:
@@ -580,8 +580,8 @@ def on_about_button(button):
     dialog.set_program_name('Azote')
 
     try:
-        version = pkg_resources.require(common.app_name)[0].version
-        dialog.set_version("v{}".format(version))
+        # version = pkg_resources.require(common.app_name)[0].version
+        dialog.set_version("v{}".format(__version__))
     except Exception as e:
         print("Couldn't check version: {}".format(e))
         pass
@@ -590,7 +590,7 @@ def on_about_button(button):
 
     dialog.set_keep_above(True)
     dialog.set_logo(logo)
-    dialog.set_copyright('(c) 2019-2022 Piotr Miller')
+    dialog.set_copyright('(c) 2019-2023 Piotr Miller & Contributors')
     dialog.set_website('https://github.com/nwg-piotr/azote')
     dialog.set_comments(common.lang['app_desc'])
     dialog.set_license_type(Gtk.License.GPL_3_0)
@@ -1732,15 +1732,12 @@ def apply_to_all_feh(item, mode):
 
 
 def print_help():
-    try:
-        version = pkg_resources.require(common.app_name)[0].version
-    except Exception as e:
-        version = 'unknown ({})'.format(e)
-    print('\nAzote wallpaper manager version {}\n'.format(version))
-    print('[-h] | [--help]\t\t\t Print help')
-    print('[-l] | [--lang] <ln_LN> \t Force a locale (de_DE, en_EN, fr_FR, pl_PL)')
+    print('\nAzote wallpaper manager version {}\n'.format(__version__))
+    print('[-h] | [--help]\t\t\t print Help')
+    print('[-l] | [--lang] <ln_LN> \t force a Locale (de_DE, en_US, fr_FR, pl_PL)')
     print('[-c] | [--clear]\t\t Clear unused thumbnails')
-    print('[-a] | [--clear-all]\t\t Clear all thumbnails\n')
+    print('[-a] | [--clear-all]\t\t clear All thumbnails\n')
+    print('[-v] | [--version]\t\t display Version information\n')
 
 
 def track_changes():
@@ -1825,6 +1822,10 @@ def main():
 
         if sys.argv[i].upper() == '-A' or sys.argv[i].upper() == '--CLEAR-ALL':
             clear_thumbs, clear_all = True, True
+
+        if sys.argv[i].upper() == '-V' or sys.argv[i].upper() == '--VERSION':
+            print("Azote version {}".format(__version__))
+            exit(0)
 
     screen = Gdk.Screen.get_default()
     provider = Gtk.CssProvider()

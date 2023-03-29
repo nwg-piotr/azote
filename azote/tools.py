@@ -116,7 +116,6 @@ def check_displays():
         s.send("j/monitors".encode("utf-8"))
         output = s.recv(20480).decode('utf-8')
         s.close()
-        print(output)
         displays = []
         clients = json.loads(output)
         for c in clients:
