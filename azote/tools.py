@@ -182,7 +182,7 @@ def check_displays():
         try:
             names = subprocess.check_output("xrandr | awk '/ connected/{print $1}'", shell=True).decode(
                 "utf-8").splitlines()
-            res = subprocess.check_output("xrandr | awk '/*/{print $1}'", shell=True).decode("utf-8").splitlines()
+            res = subprocess.check_output("xrandr | awk '/[*]/{print $1}'", shell=True).decode("utf-8").splitlines()
             coords = subprocess.check_output("xrandr --listmonitors | awk '{print $3}'", shell=True).decode(
                 "utf-8").splitlines()
             displays = []
