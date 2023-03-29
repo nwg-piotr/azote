@@ -18,8 +18,7 @@ from PIL import Image
 import common
 import pickle
 import subprocess
-import json
-import pkg_resources
+import sys
 import shutil
 
 import json
@@ -28,6 +27,8 @@ import gi
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GLib
+
+from azote.__about__ import __version__
 
 
 def log(message, level=None):
@@ -129,8 +130,13 @@ def check_displays():
             log("Output found: {}".format(display), common.INFO)
 
             if c['focused']:
-                common.screen_h = c['height'] - c["reserved"][1] - c["reserved"][3]
-                print("Available screen height: {} px".format(int(common.screen_h * 0.95)))
+                if c['transform'] in [0, 2, 4, 6]:
+                    h = c['height'] - c["reserved"][1] - c["reserved"][3] - 6
+                    common.screen_h = h
+                else:
+                    h = c['width'] - c["reserved"][0] - c["reserved"][2] - 6
+                    common.screen_h = h
+                print("Available screen height: {} px".format(h))
 
         # sort displays list by x, y: from left to right, then from bottom to top
         displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
@@ -145,7 +151,7 @@ def check_displays():
         except Exception as e:
             print("Wayland, but not sway. Optional wlr-randr package required.")
             log("Failed checking displays: {}".format(e), common.ERROR)
-            exit(1)
+            sys.exit(1)
 
         if lines:
             name, w, h, x, y, generic_name = None, None, None, None, None, None
@@ -330,12 +336,7 @@ def set_env(lang_from_args=None):
     logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
                         level=logging.INFO)
 
-    try:
-        version = pkg_resources.require(common.app_name)[0].version
-    except Exception as e:
-        version = ' unknown version: {}'.format(e)
-
-    log('Azote v{}'.format(version), common.INFO)
+    log('Azote v{}'.format(__version__), common.INFO)
 
     if data_migrated:
         log('Data migrated to XDG-compliant folders', common.INFO)
