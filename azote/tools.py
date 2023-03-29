@@ -18,7 +18,7 @@ from PIL import Image
 import common
 import pickle
 import subprocess
-import locale
+import json
 import pkg_resources
 import shutil
 
@@ -106,6 +106,37 @@ def check_displays():
             print("Failed checking displays: {}".format(e), common.ERROR)
             log("Failed checking displays: {}".format(e), common.ERROR)
             exit(1)
+
+    elif os.getenv("HYPRLAND_INSTANCE_SIGNATURE"):
+        print("Running on Hyprland")
+        import socket
+        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        s.connect("/tmp/hypr/{}/.socket.sock".format(os.getenv("HYPRLAND_INSTANCE_SIGNATURE")))
+
+        s.send("j/monitors".encode("utf-8"))
+        output = s.recv(20480).decode('utf-8')
+        s.close()
+        print(output)
+        displays = []
+        clients = json.loads(output)
+        for c in clients:
+            display = {'name': c['name'],
+                       'x': c['x'],
+                       'y': c['y'],
+                       'width': c['width'],
+                       'height': c['height'],
+                       'generic-name': "{} {} {}".format(c["make"], c["model"], c["serial"])}
+            displays.append(display)
+            log("Output found: {}".format(display), common.INFO)
+
+            if c['focused']:
+                common.screen_h = c['height'] - c["reserved"][1] - c["reserved"][3]
+                print("Available screen height: {} px".format(int(common.screen_h * 0.95)))
+
+        # sort displays list by x, y: from left to right, then from bottom to top
+        displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
+
+        return displays
 
     elif common.env['wayland']:
         print("Running on Wayland, but not sway")

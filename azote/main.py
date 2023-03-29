@@ -1919,7 +1919,7 @@ def main():
     # We want Azote to take all the possible screen height. Since Gdk.Screen.height is deprecated, we need to measure
     # the current screen height in another way. `w` is a temporary window.
     # If on sway, we've already detected the screen height in tools/check_displays() and stored it in common.screen_h
-    if not common.screen_h:
+    if not common.screen_h:  # neither sway, nor Hyprland
         w = TransparentWindow()
         if common.sway or common.env['wm'] == "i3":
             w.fullscreen()  # .maximize() doesn't work as expected on sway
@@ -1929,7 +1929,10 @@ def main():
 
         GLib.timeout_add(common.settings.screen_measurement_delay, check_height_and_start, w)
     else:
-        app = GUI(int(common.screen_h * 0.95))
+        if os.getenv("HYPRLAND_INSTANCE_SIGNATURE"):
+            app = GUI(common.screen_h)  # Hyprland
+        else:
+            app = GUI(int(common.screen_h * 0.95))  # sway
 
     Gtk.main()
 
