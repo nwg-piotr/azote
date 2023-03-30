@@ -284,7 +284,7 @@ def current_display():
     return display_number
 
 
-def set_env(lang_from_args=None):
+def set_env(__version__, lang_from_args=None):
     xdg_config_home = os.getenv('XDG_CONFIG_HOME')
     common.config_home = xdg_config_home if xdg_config_home else os.path.join(os.getenv("HOME"), ".config")
     common.azote_config_home = os.path.join(xdg_config_home, "azote") if xdg_config_home else os.path.join(
@@ -337,7 +337,7 @@ def set_env(lang_from_args=None):
     logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
                         level=logging.INFO)
 
-    # log('Azote v{}'.format(__version__), common.INFO)
+    log('>> Azote v{}'.format(__version__), common.INFO)
 
     if data_migrated:
         log('Data migrated to XDG-compliant folders', common.INFO)

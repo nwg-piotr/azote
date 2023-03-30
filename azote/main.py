@@ -1905,7 +1905,7 @@ def main():
             """
     provider.load_from_data(css)
 
-    set_env(lang_from_args)  # detect displays, check installed modules, set paths and stuff
+    set_env(__version__, lang_from_args=lang_from_args)  # detect displays, check installed modules, set paths and stuff
     if clear_thumbs:
         clear_thumbnails(clear_all)
         exit()
