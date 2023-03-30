@@ -375,7 +375,6 @@ def set_env(lang_from_args=None):
 
     # Sample folder (will be set on 1st run only)
     common.sample_dir = os.path.join(common.data_home, "sample")
-    print(">>> common.sample_dir: '{}', common.data_home: '{}'".format(common.sample_dir, common.data_home))
     if not os.path.isdir(common.sample_dir):
         os.mkdir(common.sample_dir)
         shutil.copyfile(os.path.join(dir_name, 'images/azote-wallpaper.png'), os.path.join(common.sample_dir, 'azote-wallpaper.png'))
