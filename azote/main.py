@@ -34,9 +34,7 @@ from colorthief import ColorThief
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
 from gi.repository.GdkPixbuf import InterpType
-from azote.tools import set_env, hash_name, create_thumbnails, file_allowed, update_status_bar, flip_selected_wallpaper, \
-    copy_backgrounds, create_pixbuf, split_selected_wallpaper, scale_and_crop, clear_thumbnails, current_display, \
-    save_json, load_json
+from azote.tools import *
 from azote.color_tools import rgba_to_hex, hex_to_rgb, rgb_to_hex, rgb_to_rgba
 from azote.plugins import Alacritty, Xresources
 from azote.color_tools import WikiColours
