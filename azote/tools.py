@@ -30,6 +30,8 @@ from gi.repository import Gtk, GdkPixbuf, GLib
 from azote.__about__ import __version__
 from azote import common
 
+dir_name = os.path.dirname(__file__)
+
 def log(message, level=None):
     if common.logging_enabled:
         if level == "critical":
@@ -376,16 +378,13 @@ def set_env(lang_from_args=None):
     print(">>> common.sample_dir: '{}', common.data_home: '{}'".format(common.sample_dir, common.data_home))
     if not os.path.isdir(common.sample_dir):
         os.mkdir(common.sample_dir)
-    shutil.copyfile('images/azote-wallpaper.jpg', os.path.join(common.sample_dir, 'azote-wallpaper.jpg'))
-    shutil.copyfile('images/azote-wallpaper1.jpg', os.path.join(common.sample_dir, 'azote-wallpaper1.jpg'))
-    shutil.copyfile('images/azote-wallpaper2.jpg', os.path.join(common.sample_dir, 'azote-wallpaper2.jpg'))
+        shutil.copyfile(os.path.join(dir_name, 'images/azote-wallpaper.png'), os.path.join(common.sample_dir, 'azote-wallpaper.png'))
+        shutil.copyfile(os.path.join(dir_name, 'images/azote-wallpaper1.jpg'), os.path.join(common.sample_dir, 'azote-wallpaper1.jpg'))
+        shutil.copyfile(os.path.join(dir_name, 'images/azote-wallpaper2.png'), os.path.join(common.sample_dir, 'azote-wallpaper2.png'))
 
     # Sway comes with some sample wallpapers
     if common.sway and os.path.isdir('/usr/share/backgrounds/sway'):
         common.sample_dir = '/usr/share/backgrounds/sway'
-
-    if os.path.isdir('/usr/share/backgrounds/archlabs'):
-        common.sample_dir = '/usr/share/backgrounds/archlabs'
 
     if os.path.isdir('/usr/share/backgrounds/nwg-shell'):
         common.sample_dir = '/usr/share/backgrounds/nwg-shell'
