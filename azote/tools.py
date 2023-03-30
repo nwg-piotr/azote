@@ -27,7 +27,6 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GLib
 
-# from azote.__about__ import __version__
 from azote import common
 
 dir_name = os.path.dirname(__file__)
@@ -337,7 +336,7 @@ def set_env(__version__, lang_from_args=None):
     logging.basicConfig(filename=common.log_file, format='%(asctime)s %(levelname)s: %(message)s', filemode='w',
                         level=logging.INFO)
 
-    log('>> Azote v{}'.format(__version__), common.INFO)
+    log('Azote v{}'.format(__version__), common.INFO)
 
     if data_migrated:
         log('Data migrated to XDG-compliant folders', common.INFO)

@@ -21,9 +21,4 @@ setup(
     author_email='nwg.piotr@gmail.com',
     python_requires='>=3.8.0',
     install_requires=[],
-    # entry_points={
-    #     'gui_scripts': [
-    #         'azote = azote.main:main',
-    #     ]
-    # }
 )
