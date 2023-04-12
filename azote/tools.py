@@ -556,32 +556,31 @@ def hash_name(full_path):
 
 
 def create_thumbnails(scr_path):
-    # Let's count allowed files first
     common.progress_bar.hide()
     counter = 0
-    for extension in common.allowed_file_types:
-        for in_path in glob.glob(os.path.join(scr_path, "*.{}".format(extension))):
-            if file_allowed(in_path):
-                counter += 1
+    inames = "-iname \"*."+"\" -o -iname \"*.".join(common.allowed_file_types)+"\""
+    files=subprocess.check_output("find %s -mindepth 1 %s" %(scr_path, inames), shell=True).decode().split("\n")[:-1]
+    for in_path in files:
+        if file_allowed(in_path):
+            counter += 1
     if counter > 0:
         # get all the files of allowed types from current path
         common.progress_bar.show()
         common.progress_bar.set_fraction(0.0)
         processed = 0
-        for extension in common.allowed_file_types:
-            for in_path in glob.glob(os.path.join(scr_path, "*.{}".format(extension))):
-                if file_allowed(in_path):
-                    thumb_name = "{}.png".format(hash_name(in_path))
-                    dest_path = os.path.join(common.thumb_dir, thumb_name)
-                    if not os.path.isfile(dest_path):
-                        create_thumbnail(in_path, dest_path, thumb_name)
-                    elif is_newer(in_path, dest_path):
-                        create_thumbnail(in_path, dest_path, thumb_name, True)
-                    processed += 1
-                    common.progress_bar.set_fraction(processed / counter)
-                    common.progress_bar.set_text(str(processed))
-                    while Gtk.events_pending():
-                        Gtk.main_iteration()
+        for in_path in files:
+            if file_allowed(in_path):
+                thumb_name = "{}.png".format(hash_name(in_path))
+                dest_path = os.path.join(common.thumb_dir, thumb_name)
+                if not os.path.isfile(dest_path):
+                    create_thumbnail(in_path, dest_path, thumb_name)
+                elif is_newer(in_path, dest_path):
+                    create_thumbnail(in_path, dest_path, thumb_name, True)
+                processed += 1
+                common.progress_bar.set_fraction(processed / counter)
+                common.progress_bar.set_text(str(processed))
+                while Gtk.events_pending():
+                    Gtk.main_iteration()
     common.progress_bar.hide()
 
 
