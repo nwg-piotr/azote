@@ -37,7 +37,7 @@ apply_to_all_button = None
 
 cols = 3                # number of columns in pictures preview
 
-allowed_file_types = ['jpg', 'jpeg', 'png']
+allowed_file_types = ['jpg', 'jpeg', 'png', 'webp']
 associations = None     # dictionary {'extension": [program1, program2, program3, ...]}
 
 app_dir = ''            # ~/.azote
