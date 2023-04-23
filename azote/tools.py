@@ -354,8 +354,17 @@ def set_env(__version__, lang_from_args=None):
         os.mkdir(common.thumb_dir)
 
     # command file
-    common.cmd_file = os.path.join(os.getenv("HOME"), ".azotebg")
-
+    
+    if os.path.isfile(os.path.join(os.getenv("HOME"), ".azotebg")):
+        common.cmd_file = os.path.join(os.getenv("HOME"), ".azotebg")
+        log("~/.azotebg file found", common.INFO)
+    elif os.path.join(os.getenv("HOME"), ".local/bin")  in os.getenv("PATH"):
+        common.cmd_file = os.path.join(os.getenv("HOME"), ".local/bin/azotebg")
+    elif os.path.join(os.getenv("HOME"), "bin") in os.getenv("PATH"):
+        common.cmd_file = os.path.join(os.getenv("HOME"), "bin/azotebg") 
+    else:
+        common.cmd_file = os.path.join(os.getenv("HOME"), ".azotebg")
+        log("No valid $PATH location found, using the fallback location", common.INFO)
     # temporary folder
     common.tmp_dir = os.path.join(common.data_home, "temp")
     if not os.path.isdir(common.tmp_dir):
