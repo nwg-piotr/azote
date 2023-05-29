@@ -83,12 +83,17 @@ def check_displays():
             outputs = json.loads(json_string)
             for output in outputs:
                 if output['active']:  # dunno WTF xroot-0 is: i3 returns such an output with "active":false
+                    g_name = output["make"] if output["make"] != "Unknown" else ""
+                    if output["model"] and output["model"] != "Unknown":
+                        g_name += " {}".format(output["model"])
+                    if output["serial"] and output["serial"] != "Unknown":
+                        g_name += " {}".format(output["serial"])
                     display = {'name': output['name'],
                                'x': output['rect']['x'],
                                'y': output['rect']['y'],
                                'width': output['rect']['width'],
                                'height': output['rect']['height'],
-                               'generic-name': "{} {} {}".format(output["make"], output["model"], output["serial"])}
+                               'generic-name': g_name}
                     displays.append(display)
                     log("Output found: {}".format(display), common.INFO)
                 try:
@@ -120,12 +125,17 @@ def check_displays():
         displays = []
         clients = json.loads(output)
         for c in clients:
+            g_name = c["make"] if c["make"] else ""
+            if c["model"]:
+                g_name += " {}".format(c["model"])
+            if c["serial"]:
+                g_name += " {}".format(c["serial"])
             display = {'name': c['name'],
                        'x': c['x'],
                        'y': c['y'],
                        'width': c['width'],
                        'height': c['height'],
-                       'generic-name': "{} {} {}".format(c["make"], c["model"], c["serial"])}
+                       'generic-name': g_name}
             displays.append(display)
             log("Output found: {}".format(display), common.INFO)
 
@@ -353,8 +363,11 @@ def set_env(__version__, lang_from_args=None):
     if not os.path.isdir(common.thumb_dir):
         os.mkdir(common.thumb_dir)
 
-    # command file
-    common.cmd_file = os.path.join(os.getenv("HOME"), ".azotebg")
+    # command file; let's use separate file name for Hyprland, as generic display names may be different
+    if os.getenv("HYPRLAND_INSTANCE_SIGNATURE"):
+        common.cmd_file = os.path.join(os.getenv("HOME"), ".azotebg-hyprland")
+    else:
+        common.cmd_file = os.path.join(os.getenv("HOME"), ".azotebg")
 
     # temporary folder
     common.tmp_dir = os.path.join(common.data_home, "temp")

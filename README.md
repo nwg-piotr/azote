@@ -10,8 +10,8 @@ multi-headed setups in mind. Azote also includes several colour management tools
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/azote.svg)](https://repology.org/project/azote/versions)
 
-The program is confirmed to work on sway, Wayfire, i3, Openbox, Fluxbox and dwm window managers. Wayland support is
-limited to wlroots-based compositors. GNOME is not supported.
+The program, written primarily for sway, should work on all wlroots-based Wayland compositors, as well as on
+some X11 window managers. GNOME is not supported.
 
 Azote relies on numerous external packages. Some of them determine if the program is capable of working in a certain
 environment (sway / another wlroots-based compositor / X11). It's **up to the packager** which of them come preinstalled.
@@ -44,7 +44,7 @@ package already released for a certain Linux distribution. Some features rely on
 
 ### Main features:
 
-- works on Sway;
+- works on wlroots;
 - uses own thumbnails, 240x135px by default;
 - flips wallpapers horizontally;
 - splits wallpapers between 2 or more displays;
@@ -80,6 +80,13 @@ with:
 ```bash
 exec ~/.azotebg
 ```
+
+### Hyprland
+
+Add `exec-once = ~/.azotebg-hyprland` to your hyprland.conf. 
+
+Since v1.12.0, we no longer use common ~/.azotebg file on sway and Hyprland, as they don't detect generic 
+display names the same way.
 
 ### Wayfire
 
