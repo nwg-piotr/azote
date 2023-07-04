@@ -602,7 +602,7 @@ def create_thumbnail(in_path, dest_path, thumb_name, refresh=False):
     try:
         img = Image.open(in_path)
         # convert to thumbnail image
-        img.thumbnail(common.settings.thumb_size, Image.ANTIALIAS)
+        img.thumbnail(common.settings.thumb_size, Image.LANCZOS)
 
         img = expand_img(img)
 
@@ -624,7 +624,7 @@ def flip_selected_wallpaper():
             img_path = os.path.join(common.bcg_dir, "flipped-{}".format(common.selected_wallpaper.filename))
             flipped.save(os.path.join(common.tmp_dir, "flipped-{}".format(common.selected_wallpaper.filename)), "PNG")
 
-            flipped.thumbnail(common.settings.thumb_size, Image.ANTIALIAS)
+            flipped.thumbnail(common.settings.thumb_size, Image.LANCZOS)
             flipped = expand_img(flipped)
 
             thumb_path = os.path.join(common.tmp_dir, "thumbnail-{}".format(common.selected_wallpaper.filename))
@@ -656,7 +656,7 @@ def split_selected_wallpaper(num_parts):
             img_path = os.path.join(common.bcg_dir, "part{}-{}".format(i, common.selected_wallpaper.filename))
             part.save(os.path.join(common.tmp_dir, "part{}-{}".format(i, common.selected_wallpaper.filename)), "PNG")
 
-            part.thumbnail(common.settings.thumb_size, Image.ANTIALIAS)
+            part.thumbnail(common.settings.thumb_size, Image.LANCZOS)
 
             thumb_path = os.path.join(common.tmp_dir, "thumb-part{}-{}".format(i, common.selected_wallpaper.filename))
 
@@ -681,7 +681,7 @@ def expand_img(image):
         # return ImageOps.expand(image, border=border)
         # Let's add checkered background instead of the black one
         background = Image.open('images/squares.jpg')
-        background = background.resize(common.settings.thumb_size, Image.ANTIALIAS)
+        background = background.resize(common.settings.thumb_size, Image.LANCZOS)
         background.paste(image, (border_h, border_v))
         return background
     else:
@@ -698,7 +698,7 @@ def scale_and_crop(item, image_path, width, height):
         new_height = int(width * img.size[1] / img.size[0])
         # Choose the filter depending on if we're scaling down or up
         if new_height >= height:
-            img = img.resize((width, new_height), Image.ANTIALIAS)
+            img = img.resize((width, new_height), Image.LANCZOS)
         else:
             img = img.resize((width, new_height), Image.BILINEAR)
 
@@ -708,7 +708,7 @@ def scale_and_crop(item, image_path, width, height):
     elif new_height > img.size[1]:  # we need to scale to display height and crop horizontal margins
         new_width = int(img.size[0] * height / img.size[1])
         if new_width >= width:
-            img = img.resize((new_width, height), Image.ANTIALIAS)
+            img = img.resize((new_width, height), Image.LANCZOS)
         else:
             img = img.resize((new_width, height), Image.BILINEAR)
 
@@ -716,7 +716,7 @@ def scale_and_crop(item, image_path, width, height):
         img = img.crop((margin, 0, width + margin, height))
 
     else:
-        img = img.resize((width, height), Image.ANTIALIAS)
+        img = img.resize((width, height), Image.LANCZOS)
 
     img.save('{}-{}x{}{}'.format(os.path.splitext(image_path)[0], width, height, os.path.splitext(image_path)[1]))
     common.preview.refresh()
