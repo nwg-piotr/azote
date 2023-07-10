@@ -55,7 +55,7 @@ from azote.__about__ import __version__
 def get_files():
     try:
         inames = "-iname \"*."+"\" -o -iname \"*.".join(common.allowed_file_types)+"\""
-        files = subprocess.check_output("find %s -mindepth 1 %s" %(common.settings.src_path, inames), shell=True).decode().split("\n")[:-1]
+        files = subprocess.check_output("find '%s' -mindepth 1 %s" %(common.settings.src_path, inames), shell=True).decode().split("\n")[:-1]
         file_names = [f.replace(common.settings.src_path+"/", "") for f in files]
     except FileNotFoundError:
         common.settings.src_path = os.getenv('HOME')

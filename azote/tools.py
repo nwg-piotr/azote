@@ -572,7 +572,7 @@ def create_thumbnails(scr_path):
     common.progress_bar.hide()
     counter = 0
     inames = "-iname \"*."+"\" -o -iname \"*.".join(common.allowed_file_types)+"\""
-    files=subprocess.check_output("find %s -mindepth 1 %s" %(scr_path, inames), shell=True).decode().split("\n")[:-1]
+    files=subprocess.check_output("find '%s' -mindepth 1 %s" %(scr_path, inames), shell=True).decode().split("\n")[:-1]
     for in_path in files:
         if file_allowed(in_path):
             counter += 1
