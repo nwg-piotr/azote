@@ -28,7 +28,7 @@ Running on Wayland, but not sway
 Available screen height: 1030 px; measurement delay: 5 ms
 ```
 
-![2022-05-29-125823_screenshot](https://user-images.githubusercontent.com/20579136/170864580-840e1c27-702d-40f4-a98c-a460826b805c.png)
+<img src="https://user-images.githubusercontent.com/20579136/170864580-840e1c27-702d-40f4-a98c-a460826b805c.png" width=640 alt="screenshot"><br>
 
 ## Project assumptions
 
@@ -208,8 +208,6 @@ gtk-button-images=1
 ```
 
 ### 'Open with...' feature doesn't work
-
-![screenshot](http://nwg.pl/Lychee/uploads/big/4372deec10eb787fbf8f840c2abf3b67.png)
 
 **Azote v1.2.0 and below** - no 'Open with' menu entry at all;
 
