@@ -630,7 +630,7 @@ def show_image_menu(widget, event=None, parent=None, from_toolbar=False):
     cd = current_display()
     if common.selected_wallpaper:
         if common.associations:  # not None if /usr/share/applications/mimeinfo.cache found and parse
-            openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1]]
+            openers = common.associations[common.selected_wallpaper.source_path.split('.')[-1].lower()]
             menu = Gtk.Menu()
             if openers:
                 for opener in openers:
