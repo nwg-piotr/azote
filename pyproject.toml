@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "azote"
+version = "1.12.6"
+description = "Wallpaper manager for sway and some other WMs"
+readme = "README.md"
+license = {text = "GPL3"}
+requires-python = ">= 3.8.0"
+authors = [
+  {name = "Piotr Miller", email = "nwg.piotr@gmail.com"},
+]
+dependencies = [
+  "pillow",
+  "PyGObject",
+  "PyYAML",
+  "Send2Trash",
+]
+
+[project.urls]
+Repository = "https://github.com/nwg-piotr/azote"
+License = "https://github.com/nwg-piotr/azote/blob/master/LICENSE"
+
+[project.scripts]
+azote = "azote.main:main"
