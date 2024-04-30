@@ -117,7 +117,7 @@ def check_displays():
         print("Running on Hyprland")
         import socket
         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        s.connect("/tmp/hypr/{}/.socket.sock".format(os.getenv("HYPRLAND_INSTANCE_SIGNATURE")))
+        s.connect("{}/hypr/{}/.socket.sock".format(os.getenv("XDG_RUNTIME_DIR"),os.getenv("HYPRLAND_INSTANCE_SIGNATURE")))
 
         s.send("j/monitors".encode("utf-8"))
         output = s.recv(20480).decode('utf-8')
