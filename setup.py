@@ -8,7 +8,7 @@ def read(f_name):
 
 setup(
     name='azote',
-    version='1.12.6',
+    version='1.12.7',
     description='Wallpaper manager for sway and some other WMs',
     packages=find_packages(),
     include_package_data=True,
