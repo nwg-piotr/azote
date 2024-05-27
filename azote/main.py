@@ -29,7 +29,7 @@ except Exception:
     common.env['send2trash'] = False
     print('python-send2trash package not found - deleting pictures unavailable')
 
-from colorthief import ColorThief
+from azote.colorthief import ColorThief
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
