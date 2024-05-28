@@ -31,6 +31,8 @@ except Exception:
 
 from azote.colorthief import ColorThief
 
+dir_name = os.path.dirname(__file__)
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
 from gi.repository.GdkPixbuf import InterpType
@@ -212,7 +214,7 @@ class ImageToolbar(Gtk.HBox):
 
         self.menu_btn = Gtk.EventBox()
         img = Gtk.Image()
-        img.set_from_file('images/icon_image_menu.svg')
+        img.set_from_file(os.path.join(dir_name, 'images/icon_image_menu.svg'))
         self.menu_btn.add(img)
         self.menu_btn.connect('button-press-event', self.on_menu_button_press)
         self.pack_start(self.menu_btn, False, False, 0)
@@ -243,7 +245,7 @@ class DisplayBox(Gtk.Box):
         if thumb and os.path.isfile(thumb):
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(thumb)
         else:
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file('images/empty.png')
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(os.path.join(dir_name, 'images/empty.png'))
         pixbuf = pixbuf.scale_simple(common.settings.thumb_size[0], common.settings.thumb_size[1], InterpType.BILINEAR)
 
         self.img = Gtk.Image.new_from_pixbuf(pixbuf)
@@ -308,7 +310,7 @@ class DisplayBox(Gtk.Box):
         self.flip_button = Gtk.Button()
         self.flip_button.set_always_show_image(True)
         img = Gtk.Image()
-        img.set_from_file('images/icon_flip.svg')
+        img.set_from_file(os.path.join(dir_name, 'images/icon_flip.svg'))
         self.flip_button.set_image(img)
         self.flip_button.set_tooltip_text(common.lang['flip_image'])
         self.flip_button.set_sensitive(False)
@@ -360,7 +362,7 @@ class DisplayBox(Gtk.Box):
     def on_color_chosen(self, user_data, button):
         self.color = rgba_to_hex(button.get_rgba())
         # clear selected image to indicate it won't be used
-        self.img.set_from_file("images/empty.png")
+        self.img.set_from_file(os.path.join(dir_name, "images/empty.png"))
         common.apply_button.set_sensitive(True)
 
     def on_flip_button(self, button):
@@ -383,13 +385,13 @@ class SortingButton(Gtk.Button):
 
     def refresh(self):
         if common.settings.sorting == 'old':
-            self.img.set_from_file('images/icon_old.svg')
+            self.img.set_from_file(os.path.join(dir_name, 'images/icon_old.svg'))
         elif common.settings.sorting == 'az':
-            self.img.set_from_file('images/icon_az.svg')
+            self.img.set_from_file(os.path.join(dir_name, 'images/icon_az.svg'))
         elif common.settings.sorting == 'za':
-            self.img.set_from_file('images/icon_za.svg')
+            self.img.set_from_file(os.path.join(dir_name, 'images/icon_za.svg'))
         else:
-            self.img.set_from_file('images/icon_new.svg')
+            self.img.set_from_file(os.path.join(dir_name, 'images/icon_new.svg'))
         self.set_image(self.img)
 
     def on_sorting_button(self, widget):
@@ -587,7 +589,7 @@ def on_about_button(button):
         print("Couldn't check version: {}".format(e))
         pass
 
-    logo = GdkPixbuf.Pixbuf.new_from_file_at_size('images/azote.svg', 96, 96)
+    logo = GdkPixbuf.Pixbuf.new_from_file_at_size(os.path.join(dir_name, 'images/azote.svg'), 96, 96)
 
     dialog.set_keep_above(True)
     dialog.set_logo(logo)
@@ -916,7 +918,7 @@ class GUI:
         refresh_button = Gtk.Button()
         refresh_button.set_always_show_image(True)
         img = Gtk.Image()
-        img.set_from_file('images/icon_refresh.svg')
+        img.set_from_file(os.path.join(dir_name, 'images/icon_refresh.svg'))
         refresh_button.set_image(img)
         refresh_button.set_tooltip_text(common.lang['refresh_folder_preview'])
         bottom_box.add(refresh_button)
@@ -941,7 +943,7 @@ class GUI:
             common.split_button = Gtk.Button()
             common.split_button.set_always_show_image(True)
             img = Gtk.Image()
-            img.set_from_file('images/icon_split.svg')
+            img.set_from_file(os.path.join(dir_name, 'images/icon_split.svg'))
             common.split_button.set_image(img)
             bottom_box.add(common.split_button)
             common.split_button.set_sensitive(False)
@@ -952,7 +954,7 @@ class GUI:
         common.apply_to_all_button = Gtk.Button()
         common.apply_to_all_button.set_always_show_image(True)
         img = Gtk.Image()
-        img.set_from_file('images/icon_all.svg')
+        img.set_from_file(os.path.join(dir_name, 'images/icon_all.svg'))
         common.apply_to_all_button.set_image(img)
         common.apply_to_all_button.connect('clicked', on_apply_to_all_button)
         common.apply_to_all_button.set_sensitive(False)
@@ -967,7 +969,7 @@ class GUI:
         common.apply_button = Gtk.Button()
         common.apply_button.set_always_show_image(True)
         img = Gtk.Image()
-        img.set_from_file('images/icon_apply.svg')
+        img.set_from_file(os.path.join(dir_name, 'images/icon_apply.svg'))
         common.apply_button.set_image(img)
         common.apply_button.connect('clicked', on_apply_button)
         common.apply_button.set_sensitive(False)
@@ -989,7 +991,7 @@ class GUI:
         about_button = Gtk.Button()
         about_button.set_always_show_image(True)
         img = Gtk.Image()
-        img.set_from_file('images/icon_about.svg')
+        img.set_from_file(os.path.join(dir_name, 'images/icon_about.svg'))
         about_button.set_image(img)
         about_button.set_tooltip_text(common.lang['about_azote'])
         about_button.connect('clicked', on_about_button)
@@ -999,7 +1001,7 @@ class GUI:
         settings_button = Gtk.Button()
         settings_button.set_always_show_image(True)
         img = Gtk.Image()
-        img.set_from_file('images/icon_menu.svg')
+        img.set_from_file(os.path.join(dir_name, 'images/icon_menu.svg'))
         settings_button.set_image(img)
         settings_button.set_tooltip_text(common.lang['preferences'])
         settings_button.connect('clicked', on_settings_button)
@@ -1009,7 +1011,7 @@ class GUI:
         picker_button = Gtk.Button()
         picker_button.set_always_show_image(True)
         img = Gtk.Image()
-        img.set_from_file('images/icon_picker.svg')
+        img.set_from_file(os.path.join(dir_name, 'images/icon_picker.svg'))
         picker_button.set_image(img)
         picker_button.set_sensitive(common.picker)
         if common.sway or common.env['wayland']:
@@ -1024,7 +1026,7 @@ class GUI:
         dotfiles_button = Gtk.Button()
         dotfiles_button.set_always_show_image(True)
         img = Gtk.Image()
-        img.set_from_file('images/icon_config.svg')
+        img.set_from_file(os.path.join(dir_name, 'images/icon_config.svg'))
         dotfiles_button.set_image(img)
         active = common.xresources or common.alacritty_config and common.env['yaml']
         if active:
@@ -1515,7 +1517,7 @@ class ColorPickerDialog(Gtk.Window):
         button = Gtk.Button()
         button.set_always_show_image(True)
         img = Gtk.Image()
-        img.set_from_file('images/icon_picker.svg')
+        img.set_from_file(os.path.join(dir_name, 'images/icon_picker.svg'))
         button.set_image(img)
         button.connect_after('clicked', self.pick_new_color)
         hbox.pack_start(button, True, False, 0)
