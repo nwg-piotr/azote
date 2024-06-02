@@ -472,7 +472,7 @@ def set_env(__version__, lang_from_args=None):
 
     # Check if packages necessary to pick colours from the screen available
     try:
-        magick = subprocess.run(['convert', '-version'], stdout=subprocess.DEVNULL).returncode == 0
+        magick = subprocess.run(['magick', '-version'], stdout=subprocess.DEVNULL).returncode == 0
     except FileNotFoundError:
         magick = False
         print('imagemagick package not found - color picked disabled')

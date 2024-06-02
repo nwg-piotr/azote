@@ -1126,7 +1126,7 @@ def pick_color():
     if common.sway or common.env['wayland']:
         try:
             color = hex_to_rgb(subprocess.check_output(
-                'grim -g "$(slurp -p)" -t ppm - | convert - -format \'%[pixel:p{0,0}]\' txt:- | awk \'NR==2 {print $3}\'',
+                'grim -g "$(slurp -p)" -t ppm - | magick - -format \'%[pixel:p{0,0}]\' txt:- | awk \'NR==2 {print $3}\'',
                 shell=True).decode("utf-8"))
         except:
             try:
@@ -1135,7 +1135,7 @@ def pick_color():
                 pass
     else:
         try:
-            output = subprocess.check_output('maim -st 0 | convert - -resize 1x1! -format \'%[pixel:p{0,0}]\' info:-',
+            output = subprocess.check_output('maim -st 0 | magick - -resize 1x1! -format \'%[pixel:p{0,0}]\' info:-',
                                              shell=True).decode("utf-8")
             values = output[6:-1].split(",")
             color = (int(values[0]), int(values[1]), int(values[2]))
