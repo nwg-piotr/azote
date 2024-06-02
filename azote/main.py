@@ -466,7 +466,7 @@ def on_apply_button(button):
                     display_name = box.display_name
 
                 # Escape some special characters which would mess up the script
-                wallpaper_path = box.wallpaper_path.replace('\\', '\\\\').replace("$", "\$").replace("`",
+                wallpaper_path = box.wallpaper_path.replace('\\', '\\\\').replace("$", "\\$").replace("`",
                                                                                                      "\\`").replace('"',
                                                                                                                     '\\"')
 
