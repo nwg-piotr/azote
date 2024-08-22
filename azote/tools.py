@@ -135,6 +135,8 @@ def check_displays():
                 g_name += " {}".format(c["model"])
             if c["serial"]:
                 g_name += " {}".format(c["serial"])
+            else:
+                g_name += " "
             display = {'name': c['name'],
                        'x': c['x'],
                        'y': c['y'],
