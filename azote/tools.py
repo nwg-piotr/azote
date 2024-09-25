@@ -687,7 +687,7 @@ def expand_img(image):
         # border = (border_h, border_v, border_h, border_v)
         # return ImageOps.expand(image, border=border)
         # Let's add checkered background instead of the black one
-        background = Image.open('images/squares.jpg')
+        background = Image.open(os.path.join(dir_name, 'images/squares.jpg'))
         background = background.resize(common.settings.thumb_size, Image.LANCZOS)
         background.paste(image, (border_h, border_v))
         return background
