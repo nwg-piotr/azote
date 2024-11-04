@@ -6,7 +6,6 @@ Wallpaper and colour manager for Sway, i3 and some other WMs, as a frontend to s
 
 Author: Piotr Miller & Contributors
 e-mail: nwg.piotr@gmail.com
-Website: http://nwg.pl
 Project: https://github.com/nwg-piotr/azote
 License: GPL3
 
@@ -610,7 +609,7 @@ def on_about_button(button):
                         '- maim, slop (c) 2014 Dalton Nell and Contributors',
                         '- imagemagick (c) 1999-2019 ImageMagick Studio LLC',
                         '- PyYAML (c) 2017-2019 Ingy döt Net Copyright (c) 2006-2016 Kirill Simonov'])
-    dialog.set_translator_credits('xsme, Leon-Plickat (de_DE), HumanG33k (fr_FR)')
+    dialog.set_translator_credits('xsme, Leon-Plickat (de_DE), HumanG33k (fr_FR), Andrea Frati (it_IT),\nMarcelo dos Santos (pt_BR), Aleksey Samoilov (ru_RU)')
     dialog.set_artists(['edskeye'])
 
     dialog.show()
