@@ -218,11 +218,12 @@ def check_displays():
         else:
             print("Running on X11")
         fnull = open(os.devnull, 'w')
+
         try:
-            common.env['xrandr'] = subprocess.call(["xrandr", "-v"], stdout=fnull, stderr=subprocess.STDOUT) == 0
-        except Exception as e:
-            print("xorg-xrandr package required: {}".format(e))
-            log("xorg-xrandr package not found", common.ERROR)
+            from Xlib import display
+        except ImportError as e:
+            print("python3-xlib package required: {}".format(e))
+            log("python-xlib package not found", common.ERROR)
             exit(1)
 
         try:
@@ -233,29 +234,17 @@ def check_displays():
             exit(1)
 
         try:
-            names = subprocess.check_output("xrandr | awk '/ connected/{print $1}'", shell=True).decode(
-                "utf-8").splitlines()
-            res = subprocess.check_output("xrandr | awk '/[*]/{print $1}'", shell=True).decode("utf-8").splitlines()
-            coords = subprocess.check_output("xrandr --listmonitors | awk '{print $3}'", shell=True).decode(
-                "utf-8").splitlines()
-            displays = []
-            for i in range(len(res)):
-                w_h = res[i].split('x')
-                try:
-                    x_y = coords[i + 1].split('+')
-                except:
-                    x_y = (0, 0, 0)
-                display = {'name': names[i],
-                           'x': x_y[1],
-                           'y': x_y[2],
-                           'width': int(w_h[0]),
-                           'height': int(w_h[1]),
-                           'xrandr-idx': i}
-                displays.append(display)
-                log("Output found: {}".format(display), common.INFO)
-
-            displays = sorted(displays, key=lambda x: (x.get('x'), x.get('y')))
-            return displays
+            display = display.Display()
+            root = display.screen().root
+            return [
+                {'name': display.get_atom_name(m.name),
+                 'x': m.x,
+                 'y': m.y,
+                 'width': m.width_in_pixels,
+                 'height': m.height_in_pixels,
+                 'xrandr-idx': i}
+                for i, m in enumerate(root.xrandr_get_monitors().monitors)
+            ]
 
         except Exception as e:
             print("Failed checking displays: {}".format(e), common.ERROR)
