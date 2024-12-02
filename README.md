@@ -16,7 +16,7 @@ Azote relies on numerous external packages. Some of them determine if the progra
 environment (sway / another wlroots-based compositor / X11). It's **up to the packager** which of them come preinstalled.
 It's recommendable to first run `azote` from terminal:
 
-- if one of missing packages disallows Azote to work at all (e.g. `xorg-xrandr` or `feh` on X11, `wlr-randr` or 
+- if one of missing packages disallows Azote to work at all (e.g. `python-xlib` or `feh` on X11, `wlr-randr` or 
 `swaybg` on Wayfire), the program will display a message and terminate with exit code 1.
 
 - If a missing dependency just stops some feature from working, Azote will display a message and start normally.
@@ -97,9 +97,9 @@ In `~/.config/wayfire.ini` set `autostart_wf_shell = false`, and replace `backgr
 ### X window managers (i3, Openbox, dwm etc.)
 
 You need to execute `~/.fehbg` from your window manager’s startup file.
-You'll also need optional `feh` and `xorg-xrandr` packages.
+You'll also need optional `feh` and `python-xlib` (or `python3-xlib`, depending on the distro) packages.
 
-**Important:** optional `xorg-xrandr` and `feh` packages are necessary.
+**Important:** optional `python-xlib` and `feh` packages are necessary.
 
 **dwm note:**
 
@@ -118,7 +118,7 @@ done &
 exec dwm
 ```
 
-### Dependencies (as used in the `azote` AUR package):
+### Dependencies (as used in the `azote` Arch package):
 
 - `python` (`python3`)
 - `python-setuptools`
@@ -137,7 +137,7 @@ exec dwm
 - `python-yaml`: for alacritty.yml toolbox
 - `swaybg`: for setting background on wlroots-based compositors other than sway
 - `feh`: for setting background on X11-based WMs
-- `xorg-xrandr`: for checking outputs on X11-based WMs
+- `python-xlib`: for checking outputs on X11-based WMs
 - `wlr-randr` (`wlr-randr-git`): for checking outputs on wlroots-based compositors other than sway
 
 Please use assets from the [latest release](https://github.com/nwg-piotr/azote/releases/latest).
@@ -236,6 +236,6 @@ see the black screen on sway). On my development machine the minimum value is 30
 
 ## X11 / feh notice
 
-The background color picker won't be available. You'll also be unable to select different modes 
+You'll be unable to select different modes
 *("scale", "max", "fill", "center", "tile")* for certain displays. The list of modes varies from what you see in Sway 
 *("stretch", "fit", "fill", "center", "tile")*.
