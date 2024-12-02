@@ -236,7 +236,7 @@ def check_displays():
         try:
             display = display.Display()
             root = display.screen().root
-            return [
+            displays = [
                 {'name': display.get_atom_name(m.name),
                  'x': m.x,
                  'y': m.y,
@@ -245,7 +245,7 @@ def check_displays():
                  'xrandr-idx': i}
                 for i, m in enumerate(root.xrandr_get_monitors().monitors)
             ]
-
+            return sorted(displays, key=lambda d: (d["x"], d["y"]))
         except Exception as e:
             print("Failed checking displays: {}".format(e), common.ERROR)
             log("Failed checking displays: {}".format(e), common.ERROR)
