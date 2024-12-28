@@ -43,13 +43,22 @@ from azote.plugins import Alacritty, Xresources
 from azote.color_tools import WikiColours
 
 try:
-    gi.require_version('AppIndicator3', '0.1')
-    from gi.repository import AppIndicator3
+    try:
+        gi.require_version('AppIndicator3', '0.1')
+        from gi.repository import AppIndicator3
 
-    common.env['app_indicator'] = True
-except:
+        common.env['app_indicator'] = True
+        common.env['app_indicator_library'] = 'AppIndicator3'
+    except (ImportError, ValueError):
+        gi.require_version('AyatanaAppIndicator3', '0.1')
+        from gi.repository import AyatanaAppIndicator3 as AppIndicator3
+
+        common.env['app_indicator'] = True
+        common.env['app_indicator_library'] = 'AyatanaAppIndicator3'
+except Exception as e:
     common.env['app_indicator'] = False
-    print('libappindicator-gtk3 package not found - tray icon unavailable')
+    common.env['app_indicator_library'] = None
+    print('Neither libappindicator-gtk3 nor libayatana-appindicator3 package found - tray icon unavailable')
 
 from azote.__about__ import __version__
 
