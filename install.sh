@@ -13,6 +13,8 @@ for path in $PATTERN; do
     fi
 done
 
+[ -d "./dist" ] && rm -rf ./dist
+
 rm -f /usr/bin/azote
 
 install -Dm 644 -t /usr/share/pixmaps "dist/$PROGRAM_NAME.svg"
