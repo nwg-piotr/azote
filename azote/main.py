@@ -618,7 +618,7 @@ def on_about_button(button):
                         '- maim, slop (c) 2014 Dalton Nell and Contributors',
                         '- imagemagick (c) 1999-2019 ImageMagick Studio LLC',
                         '- PyYAML (c) 2017-2019 Ingy döt Net Copyright (c) 2006-2016 Kirill Simonov'])
-    dialog.set_translator_credits('xsme, Leon-Plickat (de_DE), HumanG33k (fr_FR), Andrea Frati (it_IT),\nMarcelo dos Santos (pt_BR), Aleksey Samoilov (ru_RU)')
+    dialog.set_translator_credits('zen0bit (cs_CZ), xsme, Leon-Plickat (de_DE), HumanG33k (fr_FR), Andrea Frati (it_IT),\nMarcelo dos Santos (pt_BR), Aleksey Samoilov (ru_RU), nufuayk (tr_TR)')
     dialog.set_artists(['edskeye'])
 
     dialog.show()
