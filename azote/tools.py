@@ -14,13 +14,19 @@ import os
 import glob
 import hashlib
 import logging
-from PIL import Image
 import pickle
 import subprocess
 import sys
 import shutil
 
 import json
+
+# Attempt to load in JXL support
+try:
+     import pillow_jxl
+except ImportError:
+     pass
+from PIL import Image
 
 import gi
 
