@@ -58,7 +58,12 @@ def check_displays():
     # Sway or not Sway?
     common.sway = os.getenv('SWAYSOCK')
     if common.sway:
-        common.env['wm'] = 'sway'
+        if "miracle-wm" in os.getenv('XDG_SESSION_DESKTOP'):
+            common.env['wm'] = 'miracle-wm'
+            common.env['swaymsg_cmd'] = 'miraclemsg'
+        else:
+            common.env['wm'] = 'sway'
+            common.env['swaymsg_cmd'] = 'swaymsg'
 
     else:
         if os.getenv('XDG_SESSION_DESKTOP'):
@@ -75,11 +80,14 @@ def check_displays():
         common.env['wayland'] = os.getenv('WAYLAND_DISPLAY')
 
     if common.sway:
-        print("Running on sway")
-        # We need swaymsg to check outputs on Sway
+        if common.env['wm'] == "miracle-wm":
+            print("Running on Miracle WM")
+        else:
+            print("Running on sway")
+        # We need miraclemsg/swaymsg to check outputs on MiracleWM or Sway
         try:
             displays = []
-            json_string = subprocess.check_output("swaymsg -t get_outputs", shell=True).decode("utf-8").strip()
+            json_string = subprocess.check_output(f"{common.env['swaymsg_cmd']} -t get_outputs", shell=True).decode("utf-8").strip()
             outputs = json.loads(json_string)
             for output in outputs:
                 if output['active']:  # dunno WTF xroot-0 is: i3 returns such an output with "active":false
@@ -255,8 +263,8 @@ def check_displays():
 def current_display():
     display_number = 0
     x, y = 0, 0
-    if common.env['wm'] == "sway":
-        string = subprocess.getoutput("swaymsg -t get_outputs")
+    if common.env['wm'] == "miracle-wm" or common.env['wm'] == "sway":
+        string = subprocess.getoutput(f"{common.env['swaymsg_cmd']} -t get_outputs")
         outputs = json.loads(string)
         for i in range(len(outputs)):
             if outputs[i]["focused"]:
