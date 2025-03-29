@@ -12,6 +12,11 @@ __version__ = '0.2.1'
 
 import math
 
+# Attempt to load in JXL support
+try:
+     import pillow_jxl
+except ImportError:
+     pass
 from PIL import Image
 
 
