@@ -130,7 +130,7 @@ exec dwm
 
 ### Optional dependencies:
 
-- `python-pillow-jxl-plugin`: for JPEG XL support in Pillow
+- `python-pillow-jxl-plugin` | `python-pillow-jpegxl-plugin`: for JPEG XL support in Pillow
 - `imagemagick`: for screen color picker in every environment
 - `grim`, `slurp`: for screen color picker on sway / wlroots
 - `maim`, `slop`: for screen color picker on X11
