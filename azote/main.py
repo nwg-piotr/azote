@@ -14,9 +14,17 @@ import os
 import sys
 import subprocess
 import stat
+
 import gi
 import cairo
+
+# Attempt to load in JXL support
+try:
+     import pillow_jxl
+except ImportError:
+     pass
 from PIL import Image
+
 from azote import common
 
 # send2trash module may or may not be available
