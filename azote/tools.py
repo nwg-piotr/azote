@@ -64,7 +64,7 @@ def check_displays():
     # Sway or not Sway?
     common.sway = os.getenv('SWAYSOCK')
     if common.sway:
-        if "miracle-wm" in os.getenv('XDG_SESSION_DESKTOP'):
+        if os.getenv('XDG_SESSION_DESKTOP') and "miracle-wm" in os.getenv('XDG_SESSION_DESKTOP'):
             common.env['wm'] = 'miracle-wm'
             common.env['swaymsg_cmd'] = 'miraclemsg'
         else:
