@@ -160,7 +160,7 @@ Seeing Arch [PKGBUILD](https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=az
 }
 ```
 
-Azote is being developed on the 1920 x 1080 box, and some graphics dimensions may not go well with other screens.
+Azote is being developed on the 1920x1080 box, and some graphics dimensions may not go well with other screens.
 The runtime configuration file allows to redefine them:
 
 - `thumb_width` - thumbnail width; changing the value triggers thumbnails regeneration on startup;
