@@ -18,12 +18,24 @@ import stat
 import gi
 import cairo
 
-# Attempt to load in JXL support
-try:
-     import pillow_jxl
-except ImportError:
-     pass
 from PIL import Image
+
+try:
+    from pillow_heif import register_heif_opener
+    register_heif_opener()
+except ImportError:
+    print('Warning: HEIF/HEIC image support not available. Install pillow-heif.')
+
+try:
+    import pillow_avif
+except ImportError:
+    print('Warning: AVIF image support not available. Install pillow-avif.')
+
+try:
+    import pillow_jxl  # samo załadowanie wystarcza
+    print('JPEG XL (JXL) support registered successfully.')
+except ImportError:
+    print('JPEG XL (JXL) support not available. Install pillow-jxl if needed.')
 
 from azote import common
 
@@ -70,11 +82,13 @@ except Exception as e:
 
 from azote.__about__ import __version__
 
+
 def get_files():
     try:
-        inames = "-iname \"*."+"\" -o -iname \"*.".join(common.allowed_file_types)+"\""
-        files = subprocess.check_output("find '%s' -mindepth 1 %s" %(common.settings.src_path, inames), shell=True).decode().split("\n")[:-1]
-        file_names = [f.replace(common.settings.src_path+"/", "") for f in files]
+        inames = "-iname \"*." + "\" -o -iname \"*.".join(common.allowed_file_types) + "\""
+        files = subprocess.check_output("find '%s' -mindepth 1 %s" % (common.settings.src_path, inames),
+                                        shell=True).decode().split("\n")[:-1]
+        file_names = [f.replace(common.settings.src_path + "/", "") for f in files]
     except FileNotFoundError:
         common.settings.src_path = os.getenv('HOME')
         file_names = [f for f in os.listdir(common.settings.src_path)
@@ -483,8 +497,9 @@ def on_apply_button(button):
 
                 # Escape some special characters which would mess up the script
                 wallpaper_path = box.wallpaper_path.replace('\\', '\\\\').replace("$", "\\$").replace("`",
-                                                                                                     "\\`").replace('"',
-                                                                                                                    '\\"')
+                                                                                                      "\\`").replace(
+                    '"',
+                    '\\"')
 
                 batch_content.append(
                     "swaybg -o '{}' -i \"{}\" -m {} &".format(display_name, wallpaper_path, box.mode))
@@ -626,7 +641,8 @@ def on_about_button(button):
                         '- maim, slop (c) 2014 Dalton Nell and Contributors',
                         '- imagemagick (c) 1999-2019 ImageMagick Studio LLC',
                         '- PyYAML (c) 2017-2019 Ingy döt Net Copyright (c) 2006-2016 Kirill Simonov'])
-    dialog.set_translator_credits('zen0bit (cs_CZ), xsme, Leon-Plickat (de_DE), HumanG33k (fr_FR), Andrea Frati (it_IT),\nMarcelo dos Santos (pt_BR), Aleksey Samoilov (ru_RU), Ufuayk (tr_TR)')
+    dialog.set_translator_credits(
+        'zen0bit (cs_CZ), xsme, Leon-Plickat (de_DE), HumanG33k (fr_FR), Andrea Frati (it_IT),\nMarcelo dos Santos (pt_BR), Aleksey Samoilov (ru_RU), Ufuayk (tr_TR)')
     dialog.set_artists(['edskeye'])
 
     dialog.show()

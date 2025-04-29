@@ -12,12 +12,24 @@ __version__ = '0.2.1'
 
 import math
 
-# Attempt to load in JXL support
-try:
-     import pillow_jxl
-except ImportError:
-     pass
 from PIL import Image
+
+try:
+    from pillow_heif import register_heif_opener
+    register_heif_opener()
+except ImportError:
+    print('Warning: HEIF/HEIC image support not available. Install pillow-heif.')
+
+try:
+    import pillow_avif
+except ImportError:
+    print('Warning: AVIF image support not available. Install pillow-avif.')
+
+try:
+    import pillow_jxl  # samo załadowanie wystarcza
+    print('JPEG XL (JXL) support registered successfully.')
+except ImportError:
+    print('JPEG XL (JXL) support not available. Install pillow-jxl if needed.')
 
 
 class cached_property(object):
