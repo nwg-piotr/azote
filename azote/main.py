@@ -32,7 +32,7 @@ except ImportError:
     print('Warning: AVIF image support not available. Install pillow-avif.')
 
 try:
-    import pillow_jxl  # samo załadowanie wystarcza
+    import pillow_jxl
     print('JPEG XL (JXL) support registered successfully.')
 except ImportError:
     print('JPEG XL (JXL) support not available. Install pillow-jxl if needed.')
