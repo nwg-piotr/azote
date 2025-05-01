@@ -33,7 +33,7 @@ Available screen height: 1030 px; measurement delay: 5 ms
 ## Project assumptions
 
 The most commonly used *desktop background browser and setter* is aimed at X windows, and does not work with 
-wlroots-based composers. Since the `swaybg` command does everything we may need, it's enough to give it a GUI. 
+wlroots-based compositors. Since the `swaybg` command does everything we may need, it's enough to give it a GUI. 
 In order not to limit the program usage to the single environment, Azote is also capable of using feh 
 when running on i3, Openbox or other X11 window managers.
 
